@@ -13,7 +13,7 @@ OBJECT Table 60000 test
   FIELDS
   {
     { 1   ;   ;no                  ;Code10        ;OnValidate=BEGIN
-                                                                MESSAGE('test modified')
+                                                                MESSAGE('original')
                                                               END;
                                                                }
   }
