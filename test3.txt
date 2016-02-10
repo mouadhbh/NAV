@@ -1,0 +1,34 @@
+OBJECT Table 60000 test
+{
+  OBJECT-PROPERTIES
+  {
+    Date=08/02/16;
+    Time=16:06:35;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+  }
+  FIELDS
+  {
+    { 1   ;   ;no                  ;Code10        ;OnValidate=BEGIN
+                                                                MESSAGE('test txt')
+                                                              END;
+                                                               }
+  }
+  KEYS
+  {
+    {    ;no                                      ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+
