@@ -1,0 +1,158 @@
+OBJECT Codeunit 10842 G/L Entry Application
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVFR8.00;
+  }
+  PROPERTIES
+  {
+    Permissions=TableData 17=rimd;
+    OnRun=BEGIN
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      GLEntry@1120001 : Record 17;
+      LetterToSet@1120002 : Text[3];
+      SumPos@1120003 : Decimal;
+      SumNeg@1120004 : Decimal;
+      LetterDate@1120005 : Date;
+      Text1120006@1120006 : TextConst 'ENU=Successfully applied;FRA=Lettrage r‚ussi';
+
+    PROCEDURE Validate@1120000(VAR Entry@1120000 : Record 17);
+    BEGIN
+      GLEntry.RESET;
+      LetterToSet := '';
+      SumPos := 0;
+      SumNeg := 0;
+      LetterDate := 0D;
+      IF NOT GLEntry.GET(Entry."Entry No.") THEN
+        EXIT;
+      IF GLEntry."Applies-to ID" = '' THEN
+        EXIT;
+      MarkEntries;
+      GetLetter;
+      IF SumPos + SumNeg <> 0 THEN
+        LetterToSet := LOWERCASE(LetterToSet)
+      ELSE
+        LetterToSet := UPPERCASE(LetterToSet);
+      GLEntry.MARKEDONLY(TRUE);
+      IF GLEntry.FIND('-') THEN
+        REPEAT
+          GLEntry.Letter := LetterToSet;
+          GLEntry."Applies-to ID" := '';
+          GLEntry."Letter Date" := LetterDate;
+          GLEntry.MODIFY;
+        UNTIL GLEntry.NEXT = 0;
+      MESSAGE('%1',Text1120006);
+    END;
+
+    PROCEDURE MarkEntries@1120001();
+    VAR
+      GLEntry2@1120000 : Record 17;
+      GLEntry3@1120001 : Record 17;
+      ApplicationID@1120002 : Text[20];
+      Operand1@1120004 : Text[3];
+      Operand2@1120005 : Text[3];
+    BEGIN
+      GLEntry2.SETRANGE("G/L Account No.",GLEntry."G/L Account No.");
+      GLEntry2.SETRANGE("Applies-to ID",GLEntry."Applies-to ID");
+
+      IF GLEntry2.FIND('-') THEN
+        REPEAT
+          GLEntry.GET(GLEntry2."Entry No.");
+          IF NOT GLEntry.MARK THEN BEGIN
+            Operand1 := UPPERCASE(GLEntry.Letter);
+            Operand2 := UPPERCASE(LetterToSet);
+            IF ((Operand1 < Operand2) AND (GLEntry.Letter <> '')) OR
+               (LetterToSet = '')
+            THEN
+              LetterToSet := GLEntry.Letter;
+            IF GLEntry."Posting Date" > LetterDate THEN
+              LetterDate := GLEntry."Posting Date";
+            GLEntry.MARK(TRUE);
+            IF GLEntry.Amount < 0 THEN
+              SumNeg += GLEntry.Amount
+            ELSE
+              SumPos += GLEntry.Amount;
+            IF GLEntry.Letter <> '' THEN BEGIN
+              GLEntry3.SETFILTER("G/L Account No.",GLEntry."G/L Account No.");
+              GLEntry3.SETFILTER(Letter,GLEntry.Letter);
+              IF GLEntry3.FIND('-') THEN
+                REPEAT
+                  GLEntry.GET(GLEntry3."Entry No.");
+                  IF NOT GLEntry.MARK THEN BEGIN
+                    GLEntry.MARK(TRUE);
+                    Operand1 := UPPERCASE(GLEntry.Letter);
+                    Operand2 := UPPERCASE(LetterToSet);
+                    IF ((Operand1 < Operand2) AND (GLEntry.Letter <> '')) OR
+                       (LetterToSet = '')
+                    THEN
+                      LetterToSet := GLEntry.Letter;
+                    IF GLEntry."Posting Date" > LetterDate THEN
+                      LetterDate := GLEntry."Posting Date";
+                    IF GLEntry.Amount < 0 THEN
+                      SumNeg += GLEntry.Amount
+                    ELSE
+                      SumPos += GLEntry.Amount;
+                  END;
+                UNTIL GLEntry3.NEXT = 0;
+            END;
+          END;
+        UNTIL GLEntry2.NEXT = 0;
+    END;
+
+    PROCEDURE GetLetter@1120002();
+    VAR
+      GLEntry2@1120000 : Record 17;
+    BEGIN
+      IF LetterToSet <> '' THEN
+        EXIT;
+      GLEntry2.SETFILTER("G/L Account No.",GLEntry."G/L Account No.");
+      GLEntry2.SETCURRENTKEY("G/L Account No.",Letter);
+      IF GLEntry2.FINDLAST THEN
+        LetterToSet := GLEntry2.Letter;
+      IF GLEntry2.FINDLAST THEN
+        IF LetterToSet < UPPERCASE(GLEntry2.Letter) THEN
+          LetterToSet := UPPERCASE(GLEntry2.Letter);
+      NextLetter(LetterToSet);
+    END;
+
+    PROCEDURE NextLetter@3(VAR Letter@1120000 : Text[3]);
+    VAR
+      i@1120001 : Integer;
+    BEGIN
+      IF Letter = 'ZZZ' THEN
+        EXIT;
+      IF Letter = '' THEN BEGIN
+        Letter := 'AAA';
+        EXIT;
+      END;
+      IF Letter[3] <> 'Z' THEN BEGIN
+        i := Letter[3];
+        i := i + 1;
+        Letter[3] := i;
+      END ELSE
+        IF Letter[2] <> 'Z' THEN BEGIN
+          i := Letter[2];
+          i := i + 1;
+          Letter[2] := i;
+          Letter[3] := 'A';
+        END ELSE BEGIN
+          i := Letter[1];
+          i := i + 1;
+          Letter[1] := i;
+          Letter[2] := 'A';
+          Letter[3] := 'A';
+        END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,161 @@
+OBJECT Table 99000786 Routing Version
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    OnInsert=BEGIN
+               IF "Version Code" = '' THEN BEGIN
+                 RoutingHeader.GET("Routing No.");
+                 RoutingHeader.TESTFIELD("Version Nos.");
+                 NoSeriesMgt.InitSeries(RoutingHeader."Version Nos.",xRec."No. Series",0D,VersionCode,"No. Series");
+                 IF STRLEN(VersionCode) > MAXSTRLEN("Version Code") THEN
+                   ERROR(Text000,
+                     FIELDCAPTION("Version Code"),
+                     NoSeriesLine.FIELDCAPTION("Starting No."),
+                     RoutingHeader."Version Nos.",
+                     NoSeries.TABLECAPTION,
+                     MAXSTRLEN("Version Code"));
+
+                 "Version Code" := VersionCode;
+               END;
+             END;
+
+    OnModify=BEGIN
+               "Last Date Modified" := TODAY;
+             END;
+
+    OnDelete=VAR
+               RtngLine@1000 : Record 99000764;
+             BEGIN
+               RtngLine.LOCKTABLE;
+               RtngLine.SETRANGE("Routing No.","Routing No.");
+               RtngLine.SETRANGE("Version Code","Version Code");
+               RtngLine.DELETEALL(TRUE);
+             END;
+
+    OnRename=BEGIN
+               IF Status = Status::Certified THEN
+                 ERROR(Text001,TABLECAPTION,FIELDCAPTION(Status),FORMAT(Status));
+             END;
+
+    CaptionML=[ENU=Routing Version;
+               FRA=Version gamme];
+    LookupPageID=Page99000808;
+    DrillDownPageID=Page99000808;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Routing No.         ;Code20        ;TableRelation="Routing Header";
+                                                   CaptionML=[ENU=Routing No.;
+                                                              FRA=Nø gamme];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Version Code        ;Code10        ;CaptionML=[ENU=Version Code;
+                                                              FRA=Code version] }
+    { 3   ;   ;Description         ;Text50        ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 10  ;   ;Starting Date       ;Date          ;CaptionML=[ENU=Starting Date;
+                                                              FRA=Date d‚but] }
+    { 20  ;   ;Status              ;Option        ;OnValidate=VAR
+                                                                RtngHeader@1000 : Record 99000763;
+                                                              BEGIN
+                                                                IF (Status <> xRec.Status) AND (Status = Status::Certified) THEN BEGIN
+                                                                  RtngHeader.GET("Routing No.");
+                                                                  CheckRouting.Calculate(RtngHeader,"Version Code");
+                                                                END;
+                                                                MODIFY(TRUE);
+                                                                COMMIT;
+                                                              END;
+
+                                                   CaptionML=[ENU=Status;
+                                                              FRA=Statut];
+                                                   OptionCaptionML=[ENU=New,Certified,Under Development,Closed;
+                                                                    FRA=Cr‚ation en cours,Valid‚e,Modification en cours,Cl“tur‚e];
+                                                   OptionString=New,Certified,Under Development,Closed }
+    { 21  ;   ;Type                ;Option        ;OnValidate=BEGIN
+                                                                IF Status = Status::Certified THEN
+                                                                  FIELDERROR(Status);
+                                                              END;
+
+                                                   CaptionML=[ENU=Type;
+                                                              FRA=Type];
+                                                   OptionCaptionML=[ENU=Serial,Parallel;
+                                                                    FRA=S‚quentielle,ParallŠle];
+                                                   OptionString=Serial,Parallel }
+    { 22  ;   ;Last Date Modified  ;Date          ;CaptionML=[ENU=Last Date Modified;
+                                                              FRA=Date dern. modification];
+                                                   Editable=No }
+    { 50  ;   ;No. Series          ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=No. Series;
+                                                              FRA=Souches de nø];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Routing No.,Version Code                ;Clustered=Yes }
+    {    ;Routing No.,Starting Date                }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      NoSeries@1007 : Record 308;
+      NoSeriesLine@1006 : Record 309;
+      RoutingHeader@1000 : Record 99000763;
+      RtngVersion@1001 : Record 99000786;
+      CheckRouting@1002 : Codeunit 99000752;
+      NoSeriesMgt@1003 : Codeunit 396;
+      Text000@1008 : TextConst 'ENU=The new %1 cannot be generated by default\because the %2 for %3 %4 contains more than %5 characters.;FRA=Le nouveau %1 ne peut pas ˆtre g‚n‚r‚ par d‚faut\car le %2 de la %3 %4 d‚passe %5 caractŠres.';
+      VersionCode@1005 : Code[10];
+      Text001@1004 : TextConst 'ENU=You cannot rename the %1 when %2 is %3.;FRA=Vous ne pouvez pas renommer l''enregistrement %1 lorsque la valeur %2 est %3.';
+
+    PROCEDURE AssistEdit@2(OldRoutVersion@1000 : Record 99000786) : Boolean;
+    BEGIN
+      WITH RtngVersion DO BEGIN
+        RtngVersion := Rec;
+        RoutingHeader.GET("Routing No.");
+        RoutingHeader.TESTFIELD("Version Nos.");
+        IF NoSeriesMgt.SelectSeries(RoutingHeader."Version Nos.",OldRoutVersion."No. Series","No. Series") THEN BEGIN
+          NoSeriesMgt.SetSeries(VersionCode);
+          IF STRLEN(VersionCode) > MAXSTRLEN("Version Code") THEN
+            ERROR(Text000,
+              FIELDCAPTION("Version Code"),
+              NoSeriesLine.FIELDCAPTION("Starting No."),
+              RoutingHeader."Version Nos.",
+              NoSeries.TABLECAPTION,
+              MAXSTRLEN("Version Code"));
+
+          "Version Code" := VersionCode;
+          Rec := RtngVersion;
+          EXIT(TRUE);
+        END;
+      END;
+    END;
+
+    PROCEDURE Caption@1() : Text[100];
+    VAR
+      RtngHeader@1000 : Record 99000763;
+    BEGIN
+      IF GETFILTERS = '' THEN
+        EXIT('');
+
+      IF "Routing No." = '' THEN
+        EXIT('');
+
+      RtngHeader.GET("Routing No.");
+      EXIT(
+        STRSUBSTNO(
+          '%1 %2 %3',RtngHeader."No.",RtngHeader.Description,"Version Code"));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,228 @@
+OBJECT Page 1344 Mini Vendor Template Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Vendor Template;
+               FRA=Modäle fournisseur];
+    SourceTable=Table1303;
+    DataCaptionExpr="Template Name";
+    PageType=Card;
+    SourceTableTemporary=Yes;
+    CardPageID=Mini Vendor Template Card;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Reports,Master Data;
+                                FRA=Nouveau,Traitement,êtats,DonnÇes principales];
+    OnOpenPage=BEGIN
+                 IF Vendor."No." <> '' THEN
+                   CreateConfigTemplateFromExistingVendor(Vendor,Rec);
+               END;
+
+    OnDeleteRecord=BEGIN
+                     CheckTemplateNameProvided
+                   END;
+
+    OnQueryClosePage=BEGIN
+                       CASE CloseAction OF
+                         ACTION::LookupOK:
+                           IF Code <> '' THEN
+                             CheckTemplateNameProvided;
+                         ACTION::LookupCancel:
+                           IF DELETE(TRUE) THEN;
+                       END;
+                     END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           SetDimensionsEnabled;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 27      ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 30      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Master Data;
+                                 FRA=DonnÇes principales];
+                      ActionContainerType=NewDocumentItems }
+      { 31      ;2   ;Action    ;
+                      Name=Default Dimensions;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      ToolTipML=[ENU=View or edit any dimensions that are set up for the vendor that you want to reuse for the template.;
+                                 FRA=Affichez ou modifiez les axes configurÇs pour le fournisseur que vous souhaitez rÇutiliser pour le modäle.];
+                      RunObject=Page 1343;
+                      RunPageLink=Table Id=CONST(18),
+                                  Master Record Template Code=FIELD(Code);
+                      Promoted=Yes;
+                      Enabled=DimensionsEnabled;
+                      PromotedIsBig=Yes;
+                      Image=Dimensions;
+                      PromotedCategory=Category4 }
+    }
+  }
+  CONTROLS
+  {
+    { 29  ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 28  ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           FRA=GÇnÇral] }
+
+    { 26  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the template.;
+                           FRA=Indique le nom du modäle.];
+                SourceExpr="Template Name";
+                OnValidate=BEGIN
+                             SetDimensionsEnabled;
+                           END;
+                            }
+
+    { 25  ;1   ;Group     ;
+                Name=AddressDetails;
+                CaptionML=[ENU=Address Details;
+                           FRA=Info. adresse];
+                GroupType=Group }
+
+    { 24  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's post code.;
+                           FRA=SpÇcifie le code postal du fournisseur.];
+                SourceExpr="Post Code";
+                Importance=Promoted }
+
+    { 23  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's city.;
+                           FRA=SpÇcifie la ville du fournisseur.];
+                SourceExpr=City }
+
+    { 22  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the country/region code for this vendor.;
+                           FRA=SpÇcifie le code pays/rÇgion de ce fournisseur.];
+                SourceExpr="Country/Region Code" }
+
+    { 21  ;1   ;Group     ;
+                Name=Invoicing;
+                CaptionML=[ENU=Invoicing;
+                           FRA=Facturation];
+                GroupType=Group }
+
+    { 20  ;2   ;Group     ;
+                Name=PostingDetails;
+                CaptionML=[ENU=Posting Details;
+                           FRA=DÇtails de validation];
+                GroupType=Group }
+
+    { 19  ;3   ;Field     ;
+                ToolTipML=[ENU=Specify the vendor's trade type to link transactions made for this vendor with the appropriate general ledger account according to the general posting setup.;
+                           FRA=SpÇcifiez le type commercial du fournisseur pour lier les transactions effectuÇes pour ce fournisseur au compte gÇnÇral appropriÇ en fonction des paramätres de validation gÇnÇraux.];
+                SourceExpr="Gen. Bus. Posting Group";
+                Importance=Promoted }
+
+    { 18  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's VAT specification to link transactions made for this vendor with the appropriate general ledger account according to the VAT posting setup.;
+                           FRA=SpÇcifie le dÇtail TVA du fournisseur pour lier les transactions effectuÇes pour ce fournisseur au compte gÇnÇral appropriÇ en fonction des paramätres de validation TVA.];
+                SourceExpr="VAT Bus. Posting Group" }
+
+    { 17  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's market type to link business transactions made for the vendor with the appropriate account in the general ledger.;
+                           FRA=SpÇcifie le type du marchÇ du fournisseur pour lier les transactions commerciales effectuÇes pour le fournisseur avec le compte appropriÇ dans la comptabilitÇ.];
+                SourceExpr="Vendor Posting Group";
+                Importance=Promoted }
+
+    { 15  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the vendor's invoice discount code. When you set up a new vendor card, the number you have entered in the No. field is automatically inserted.;
+                           FRA=Indique le code remise facture du fournisseur. Lorsque vous crÇez une nouvelle fiche fournisseur, le numÇro que vous avez saisi dans le champ N¯ est automatiquement insÇrÇ.];
+                SourceExpr="Invoice Disc. Code";
+                Importance=Promoted }
+
+    { 12  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Direct Unit Cost and Line Amount fields on the purchase lines and in purchase reports should be shown with or without VAT.;
+                           FRA=SpÇcifie si les champs Coñt unitaire direct et Montant ligne des lignes achat et des Çtats achat sont affichÇs avec ou sans la TVA.];
+                SourceExpr="Prices Including VAT" }
+
+    { 11  ;2   ;Group     ;
+                Name=ForeignTrade;
+                CaptionML=[ENU=Foreign Trade;
+                           FRA=International];
+                GroupType=Group }
+
+    { 10  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies a default currency code for the vendor.;
+                           FRA=SpÇcifie un code devise par dÇfaut pour le fournisseur.];
+                SourceExpr="Currency Code";
+                Importance=Promoted }
+
+    { 9   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the language on printouts for this vendor.;
+                           FRA=Indique la langue des documents imprimÇs pour ce fournisseur.];
+                SourceExpr="Language Code" }
+
+    { 8   ;1   ;Group     ;
+                Name=Payments;
+                CaptionML=[ENU=Payments;
+                           FRA=Paiements];
+                GroupType=Group }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how to apply payments to entries for this vendor. Select Manual to manually specify the document that a payment applies to. This is the default method. Select Apply to Oldest to automatically apply payments to the oldest open vendor ledger entry.;
+                           FRA=SpÇcifie la maniäre de lettrer les paiements aux Çcritures pour ce fournisseur. SÇlectionnez Manuel pour spÇcifier manuellement le document auquel un paiement s'applique. Il s'agit de la mÇthode par dÇfaut. SÇlectionnez Au plus ancien pour lettrer automatiquement les paiements Ö l'Çcriture comptable fournisseur ouverte la plus ancienne.];
+                SourceExpr="Application Method" }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a code that indicates the payment terms that the vendor usually requires. The payment terms code you define in this field is inserted on purchase invoices for the vendor.;
+                           FRA=Indique un code qui indique les conditions de paiement que le fournisseur exige habituellement. Le code condition de paiement que vous dÇfinissez dans ce champ est insÇrÇ sur les factures achat pour le fournisseur.];
+                SourceExpr="Payment Terms Code";
+                Importance=Promoted }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how the vendor requires you to submit payment, such as bank transfer or check. The payment method code that you select in this field is inserted on purchase invoices for the vendor.;
+                           FRA=SpÇcifie le mode de paiement exigÇ par le fournisseur, tel que transfert bancaire ou chäque. Le code mode de räglement que vous sÇlectionnez dans ce champ est insÇrÇ sur les factures achat pour le fournisseur.];
+                SourceExpr="Payment Method Code";
+                Importance=Promoted }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how the vendor calculates finance charges.;
+                           FRA=Indique la maniäre dont le fournisseur calcule les intÇràts de retard.];
+                SourceExpr="Fin. Charge Terms Code";
+                Importance=Promoted }
+
+    { 1   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the vendor allows payment tolerance. You only fill this field if you know the vendor's payment reminder policy.;
+                           FRA=SpÇcifie si le fournisseur a droit Ö un Çcart de räglement. Vous ne renseignez ce champ que si vous connaissez la politique de relance de paiement du fournisseur.];
+                SourceExpr="Block Payment Tolerance" }
+
+  }
+  CODE
+  {
+    VAR
+      Vendor@1002 : Record 23;
+      DimensionsEnabled@1000 : Boolean INDATASET;
+      ProvideTemplateNameErr@1001 : TextConst '@@@=%1 Template Name;ENU=You must enter a %1.;FRA=Vous devez entrer un %1.';
+
+    LOCAL PROCEDURE SetDimensionsEnabled@4();
+    BEGIN
+      DimensionsEnabled := "Template Name" <> '';
+    END;
+
+    LOCAL PROCEDURE CheckTemplateNameProvided@2();
+    BEGIN
+      IF "Template Name" = '' THEN
+        ERROR(STRSUBSTNO(ProvideTemplateNameErr,FIELDCAPTION("Template Name")));
+    END;
+
+    PROCEDURE CreateFromVend@1(FromVendor@1000 : Record 23);
+    BEGIN
+      Vendor := FromVendor;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

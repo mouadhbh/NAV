@@ -1,0 +1,39 @@
+OBJECT Table 90010 Course
+{
+  OBJECT-PROPERTIES
+  {
+    Date=21/01/16;
+    Time=16:19:23;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+  }
+  FIELDS
+  {
+    { 10  ;   ;Code                ;Code10         }
+    { 20  ;   ;Name                ;Text30         }
+    { 30  ;   ;Description         ;Text50         }
+    { 40  ;   ;Type                ;Option        ;OptionString=Led,e-Learning,Remote Training }
+    { 50  ;   ;Duration            ;Decimal        }
+    { 60  ;   ;Price               ;Decimal        }
+    { 70  ;   ;Active              ;Boolean        }
+    { 80  ;   ;Difficulty          ;Integer        }
+    { 90  ;   ;Passing Rate        ;Integer        }
+  }
+  KEYS
+  {
+    {    ;Code                                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

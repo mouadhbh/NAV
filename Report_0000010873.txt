@@ -1,0 +1,73 @@
+OBJECT Report 10873 Archive Payment Slips
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVFR7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Archive Payment Slips;
+               FRA=Archiver les bordereaux de paiement];
+    ProcessingOnly=Yes;
+    OnPreReport=BEGIN
+                  ArchivedDocs := 0;
+                END;
+
+    OnPostReport=BEGIN
+                   IF ArchivedDocs = 0 THEN
+                     MESSAGE(Text002)
+                   ELSE
+                     IF ArchivedDocs = 1 THEN
+                       MESSAGE(Text003)
+                     ELSE
+                       MESSAGE(Text001,ArchivedDocs);
+                 END;
+
+  }
+  DATASET
+  {
+    { 6483;    ;DataItem;                    ;
+               DataItemTable=Table10865;
+               DataItemTableView=SORTING(No.);
+               OnAfterGetRecord=BEGIN
+                                  IF "Archiving Authorized" THEN BEGIN
+                                    PaymentManagement.ArchiveDocument("Payment Header");
+                                    ArchivedDocs += 1;
+                                  END;
+                                END;
+
+               ReqFilterFields=No.,Payment Class;
+               CalcFields=Archiving Authorized }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      PaymentManagement@1120000 : Codeunit 10860;
+      ArchivedDocs@1120001 : Integer;
+      Text001@1120002 : TextConst 'ENU=%1 Payment Headers have been archived.;FRA=%1 bordereaux ont ‚t‚ archiv‚s.';
+      Text002@1120003 : TextConst 'ENU=There is no Payment Header to archive.;FRA=Il n''y a pas de bordereau … archiver.';
+      Text003@1120004 : TextConst 'ENU=One Payment Header has been archived.;FRA=Un bordereau a ‚t‚ archiv‚.';
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

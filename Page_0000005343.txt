@@ -1,0 +1,130 @@
+OBJECT Page 5343 CRM Opportunity List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Microsoft Dynamics CRM Opportunities;
+               FRA=OpportunitÇs Microsoft Dynamics CRM];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    ModifyAllowed=No;
+    LinksAllowed=No;
+    SourceTable=Table5343;
+    SourceTableView=SORTING(Name);
+    PageType=List;
+    PromotedActionCategoriesML=[ENU=New,Process,Reports,Dynamics CRM;
+                                FRA=Nouveau,Traitement,êtats,Dynamics CRM];
+    OnInit=BEGIN
+             CODEUNIT.RUN(CODEUNIT::"CRM Integration Management");
+           END;
+
+    ActionList=ACTIONS
+    {
+      { 13      ;    ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 15      ;1   ;ActionGroup;
+                      Name=ActionGroupCRM;
+                      CaptionML=[ENU=Dynamics CRM;
+                                 FRA=Dynamics CRM] }
+      { 14      ;2   ;Action    ;
+                      Name=CRMGotoOpportunities;
+                      CaptionML=[ENU=Opportunity;
+                                 FRA=OpportunitÇ];
+                      Promoted=Yes;
+                      Image=CoupledOpportunity;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 HYPERLINK(CRMIntegrationManagement.GetCRMEntityUrlFromCRMID(DATABASE::"CRM Opportunity",OpportunityId));
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 16  ;2   ;Field     ;
+                CaptionML=[ENU=Status;
+                           FRA=Statut];
+                OptionCaptionML=[ENU=" ,In Progress,On Hold,Won,Canceled,Out-Sold";
+                                 FRA=" ,En cours,En attente,GagnÇ,AnnulÇ,Vendu"];
+                SourceExpr=StatusCode }
+
+    { 3   ;2   ;Field     ;
+                CaptionML=[ENU=Status Reason;
+                           FRA=Motif statut];
+                OptionCaptionML=[ENU=Open,Won,Lost;
+                                 FRA=Ouvert,GagnÇ,Perdu];
+                SourceExpr=StateCode }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=Topic;
+                           FRA=Rubrique];
+                SourceExpr=Name }
+
+    { 5   ;2   ;Field     ;
+                CaptionML=[ENU=Est. Close Date;
+                           FRA=Date fin prÇvue];
+                SourceExpr=EstimatedCloseDate }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Est. Revenue;
+                           FRA=Produit prÇvu];
+                SourceExpr=EstimatedValue }
+
+    { 7   ;2   ;Field     ;
+                CaptionML=[ENU=Total Amount;
+                           FRA=Montant total];
+                SourceExpr=TotalAmount }
+
+    { 8   ;2   ;Field     ;
+                CaptionML=[ENU=Contact Name;
+                           FRA=Nom contact];
+                SourceExpr=ParentContactIdName }
+
+    { 9   ;2   ;Field     ;
+                CaptionML=[ENU=Account Name;
+                           FRA=Nom du compte];
+                SourceExpr=ParentAccountIdName }
+
+    { 10  ;2   ;Field     ;
+                CaptionML=[ENU=Probability;
+                           FRA=ProbabilitÇ];
+                SourceExpr=CloseProbability }
+
+    { 11  ;2   ;Field     ;
+                CaptionML=[ENU=Rating;
+                           FRA=êvaluation];
+                OptionCaptionML=[ENU=Hot,Warm,Cold;
+                                 FRA=Enthousiaste,Chaleureuse,Froide];
+                SourceExpr=OpportunityRatingCode }
+
+    { 12  ;2   ;Field     ;
+                CaptionML=[ENU=Need;
+                           FRA=Charge];
+                OptionCaptionML=[ENU=" ,Must have,Should have,Good to have,No need";
+                                 FRA=" ,doit absolument avoir,Devrait avoir,Serait bien qu'il ait,Pas de besoin"];
+                SourceExpr=Need }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

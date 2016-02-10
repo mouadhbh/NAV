@@ -1,0 +1,179 @@
+OBJECT Page 5233 Human Resources Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Human Resources Setup;
+               FRA=Paramätres ressources humaines];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table5218;
+    PageType=Card;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Employee,Documents;
+                                FRA=Nouveau,Traitement,êtat,EmployÇ,Documents];
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 10      ;    ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 11      ;1   ;Action    ;
+                      CaptionML=[ENU=Human Res. Units of Measure;
+                                 FRA=UnitÇs de mesure des ressources humaines];
+                      ToolTipML=[ENU=Set up the units of measure, such as DAY or HOUR, that you can select from in the Human Resources Setup window to define how employment time is recorded.;
+                                 FRA=ParamÇtrez les unitÇs de mesure parmi lesquelles opÇrer votre sÇlection, par exemple JOUR ou HEURE, dans la fenàtre Paramätres ressources humaines afin de dÇfinir comment la durÇe du contrat de travail est enregistrÇe.];
+                      RunObject=Page 5236;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=UnitOfMeasure;
+                      PromotedCategory=Process }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Causes of Absence;
+                                 FRA=Motifs absence];
+                      ToolTipML=[ENU=Set up reasons why an employee can be absent.;
+                                 FRA=ParamÇtrez les motifs d'absence d'un salariÇ.];
+                      RunObject=Page 5210;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=AbsenceCategory;
+                      PromotedCategory=Process }
+      { 13      ;1   ;Action    ;
+                      CaptionML=[ENU=Causes of Inactivity;
+                                 FRA=Motifs indisponibilitÇ];
+                      ToolTipML=[ENU=Set up reasons why an employee can be inactive.;
+                                 FRA=ParamÇtrez les motifs d'indisponibilitÇ d'un salariÇ.];
+                      RunObject=Page 5214;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=InactivityDescription;
+                      PromotedCategory=Process }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Grounds for Termination;
+                                 FRA=Motifs fin de contrat];
+                      ToolTipML=[ENU=Set up reasons why an employment can be terminated.;
+                                 FRA=ParamÇtrez les motifs d'une rupture de contrat de travail d'un salariÇ.];
+                      RunObject=Page 5215;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=TerminationDescription;
+                      PromotedCategory=Process }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Unions;
+                                 FRA=Mutuelles];
+                      ToolTipML=[ENU=Set up different worker unions that employees may be members of, so that you can select it on the employee card.;
+                                 FRA=ParamÇtrez les diffÇrents syndicats auxquels les employÇs peuvent àtre membres de faáon Ö pouvoir le sÇlectionner sur la fiche salariÇ.];
+                      RunObject=Page 5213;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Union;
+                      PromotedCategory=Category4 }
+      { 16      ;1   ;Action    ;
+                      CaptionML=[ENU=Employment Contracts;
+                                 FRA=Contrats de travail];
+                      ToolTipML=[ENU=Set up the different types of contracts that employees can be employed under, such as Administration or Production.;
+                                 FRA=ParamÇtrez les diffÇrents types de contrats des salariÇs, par exemple Administration ou Production.];
+                      RunObject=Page 5217;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=EmployeeAgreement;
+                      PromotedCategory=Category5 }
+      { 17      ;1   ;Action    ;
+                      CaptionML=[ENU=Relatives;
+                                 FRA=Liens de parentÇ];
+                      ToolTipML=[ENU=Set up the types of relatives that you can select from on employee cards.;
+                                 FRA=ParamÇtrez les types de liens de parentÇ parmi lesquels vous pouvez opÇrer une sÇlection sur les fiches salariÇs.];
+                      RunObject=Page 5208;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Relatives;
+                      PromotedCategory=Category4 }
+      { 18      ;1   ;Action    ;
+                      CaptionML=[ENU=Misc. Articles;
+                                 FRA=Objets confiÇs];
+                      ToolTipML=[ENU=Set up types of company assets that employees use, such as CAR or COMPUTER, that you can select from on employee cards.;
+                                 FRA=ParamÇtrez les types de biens de la sociÇtÇ utilisÇs par les salariÇs, parmi lesquels vous pouvez opÇrer une sÇlection, sur les fiches salariÇs, par exemple VOITURE ou ORDINATEUR.];
+                      RunObject=Page 5218;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Archive;
+                      PromotedCategory=Category5 }
+      { 19      ;1   ;Action    ;
+                      CaptionML=[ENU=Confidential;
+                                 FRA=Confidentiel];
+                      ToolTipML=[ENU=Set up types of confidential information, such as SALARY or INSURANCE, that you can select from on employee cards.;
+                                 FRA=ParamÇtrez les types d'informations confidentielles parmi lesquelles vous pouvez opÇrer une sÇlection sur les fiches salariÇs, par exemple SALAIRE ou ASSURANCE.];
+                      RunObject=Page 5220;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=ConfidentialOverview;
+                      PromotedCategory=Category5 }
+      { 21      ;1   ;Action    ;
+                      CaptionML=[ENU=Qualifications;
+                                 FRA=Qualifications];
+                      ToolTipML=[ENU=Set up types of qualifications, such as DESIGN or ACCOUNTANT, that you can select from on employee cards.;
+                                 FRA=ParamÇtrez les types de qualifications parmi lesquelles vous pouvez opÇrer une sÇlection sur les fiches salariÇs, par exemple DêCO ou COMPTABLE.];
+                      RunObject=Page 5205;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=QualificationOverview;
+                      PromotedCategory=Category4 }
+      { 20      ;1   ;Action    ;
+                      CaptionML=[ENU=Employee Statistics Groups;
+                                 FRA=Groupes statistiques salariÇs];
+                      ToolTipML=[ENU="Set up salary types, such as HOURLY or MONTHLY, that you use for statistical purposes. ";
+                                 FRA="ParamÇtrez les types de salaires, par exemple HEURE ou MENSUEL, que vous utilisez Ö des fins statistiques. "];
+                      RunObject=Page 5216;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=StatisticsGroup;
+                      PromotedCategory=Category4 }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=Numbering;
+                           FRA=NumÇrotation] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Employee Nos." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Base Unit of Measure" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

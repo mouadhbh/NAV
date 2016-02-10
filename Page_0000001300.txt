@@ -1,0 +1,1104 @@
+OBJECT Page 1300 Mini Customer Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00,NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Customer Card;
+               FRA=Fiche client];
+    SourceTable=Table18;
+    PageType=Card;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,New Document,Customer,History,Prices and Discounts,View,Help;
+                                FRA=Nouveau,Traitement,êtat,Nouveau Document,Client,Historique,Prix et remises,Afficher,Aide];
+    OnOpenPage=VAR
+                 CRMIntegrationManagement@1000 : Codeunit 5330;
+               BEGIN
+                 CurrPage.PriceAndLineDisc.PAGE.InitPage(FALSE);
+                 ShowCharts := "No." <> '';
+                 IF ShowCharts THEN BEGIN
+                   CurrPage.AgedAccReceivableChart.PAGE.SetPerCustomer;
+                   CurrPage.AgedAccReceivableChart2.PAGE.SetPerCustomer;
+                 END;
+
+                 SETFILTER("Date Filter",MiniCustomerMgt.GetCurrentYearFilter);
+
+                 CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
+               END;
+
+    OnAfterGetRecord=VAR
+                       AgedAccReceivable@1000 : Codeunit 763;
+                     BEGIN
+                       BlockedCustomer := (Blocked = Blocked::All);
+                       BalanceExhausted := 10000 <= CalcCreditLimitLCYExpendedPct;
+
+                       DaysPastDueDate := AgedAccReceivable.InvoicePaymentDaysAverage("No.");
+                       AttentionToPaidDay := DaysPastDueDate > 0;
+
+                       SetSocialListeningFactboxVisibility;
+                     END;
+
+    OnNewRecord=VAR
+                  MiniCustomerTemplate@1001 : Record 1300;
+                  Customer@1002 : Record 18;
+                  NewCustomerCode@1003 : Code[20];
+                BEGIN
+                  IF "No." = '' THEN
+                    NewCustomerCode := MiniCustomerTemplate.NewCustomerFromTemplate;
+                  IF NewCustomerCode = '' THEN BEGIN
+                    CurrPage.CLOSE;
+                    EXIT;
+                  END;
+                  GET(NewCustomerCode);
+                  IF Customer.GET("No.") THEN
+                    Customer.DELETE(TRUE);
+                END;
+
+    OnAfterGetCurrRecord=VAR
+                           CRMCouplingManagement@1001 : Codeunit 5331;
+                         BEGIN
+                           GetSalesPricesAndSalesLineDisc;
+
+                           DynamicEditable := CurrPage.EDITABLE;
+
+                           CRMIsCoupledToRecord :=
+                             CRMCouplingManagement.IsRecordCoupledToCRM(RECORDID) AND CRMIntegrationEnabled;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 3       ;1   ;ActionGroup;
+                      Name=NewDocument;
+                      CaptionML=[ENU=New Document;
+                                 FRA=Nouveau document] }
+      { 1906384905;2 ;Action    ;
+                      Name=NewSalesInvoice;
+                      CaptionML=[ENU=Sales Invoice;
+                                 FRA=Facture vente];
+                      ToolTipML=[ENU=Create an invoice for the customer.;
+                                 FRA=CrÇez une facture pour le client.];
+                      Promoted=Yes;
+                      Image=Invoice;
+                      PromotedCategory=Category4;
+                      RunPageMode=Create;
+                      OnAction=BEGIN
+                                 CreateAndShowNewInvoice;
+                               END;
+                                }
+      { 88      ;2   ;Action    ;
+                      Name=NewSalesQuote;
+                      CaptionML=[ENU=Sales Quote;
+                                 FRA=Devis];
+                      ToolTipML=[ENU=Create a quote for the customer.;
+                                 FRA=CrÇez un devis pour le client.];
+                      Promoted=Yes;
+                      Image=Quote;
+                      PromotedCategory=Category4;
+                      RunPageMode=Create;
+                      OnAction=BEGIN
+                                 CreateAndShowNewQuote;
+                               END;
+                                }
+      { 1902583505;2 ;Action    ;
+                      Name=NewSalesCreditMemo;
+                      CaptionML=[ENU=Sales Credit Memo;
+                                 FRA=Avoir vente];
+                      ToolTipML=[ENU=Create a credit memo for the customer.;
+                                 FRA=CrÇez un avoir pour le client.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CreditMemo;
+                      PromotedCategory=Category4;
+                      RunPageMode=Create;
+                      OnAction=BEGIN
+                                 CreateAndShowNewCreditMemo;
+                               END;
+                                }
+      { 99      ;1   ;ActionGroup;
+                      Name=ActionGroupCRM;
+                      CaptionML=[ENU=Dynamics CRM;
+                                 FRA=Dynamics CRM];
+                      Visible=CRMIntegrationEnabled }
+      { 98      ;2   ;Action    ;
+                      Name=CRMGotoAccount;
+                      CaptionML=[ENU=Account;
+                                 FRA=Compte];
+                      ToolTipML=[ENU=Open the coupled Microsoft Dynamics CRM account.;
+                                 FRA=Ouvrez le compte Microsoft Dynamics CRM couplÇ.];
+                      Image=CoupledCustomer;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.ShowCRMEntityFromRecordID(RECORDID);
+                               END;
+                                }
+      { 96      ;2   ;Action    ;
+                      Name=CRMSynchronizeNow;
+                      CaptionML=[ENU=Synchronize Now;
+                                 FRA=Synchroniser maintenant];
+                      ToolTipML=[ENU=Send or get updated data to or from Microsoft Dynamics CRM.;
+                                 FRA=Envoyez/recevez des donnÇes mises Ö jour Ö/de Microsoft Dynamics CRM.];
+                      Image=Refresh;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1001 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.UpdateOneNow(RECORDID);
+                               END;
+                                }
+      { 25      ;2   ;Action    ;
+                      Name=UpdateStatisticsInCRM;
+                      CaptionML=[ENU=Update Account Statistics;
+                                 FRA=Mettre Ö jour les statistiques compte];
+                      ToolTipML=[ENU=Send Customer Statistics data to Microsoft Dynamics CRM to update the Account Statistics factbox;
+                                 FRA=Envoyer les donnÇes Statistiques client Ö Microsoft Dynamics CRM pour mettre Ö jour le rÇcapitulatif Statistiques compte];
+                      Enabled=CRMIsCoupledToRecord;
+                      Image=UpdateXML;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.CreateOrUpdateCRMAccountStatistics(Rec);
+                               END;
+                                }
+      { 94      ;2   ;ActionGroup;
+                      Name=Coupling;
+                      CaptionML=[@@@=Coupling is a noun;
+                                 ENU=Coupling;
+                                 FRA=Couplage];
+                      ToolTipML=[ENU=Create, change, or delete a coupling between the Microsoft Dynamics NAV record and a Microsoft Dynamics CRM record.;
+                                 FRA=CrÇez, modifiez ou supprimez un couplage entre l'enregistrement Microsoft Dynamics NAV et un enregistrement Microsoft Dynamics CRM.];
+                      Image=LinkAccount }
+      { 93      ;3   ;Action    ;
+                      Name=ManageCRMCoupling;
+                      CaptionML=[ENU=Set Up Coupling;
+                                 FRA=Configurer le couplage];
+                      ToolTipML=[ENU=Create or modify the coupling to a Microsoft Dynamics CRM account.;
+                                 FRA=CrÇez ou modifiez le couplage avec un compte Microsoft Dynamics CRM.];
+                      Image=LinkAccount;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.CreateOrUpdateCoupling(RECORDID);
+                               END;
+                                }
+      { 92      ;3   ;Action    ;
+                      Name=DeleteCRMCoupling;
+                      CaptionML=[ENU=Delete Coupling;
+                                 FRA=Supprimer le couplage];
+                      ToolTipML=[ENU=Delete the coupling to a Microsoft Dynamics CRM account.;
+                                 FRA=Supprimez le couplage avec un compte Microsoft Dynamics CRM.];
+                      Enabled=CRMIsCoupledToRecord;
+                      Image=UnLinkAccount;
+                      OnAction=VAR
+                                 CRMCouplingManagement@1000 : Codeunit 5331;
+                               BEGIN
+                                 CRMCouplingManagement.RemoveCoupling(RECORDID);
+                               END;
+                                }
+      { 32      ;1   ;ActionGroup;
+                      Name=Customer;
+                      CaptionML=[ENU=Customer;
+                                 FRA=Client];
+                      Image=Customer }
+      { 20      ;2   ;Action    ;
+                      Name=<Recurrent Sales Lines>;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Recurring Sales Lines;
+                                 FRA=Lignes vente rÇcurrentes];
+                      ToolTipML=[ENU=Set up recurring sales lines for the customer, such as a monthly replenishment order, that can quickly be inserted on a sales document for the customer.;
+                                 FRA=DÇfinissez des lignes vente rÇcurrentes pour le client, par exemple un ordre de rÇapprovisionnement mensuel, qui peuvent àtre rapidement insÇrÇes dans un document vente pour le client.];
+                      RunObject=Page 1314;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=CustomerCode;
+                      PromotedCategory=Category5 }
+      { 29      ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Accounts;
+                                 FRA=Comptes bancaires];
+                      ToolTipML=[ENU=Set up information about the customer's bank account.;
+                                 FRA=Configurez les informations concernant le compte bancaire du client.];
+                      RunObject=Page 424;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=BankAccount;
+                      PromotedCategory=Category5 }
+      { 30      ;2   ;Action    ;
+                      CaptionML=[ENU=Ship-&to Addresses;
+                                 FRA=&Adresses destinataire];
+                      ToolTipML=[ENU=Set up the alternate address where the customer wants the item delivered if different from its regular address.;
+                                 FRA=Configurez l'autre adresse oó le client souhaite faire livrer l'article, si elle est diffÇrente de l'adresse habituelle.];
+                      RunObject=Page 301;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=ShipAddress;
+                      PromotedCategory=Category5 }
+      { 22      ;2   ;Action    ;
+                      CaptionML=[ENU=Cross Re&ferences;
+                                 FRA=&RÇfÇrences externes];
+                      ToolTipML=[ENU=Set up the customer's own identification of items that you sell to the customer. Cross-references to the customer's item number means that that item number is automatically shown on sales documents instead of the number that you use.;
+                                 FRA=Configurez la maniäre dont le client identifie les articles que vous lui vendez. Les rÇfÇrences externes au numÇro d'article du client impliquent que le numÇro d'article est automatiquement affichÇ sur les documents vente au lieu du numÇro que vous utilisez.];
+                      RunObject=Page 5723;
+                      RunPageView=SORTING(Cross-Reference Type,Cross-Reference Type No.);
+                      RunPageLink=Cross-Reference Type=CONST(Customer),
+                                  Cross-Reference Type No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Change;
+                      PromotedCategory=Category5 }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Online Map;
+                                 FRA=Online Map];
+                      ToolTipML=[ENU=View the customer's address on your preferred map website.;
+                                 FRA=Affichez l'adresse du client sur votre site Web de mappage par dÇfaut.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Map;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 DisplayMap;
+                               END;
+                                }
+      { 31      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      ToolTipML=[ENU=Set up default dimensions for the customer, such as an area or customer group code. You can assign dimension codes to transactions to distribute costs and analyze historical information.;
+                                 FRA=Configurez des axes analytiques par dÇfaut pour le client, comme un code groupe clients ou une zone. Vous pouvez affecter des codes axe aux transactions dans le but de rÇpartir les coñts et d'analyser les informations d'historique.];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(18),
+                                  No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Dimensions;
+                      PromotedCategory=Category5 }
+      { 26      ;2   ;Action    ;
+                      Name=CustomerReportSelections;
+                      CaptionML=[ENU=Document Layouts;
+                                 FRA=PrÇsentations document];
+                      Image=Quote;
+                      OnAction=VAR
+                                 CustomReportSelection@1000 : Record 9657;
+                               BEGIN
+                                 CustomReportSelection.SETRANGE("Source Type",DATABASE::Customer);
+                                 CustomReportSelection.SETRANGE("Source No.","No.");
+                                 PAGE.RUNMODAL(PAGE::"Customer Report Selections",CustomReportSelection);
+                               END;
+                                }
+      { 5       ;1   ;ActionGroup;
+                      Name=History;
+                      CaptionML=[ENU=History;
+                                 FRA=Historique];
+                      Image=History }
+      { 80      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 FRA=ê&critures comptables];
+                      ToolTipML=[ENU=View the history of transactions for the customer.;
+                                 FRA=Affichez l'historique des transactions pour le client.];
+                      RunObject=Page 25;
+                      RunPageView=SORTING(Customer No.);
+                      RunPageLink=Customer No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=CustomerLedger;
+                      PromotedCategory=Category6 }
+      { 82      ;1   ;ActionGroup;
+                      Name=PricesandDiscounts;
+                      CaptionML=[ENU=Prices and Discounts;
+                                 FRA=Prix et remises];
+                      Image=Sales }
+      { 83      ;2   ;Action    ;
+                      CaptionML=[ENU=Invoice &Discounts;
+                                 FRA=Remises &facture];
+                      ToolTipML=[ENU=Set up different discounts that are applied to invoices for the customer. An invoice discount is automatically granted to the customer when the total on a sales invoice exceeds a certain amount.;
+                                 FRA=Configurez des remises diffÇrentes qui seront appliquÇes aux factures client. Une remise facture est automatiquement accordÇe au client lorsque le total sur la facture vente dÇpasse un certain montant.];
+                      RunObject=Page 23;
+                      RunPageLink=Code=FIELD(Invoice Disc. Code);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CalculateInvoiceDiscount;
+                      PromotedCategory=Category7 }
+      { 113     ;2   ;Action    ;
+                      CaptionML=[ENU=Prices;
+                                 FRA=Prix];
+                      ToolTipML=[ENU=Set up different prices for items that you sell to the customer. An item price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.;
+                                 FRA=ParamÇtrez des prix diffÇrents pour les articles que vous vendez au client. Un prix article est automatiquement affectÇ sur les lignes facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le client, la quantitÇ ou la date de fin.];
+                      RunObject=Page 7002;
+                      RunPageView=SORTING(Sales Type,Sales Code);
+                      RunPageLink=Sales Type=CONST(Customer),
+                                  Sales Code=FIELD(No.);
+                      Image=Price }
+      { 136     ;2   ;Action    ;
+                      CaptionML=[ENU=Line Discounts;
+                                 FRA=Remises ligne];
+                      ToolTipML=[ENU=Set up different discounts for items that you sell to the customer. An item discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.;
+                                 FRA=ParamÇtrez des remises diffÇrentes pour les articles que vous vendez au client. Une remise article est automatiquement affectÇe sur les lignes facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le client, la quantitÇ ou la date de fin.];
+                      RunObject=Page 7004;
+                      RunPageView=SORTING(Sales Type,Sales Code);
+                      RunPageLink=Sales Type=CONST(Customer),
+                                  Sales Code=FIELD(No.);
+                      Image=LineDiscount }
+      { 28      ;1   ;ActionGroup;
+                      Name=DataTemplate;
+                      CaptionML=[ENU=Data Template;
+                                 FRA=Modäle donnÇes] }
+      { 167     ;2   ;Action    ;
+                      Name=SaveAsTemplate;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Save as Template;
+                                 FRA=Sauvegarder comme modäle];
+                      ToolTipML=[ENU=Save the customer card as a template that can be reused to create new customer cards. Customer templates contain preset information to help you fill fields on customer cards.;
+                                 FRA=Enregistrez la fiche client comme modäle que vous pourrez rÇutiliser pour crÇer de nouvelles fiches client. Les modäles client contiennent des informations prÇdÇfinies pour vous aider Ö complÇter les fiches client.];
+                      PromotedIsBig=Yes;
+                      Image=Save;
+                      PromotedCategory=New;
+                      OnAction=VAR
+                                 TempMiniCustomerTemplate@1000 : TEMPORARY Record 1300;
+                               BEGIN
+                                 TempMiniCustomerTemplate.SaveAsTemplate(Rec);
+                               END;
+                                }
+      { 81      ;2   ;Action    ;
+                      Name=Templates;
+                      CaptionML=[ENU=Templates;
+                                 FRA=Modäles];
+                      ToolTipML=[ENU=View or edit customer templates.;
+                                 FRA=Affichez ou modifiez des modäles client.];
+                      RunObject=Page 1340;
+                      RunPageView=WHERE(Table ID=CONST(18));
+                      PromotedIsBig=Yes;
+                      Image=Template }
+      { 84      ;1   ;ActionGroup;
+                      Name=Reports;
+                      CaptionML=[ENU=Reports;
+                                 FRA=êtats];
+                      Image=Reports }
+      { 85      ;2   ;ActionGroup;
+                      Name=FinanceReports;
+                      CaptionML=[ENU=Finance Reports;
+                                 FRA=êtats financiers];
+                      Image=Report }
+      { 1906813206;3 ;Action    ;
+                      Name=Report Customer Detailed Aging;
+                      CaptionML=[ENU=Customer - Detailed Aging;
+                                 FRA=Client - êcritures Çchues];
+                      ToolTipML=[ENU=View, print, or save a detailed list of each customer's total payments due, divided into three time periods. The report can be used to decide when to issue reminders, to evaluate a customer's creditworthiness, or to prepare liquidity analyses.;
+                                 FRA=Affichez, imprimez ou enregistrez une liste dÇtaillÇe des totaux dus de chaque client, divisÇe en troisˇpÇriodes. Cet Çtat sert Ö dÇcider quand Çmettre des relances, Ö Çvaluer la solvabilitÇ d'un client ou Ö prÇparer des analyses de liquiditÇs.];
+                      Image=Report;
+                      OnAction=VAR
+                                 Customer@1001 : Record 18;
+                               BEGIN
+                                 Customer.SETRANGE("No.","No.");
+                                 REPORT.RUNMODAL(REPORT::"Customer Detailed Aging",TRUE,TRUE,Customer);
+                               END;
+                                }
+      { 1902299006;3 ;Action    ;
+                      Name=Report Customer - Balance to Date;
+                      CaptionML=[ENU=Customer - Balance to Date;
+                                 FRA=Clients : êcritures ouvertes];
+                      ToolTipML=[ENU=View, print, or save a list with customers' payment history up until a certain date. You can use the report to extract your total sales income at the close of an accounting period or fiscal year.;
+                                 FRA=Affichez, imprimez ou enregistrez une liste reprenant l'historique de paiement des clients jusqu'Ö une certaine date. Vous pouvez utiliser l'Çtat pour extraire vos revenus de vente totaux Ö la clìture d'une pÇriode ou d'un exercice comptable.];
+                      Image=Report;
+                      OnAction=VAR
+                                 Customer@1001 : Record 18;
+                               BEGIN
+                                 Customer.SETRANGE("No.","No.");
+                                 REPORT.RUNMODAL(REPORT::"Customer - Balance to Date",TRUE,TRUE,Customer);
+                               END;
+                                }
+      { 9       ;3   ;Action    ;
+                      Name=Report Statement;
+                      CaptionML=[ENU=Statement;
+                                 FRA=RelevÇ];
+                      ToolTipML=[ENU=View, print, or save a list of a customer's transactions for a selected period, for example, to send to the customer at the close of an accounting period. You can choose to have all overdue balances displayed regardless of the period specified, or you can choose to include an aging band.;
+                                 FRA=Affichez, imprimez ou enregistrez une liste des transactions d'un client pendant une pÇriode sÇlectionnÇe, par exemple, pour envoyer au client Ö la clìture d'une pÇriode comptable. Vous pouvez choisir d'afficher tous les soldes Çchus, sans tenir compte de la pÇriode spÇcifiÇe, ou d'inclure un cumul date.];
+                      Image=Report;
+                      OnAction=VAR
+                                 Customer@1000 : Record 18;
+                               BEGIN
+                                 Customer.SETRANGE("No.","No.");
+                                 REPORT.RUNMODAL(REPORT::Statement,TRUE,TRUE,Customer);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=Customer;
+                           FRA=Client];
+                GroupType=Group }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the customer. The field is either filled automatically from a defined number series, or you enter the number manually because you have enabled manual number entry in the number-series setup.;
+                           FRA=Indique le numÇro du client. Le champ est renseignÇ soit automatiquement Ö partir d'une souche de numÇros dÇfinie, soit vous entrez manuellement le numÇro car vous avez activÇ la saisie manuelle de numÇro dans le paramÇtrage de la souche de numÇros.];
+                SourceExpr="No.";
+                Importance=Additional;
+                OnAssistEdit=BEGIN
+                               IF AssistEdit(xRec) THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's name. This name will appear on all sales documents for the customer. You can enter a maximum of 50 characters, both numbers and letters.;
+                           FRA=SpÇcifie le nom du client. Ce nom apparaåtra sur tous les documents vente pour le client. Vous pouvez entrer au maximum 50ˇcaractäres, des chiffres ou des lettres.];
+                SourceExpr=Name;
+                Importance=Promoted;
+                ShowMandatory=TRUE }
+
+    { 23  ;2   ;Field     ;
+                Name=<Blocked>;
+                CaptionML=[ENU=Blocked;
+                           FRA=BloquÇ];
+                ToolTipML=[ENU=Specifies if transactions with the customer should be blocked, for example, because the customer is declared insolvent.;
+                           FRA=SpÇcifie si les transactions avec le client doivent àtre bloquÇes, par exemple, parce que le client est dÇclarÇ insolvable.];
+                OptionCaptionML=[ENU=" ,,,All";
+                                 FRA=" ,,,Tous"];
+                SourceExpr=BlockedCustomer;
+                Enabled=DynamicEditable;
+                OnValidate=BEGIN
+                             IF BlockedCustomer THEN
+                               Blocked := Blocked::All
+                             ELSE
+                               Blocked := Blocked::" ";
+                           END;
+                            }
+
+    { 17  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies when the customer card was last modified.;
+                           FRA=Indique la date Ö laquelle la fiche client a ÇtÇ modifiÇe pour la derniäre fois.];
+                SourceExpr="Last Date Modified";
+                Importance=Additional }
+
+    { 62  ;2   ;Field     ;
+                Name=TotalSales2;
+                CaptionML=[ENU=Total Sales;
+                           FRA=Total des ventes];
+                ToolTipML=[ENU=Specifies your total sales turnover with the customer in the current fiscal year. It is calculated from amounts excluding VAT on all completed and open sales invoices and credit memos.;
+                           FRA=Indique votre chiffre de vente total avec le client pour l'exercice comptable en cours. Il est calculÇ Ö partir des montants HT sur toutes les factures vente et avoirs terminÇs et ouverts.];
+                SourceExpr=GetTotalSales;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+    { 57  ;2   ;Field     ;
+                CaptionML=[ENU=Costs (LCY);
+                           FRA=Coñts DS];
+                ToolTipML=[ENU=Specifies how much cost you have incurred from the customer in the current fiscal year. It is calculated as the sum of unit costs of all the goods you have sold to the customer. This includes any changes that occurred in your purchase prices of the goods.;
+                           FRA=Indique les coñts que vous avez subi pour le client pour l'exercice comptable en cours. Il est calculÇ comme la somme des coñts unitaires de tous les produits que vous avez vendus au client. Cela inclut toutes les modifications qui se sont produites au niveau de vos prix d'achat des biens.];
+                SourceExpr=CustSalesLCY - CustProfit - AdjmtCostLCY;
+                AutoFormatType=1 }
+
+    { 45  ;2   ;Field     ;
+                CaptionML=[ENU=Profit (LCY);
+                           FRA=Marge DS];
+                ToolTipML=[ENU=Specifies how much profit you have made from the customer in the current fiscal year. The calculation takes into account any changes that occurred in purchase prices of the sold goods.;
+                           FRA=Indique la marge que vous avez rÇalisÇe pour le client pour l'exercice comptable en cours. Le calcul tient compte de toutes les modifications apportÇes aux prix d'achat des biens vendus.];
+                SourceExpr=AdjCustProfit;
+                AutoFormatType=1;
+                Importance=Additional;
+                Editable=False }
+
+    { 51  ;2   ;Field     ;
+                CaptionML=[ENU=Profit %;
+                           FRA=% marge sur vente];
+                ToolTipML=[ENU=Specifies how much profit you have made from the customer in the current fiscal year, expressed as a percentage of the customer's total sales. The calculation takes into account any changes that occurred in purchase prices of the sold goods.;
+                           FRA=Indique la marge que vous avez rÇalisÇe pour le client pour l'exercice comptable en cours, exprimÇe en pourcentage des ventes totales du client. Le calcul tient compte de toutes les modifications apportÇes aux prix d'achat des biens vendus.];
+                DecimalPlaces=1:1;
+                SourceExpr=AdjProfitPct;
+                Importance=Additional;
+                Editable=False }
+
+    { 65  ;1   ;Group     ;
+                CaptionML=[ENU=Address & Contact;
+                           FRA=Adresse et contact];
+                GroupType=Group }
+
+    { 19  ;2   ;Group     ;
+                Name=AddressDetails;
+                CaptionML=[ENU=Address;
+                           FRA=Adresse];
+                GroupType=Group }
+
+    { 6   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's address. This address will appear on all sales documents for the customer. You can enter a maximum of 50 characters, both numbers and letters.;
+                           FRA=SpÇcifie l'adresse du client. Cette adresse apparaåtra sur tous les documents vente pour le client. Vous pouvez entrer au maximum 50ˇcaractäres, des chiffres ou des lettres.];
+                SourceExpr=Address }
+
+    { 8   ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies a second line in the customer's address. This address will appear on all sales documents for the customer. You can enter a maximum of 30 characters, both numbers and letters.;
+                           FRA=Indique une deuxiäme ligne dans l'adresse du client. Cette adresse apparaåtra sur tous les documents vente pour le client. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.];
+                SourceExpr="Address 2" }
+
+    { 90  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's post code.;
+                           FRA=SpÇcifie le code postal du client.];
+                SourceExpr="Post Code";
+                Importance=Promoted }
+
+    { 10  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's city.;
+                           FRA=SpÇcifie la ville du client.];
+                SourceExpr=City }
+
+    { 1120000;3;Field     ;
+                ToolTipML=[ENU=Specifies the county of the customer. You can enter a maximum of 30 characters, both numbers and letters.;
+                           FRA=SpÇcifie la rÇgion du client. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.];
+                SourceExpr=County }
+
+    { 91  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies a country/region code for the customer. To see the country/region codes and address formats in the Countries/Regions window, click the field.;
+                           FRA=SpÇcifie le code pays/rÇgion du client. Pour visualiser les codes pays/rÇgion et les formats adresse dans la fenàtre Pays/RÇgions, cliquez sur le champ.];
+                SourceExpr="Country/Region Code" }
+
+    { 21  ;2   ;Group     ;
+                Name=ContactDetails;
+                CaptionML=[ENU=Contact;
+                           FRA=Contact];
+                GroupType=Group }
+
+    { 12  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's telephone number. You can enter a maximum of 30 characters, both numbers and letters.;
+                           FRA=SpÇcifie le numÇro de tÇlÇphone du client. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.];
+                SourceExpr="Phone No." }
+
+    { 107 ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's e-mail address. You can enter a maximum of 80 characters, both numbers and letters.;
+                           FRA=SpÇcifie l'adresse e-mail du client. Vous pouvez entrer au maximum 80ˇcaractäres, des chiffres ou des lettres.];
+                SourceExpr="E-Mail";
+                Importance=Promoted }
+
+    { 109 ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's home page address. You can enter a maximum of 80 characters, both numbers and letters.;
+                           FRA=SpÇcifie l'adresse de la page d'accueil du client. Vous pouvez entrer au maximum 80ˇcaractäres, des chiffres ou des lettres.];
+                SourceExpr="Home Page" }
+
+    { 16  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the person you regularly contact when you do business with this customer. You can enter a maximum of 30 characters, both numbers and letters.;
+                           FRA=SpÇcifie le nom de la personne que vous contactez rÇguliärement lorsque vous traitez avec ce client. Vous pouvez saisir au maximum 30ˇcaractäres, des chiffres ou des lettres.];
+                SourceExpr=Contact;
+                Importance=Promoted }
+
+    { 14  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the preferred method of sending documents to this customer, so that you do not have to select a sending option every time that you post and send a document to the customer. Sales documents to this customer will be sent using the specified sending profile and will override the default document sending profile.;
+                           FRA=SpÇcifie la mÇthode prÇfÇrÇe d'envoi de documents Ö ce client, afin d'Çviter d'avoir Ö sÇlectionner une option d'envoi chaque fois que vous validez et envoyez un document au client. Les documents vente Ö ce client seront envoyÇs Ö l'aide du profil d'envoi spÇcifiÇ et remplaceront le profil d'envoi de document par dÇfaut.];
+                SourceExpr="Document Sending Profile" }
+
+    { 1905885101;1;Group  ;
+                Name=Invoicing;
+                CaptionML=[ENU=Invoicing;
+                           FRA=Facturation];
+                GroupType=Group }
+
+    { 64  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the maximum amount by which you allow the customer to exceed the payment balance before warnings are issued.;
+                           FRA=SpÇcifie le montant maximal selon lequel vous autorisez au client Ö dÇpasser le solde de paiement avant que des alertes ne soient Çmises.];
+                SourceExpr="Credit Limit (LCY)" }
+
+    { 69  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's VAT registration number for customers in EU countries/regions. Choose the DrillDown button to use a web service that verifies if the number exists in the country's company register.;
+                           FRA=SpÇcifie le numÇro d'identification intra-communautaire du client dans des pays/rÇgions de l'union europÇenne. Choisissez le bouton Analyser pour utiliser un service Web qui vÇrifie si le numÇro existe dans le registre des sociÇtÇs du pays.];
+                SourceExpr="VAT Registration No.";
+                Importance=Additional;
+                OnDrillDown=VAR
+                              VATRegistrationLogMgt@1000 : Codeunit 249;
+                            BEGIN
+                              VATRegistrationLogMgt.AssistEditCustomerVATReg(Rec);
+                            END;
+                             }
+
+    { 78  ;2   ;Field     ;
+                ToolTipML=[ENU=Identifies the customer in connection with electronic document sending. For the PEPPOL format, the field is used as follows: If the EndPointID element in the Customer group has the SchemeID attribute set to GLN, then the element is mapped to GLN field on the customer card. If the field is blank, then the value in the VAT Registration No. field is used.;
+                           FRA=Identifie le client en relation avec l'envoi de documents Çlectroniques. Selon le formatˇPEPPOL, le champ est utilisÇ comme suitˇ: si l'ÇlÇment EndPointID du groupe Client a l'attribut SchemeID dÇfini sur GLN, l'ÇlÇment est mappÇ au champ GLN de la fiche client. Si le champ est vide, la valeur du champ N¯ identif. intracomm. est utilisÇe.];
+                SourceExpr=GLN;
+                Importance=Additional }
+
+    { 34  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a different customer who will be invoiced for products that you sell to the customer in the Name field on the customer card.;
+                           FRA=SpÇcifiez un autre client qui sera facturÇ pour les produits que vous vendez au client dans le champ Nom de la fiche client.];
+                SourceExpr="Bill-to Customer No.";
+                Importance=Additional;
+                LookupPageID=Mini Customer List;
+                DrillDownPageID=Mini Customer List }
+
+    { 70  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's trade type to link transactions made for this customer with the appropriate general ledger account according to the general posting setup.;
+                           FRA=SpÇcifie le type commercial du client pour lier les transactions effectuÇes pour ce client au compte gÇnÇral appropriÇ en fonction des paramätres de validation gÇnÇraux.];
+                SourceExpr="Gen. Bus. Posting Group";
+                Importance=Additional;
+                ShowMandatory=TRUE }
+
+    { 58  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's VAT specification to link transactions made for this customer with the appropriate general ledger account according to the VAT posting setup.;
+                           FRA=SpÇcifie le dÇtail TVA du client pour lier les transactions effectuÇes pour ce client au compte gÇnÇral appropriÇ en fonction des paramätres de validation TVA.];
+                SourceExpr="VAT Bus. Posting Group";
+                Importance=Additional;
+                ShowMandatory=TRUE }
+
+    { 38  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's market type to link business transactions made for the customer with the appropriate account in the general ledger.;
+                           FRA=SpÇcifie le type du marchÇ du client pour lier les transactions commerciales effectuÇes pour le client avec le compte appropriÇ dans la comptabilitÇ.];
+                SourceExpr="Customer Posting Group";
+                Importance=Additional;
+                ShowMandatory=TRUE }
+
+    { 36  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how many copies of a sales invoice for the customer will be printed at a time. For example, enter 2 if you always keep a copy in your files in addition to the one that you send to the customer.;
+                           FRA=Indique le nombre de copies imprimÇes Ö la fois pour une facture vente pour le client. Par exemple, saisissez 2 si vous conservez toujours une copie dans vos fichiers en plus de celle que vous envoyez au client.];
+                SourceExpr="Invoice Copies";
+                Importance=Additional }
+
+    { 27  ;2   ;Group     ;
+                Name=PricesandDiscounts;
+                CaptionML=[ENU=Prices and Discounts;
+                           FRA=Prix et remises];
+                GroupType=Group }
+
+    { 40  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer price group code, which you can use as a criterion to set up special sales prices in the Sales Prices window.;
+                           FRA=SpÇcifie le code groupe prix client, que vous pouvez utiliser comme critäre pour configurer des prix spÇcifiques dans la fenàtre Prix vente.];
+                SourceExpr="Customer Price Group";
+                Importance=Promoted }
+
+    { 44  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer discount group code, which you can use as a criterion to set up special discounts in the Sales Line Discounts window.;
+                           FRA=SpÇcifie le code groupe remises client, que vous pouvez utiliser comme critäre pour configurer des remises spÇcifiques dans la fenàtre Remises ligne vente.];
+                SourceExpr="Customer Disc. Group";
+                Importance=Promoted }
+
+    { 46  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if a sales line discount is calculated when a special sales price is offered according to setup in the Sales Prices window.;
+                           FRA=Indique si une remise ligne vente est calculÇe lorsqu'un prix spÇcial est proposÇ en fonction du paramÇtrage de la fenàtre Prix vente.];
+                SourceExpr="Allow Line Disc.";
+                Importance=Additional }
+
+    { 129 ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Unit Price and Line Amount fields on sales lines for this customer should be shown with or without VAT.;
+                           FRA=SpÇcifie si les champs Prix unitaire et Montant ligne des lignes vente pour ce client sont affichÇs avec ou sans la TVA.];
+                SourceExpr="Prices Including VAT";
+                Importance=Additional }
+
+    { 1907468901;2;Group  ;
+                Name=ForeignTrade;
+                CaptionML=[ENU=Foreign Trade;
+                           FRA=International];
+                GroupType=Group }
+
+    { 67  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the default currency for the customer. The code will be inserted on sales documents for the customer by default, but you can change it.;
+                           FRA=SpÇcifie le code devise par dÇfaut pour le client. Le code sera insÇrÇ par dÇfaut sur les documents vente pour le client, mais vous pouvez le modifier.];
+                SourceExpr="Currency Code";
+                Importance=Additional }
+
+    { 66  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the language to be used on printouts for this customer. In the Item Translations window, you can set up foreign language descriptions of items. If you have set these up, then the language code is used to insert the appropriate foreign text on printouts for the customer.;
+                           FRA=Indique la langue Ö utiliser sur les impressions destinÇes Ö ce client. Dans la fenàtre Traductions article, vous pouvez crÇer des descriptions d'article en langue Çtrangäre. Si vous les avez dÇjÖ paramÇtrÇs, le code langue est utilisÇ pour insÇrer le texte appropriÇ dans les documents imprimÇs concernant ce client.];
+                SourceExpr="Language Code";
+                Importance=Additional }
+
+    { 1901677601;1;Group  ;
+                Name=Payments;
+                CaptionML=[ENU=Payments;
+                           FRA=Paiements];
+                GroupType=Group }
+
+    { 48  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how to apply payments to entries for this customer. Select Manual to manually specify the document that a payment applies to. This is the default method. Select Apply to Oldest to automatically apply payments to the oldest open customer ledger entry.;
+                           FRA=SpÇcifie la maniäre de lettrer les paiements aux Çcritures pour ce client. SÇlectionnez Manuel pour spÇcifier manuellement le document auquel un paiement s'applique. Il s'agit de la mÇthode par dÇfaut. SÇlectionnez Au plus ancien pour lettrer automatiquement les paiements Ö l'Çcriture comptable client ouverte la plus ancienne.];
+                SourceExpr="Application Method";
+                Importance=Additional }
+
+    { 50  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a code that indicates the payment terms that you require of the customer. The payment terms code you define in this field is inserted on sales invoices for the customer.;
+                           FRA=Indique un code qui indique les conditions de paiement que vous demandez au client. Le code condition de paiement que vous dÇfinissez dans ce champ est insÇrÇ sur les factures vente pour le client.];
+                SourceExpr="Payment Terms Code";
+                Importance=Promoted;
+                ShowMandatory=TRUE }
+
+    { 11  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how the customer usually submits payment, such as bank transfer or check. The payment method code that you select in this field is inserted on sales invoices for the customer.;
+                           FRA=SpÇcifie le mode de paiement gÇnÇralement utilisÇ par le client, tel que par transfert bancaire ou par chäque. Le code mode de räglement que vous sÇlectionnez dans ce champ est insÇrÇ sur les factures vente pour le client.];
+                SourceExpr="Payment Method Code";
+                Importance=Additional }
+
+    { 15  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how reminders about late payments are handled for this customer.;
+                           FRA=SpÇcifie la maniäre dont les relances concernant les retards de paiement sont traitÇes pour ce client.];
+                SourceExpr="Reminder Terms Code";
+                Importance=Additional }
+
+    { 52  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies finance charges are calculated for the customer. A finance charge terms code contains information about the interest calculation method, interest rate, and so on.;
+                           FRA=SpÇcifie les intÇràts calculÇs pour le client. Un code Conditions intÇràts de retard affiche les informations relatives au mode de calcul des intÇràts, au taux d'intÇràt, etc.];
+                SourceExpr="Fin. Charge Terms Code";
+                Importance=Additional }
+
+    { 54  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies whether to include this customer when you print the Statement report.;
+                           FRA=Indique si vous souhaitez inclure ou non ce client lorsque vous imprimez l'Çtat RelevÇ client.];
+                SourceExpr="Print Statements";
+                Importance=Additional }
+
+    { 60  ;2   ;Field     ;
+                ToolTipML=[ENU=Shows the number of the last statement that was printed for this customer.;
+                           FRA=Affiche le numÇro du dernier relevÇ imprimÇ pour ce client.];
+                SourceExpr="Last Statement No.";
+                Importance=Additional }
+
+    { 143 ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies that the customer is not allowed a payment tolerance, for example, to exceed the maximum allowed amount by which the payment or refund can differ from the amount on the invoice or credit memo.;
+                           FRA=SpÇcifie qu'aucun Çcart de räglement n'est accordÇ au client, par exemple, au-dessus de l'Çcart maximal autorisÇ entre le paiement ou le remboursement et le montant de la facture ou de l'avoir.];
+                SourceExpr="Block Payment Tolerance";
+                Importance=Additional }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the customer's bank account that will be used by default when you process refunds to the customer and direct debit collections.;
+                           FRA=SpÇcifie le compte bancaire client qui sera utilisÇ par dÇfaut lorsque vous traitez des remboursements client et des collections prÇlävement automatique.];
+                SourceExpr="Preferred Bank Account";
+                Importance=Additional }
+
+    { 56  ;1   ;Group     ;
+                Name=Statistics;
+                CaptionML=[ENU=Statistics;
+                           FRA=Statistiques];
+                Editable=false;
+                GroupType=Group }
+
+    { 55  ;2   ;Group     ;
+                Name=Balance;
+                CaptionML=[ENU=Balance;
+                           FRA=Solde];
+                GroupType=Group }
+
+    { 53  ;3   ;Field     ;
+                CaptionML=[ENU=Money Owed - Current;
+                           FRA=Montant dñ - Actuel];
+                ToolTipML=[ENU=Specifies the payment amount that the customer owes for completed sales. This value is also known as the customer's balance.;
+                           FRA=SpÇcifie le montant räglement que le client doit rÇgler pour les ventes terminÇes. Cette valeur est Çgalement connue comme le solde du client.];
+                SourceExpr="Balance (LCY)";
+                Importance=Additional }
+
+    { 68  ;3   ;Field     ;
+                CaptionML=[ENU=Money Owed - Expected;
+                           FRA=Montant dñ - PrÇvu];
+                ToolTipML=[ENU=Specifies the payment amount that the customer will owe when ongoing sales invoices and credit memos are completed.;
+                           FRA=SpÇcifie le montant räglement que le client doit lorsque les factures vente et les avoirs en cours sont terminÇs.];
+                SourceExpr=GetMoneyOwedExpected;
+                Importance=Additional;
+                OnDrillDown=BEGIN
+                              MiniCustomerMgt.DrillDownMoneyOwedExpected("No.");
+                            END;
+                             }
+
+    { 43  ;3   ;Field     ;
+                CaptionML=[ENU=Money Owed - Total;
+                           FRA=Montant dñ - Total];
+                ToolTipML=[ENU=Specifies the payment amount that the customer owes for completed sales plus sales that are still ongoing. The value is the sum of the values in the Money Owed - Current and Money Owed - Expected fields.;
+                           FRA=SpÇcifie le montant räglement que le client doit rÇgler pour les ventes terminÇes et pour celles toujours en cours. La valeur indiquÇe est la somme des valeurs des champs Montant dñ - Actuel et Montant dñ - PrÇvu.];
+                SourceExpr="Balance (LCY)" + GetMoneyOwedExpected;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+    { 42  ;3   ;Field     ;
+                Name=CreditLimit;
+                CaptionML=[ENU=Credit Limit;
+                           FRA=CrÇdit autorisÇ];
+                ToolTipML=[ENU=Specifies the maximum amount by which you allow the customer to exceed the payment balance before warnings are issued.;
+                           FRA=SpÇcifie le montant maximal selon lequel vous autorisez au client Ö dÇpasser le solde de paiement avant que des alertes ne soient Çmises.];
+                SourceExpr="Credit Limit (LCY)" }
+
+    { 41  ;3   ;Field     ;
+                ExtendedDatatype=Ratio;
+                CaptionML=[ENU=Usage Of Credit Limit;
+                           FRA=Utilisation du crÇdit autorisÇ];
+                ToolTipML=[ENU=Specifies how much of the customer's payment balance consists of credit. The gauge shows the value in the Money Owed - Total field as a percentage of the value in the Credit Limit field.;
+                           FRA=Indique la partie de crÇdit du solde de paiement du client. La mesure indique la valeur du champ Montant dñ - Total sous la forme d'un pourcentage de la valeur du champ CrÇdit autorisÇ.];
+                SourceExpr=CalcCreditLimitLCYExpendedPct;
+                Style=Attention;
+                StyleExpr=BalanceExhausted }
+
+    { 39  ;2   ;Group     ;
+                CaptionML=[ENU=Payments;
+                           FRA=Paiements];
+                GroupType=Group }
+
+    { 37  ;3   ;Field     ;
+                Name=Balance Due;
+                ToolTipML=[ENU=Specifies payments from the customer that are overdue per today's date.;
+                           FRA=SpÇcifie les paiements effectuÇs par le client Çchus pour la date du jour.];
+                SourceExpr=CalcOverdueBalance;
+                CaptionClass=FORMAT(STRSUBSTNO(OverduePaymentsCap,FORMAT(WORKDATE)));
+                OnDrillDown=VAR
+                              DtldCustLedgEntry@1000 : Record 379;
+                              CustLedgEntry@1001 : Record 21;
+                            BEGIN
+                              DtldCustLedgEntry.SETFILTER("Customer No.","No.");
+                              COPYFILTER("Global Dimension 1 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                              COPYFILTER("Global Dimension 2 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                              COPYFILTER("Currency Filter",DtldCustLedgEntry."Currency Code");
+                              CustLedgEntry.DrillDownOnOverdueEntries(DtldCustLedgEntry);
+                            END;
+                             }
+
+    { 35  ;3   ;Field     ;
+                CaptionML=[ENU=Payments This Year;
+                           FRA=Paiements cette annÇe];
+                ToolTipML=[ENU=Specifies the sum of payments received from the customer in the current fiscal year.;
+                           FRA=SpÇcifie la somme des paiements reáus du client pour l'exercice comptable en cours.];
+                SourceExpr="Payments (LCY)" }
+
+    { 33  ;3   ;Field     ;
+                CaptionML=[ENU=Average Collection Period (Days);
+                           FRA=DÇlai de räglement moyen (jours)];
+                ToolTipML=[ENU=Specifies how long the customer typically takes to pay invoices in the current fiscal year. This is the average number of days from which invoices are issued until the customer pays the invoice.;
+                           FRA=SpÇcifie le dÇlai apräs lequel le client paie gÇnÇralement les factures pour l'exercice comptable en cours. Il s'agit du nombre de jours moyen entre la date d'Çmission des factures et le moment oó le client paie la facture.];
+                DecimalPlaces=0:1;
+                SourceExpr=MiniCustomerMgt.AvgDaysToPay("No.");
+                Importance=Additional }
+
+    { 79  ;3   ;Field     ;
+                Name=DaysPaidPastDueDate;
+                CaptionML=[ENU=Average Late Payments (Days);
+                           FRA=Moyenne retard de paiements (jours)];
+                ToolTipML=[ENU=Specifies the average number of days the customer is late with payments.;
+                           FRA=Indique le nombre moyen de jours de retard de paiement du client.];
+                DecimalPlaces=0:1;
+                SourceExpr=DaysPastDueDate;
+                Importance=Additional;
+                Style=Attention;
+                StyleExpr=AttentionToPaidDay }
+
+    { 59  ;2   ;Group     ;
+                CaptionML=[ENU=Sales This Year;
+                           FRA=Ventes cette annÇe];
+                GroupType=Group }
+
+    { 61  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies your sales to the customer in the current fiscal year based on completed sales invoices. The figure in parenthesis shows the number of invoices.;
+                           FRA=Indique les ventes effectuÇes au client pour l'exercice comptable en cours sur la base des factures vente terminÇes. Le chiffre qui figure entre parenthäses correspond au nombre de factures.];
+                SourceExpr=GetAmountOnPostedInvoices;
+                CaptionClass=STRSUBSTNO(PostedInvoicesCap,FORMAT(NoPostedInvoices));
+                OnDrillDown=BEGIN
+                              MiniCustomerMgt.DrillDownOnPostedInvoices("No.")
+                            END;
+                             }
+
+    { 71  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies your refunds to the customer in the current fiscal year based on completed sales credit memos. The figure in parenthesis shows the number of credit memos.;
+                           FRA=Indique les remboursements effectuÇs au client pour l'exercice comptable en cours sur la base des avoirs vente terminÇs. Le chiffre qui figure entre parenthäses correspond au nombre d'avoirs.];
+                SourceExpr=GetAmountOnCrMemo;
+                CaptionClass=STRSUBSTNO(CreditMemosCap,FORMAT(NoPostedCrMemos));
+                OnDrillDown=BEGIN
+                              MiniCustomerMgt.DrillDownOnPostedCrMemo("No.")
+                            END;
+                             }
+
+    { 72  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies your expected sales to the customer in the current fiscal year based on open sales invoices. The figure in parenthesis shows the number of open invoices.;
+                           FRA=Indique les ventes prÇvues au client pour l'exercice comptable en cours sur la base des factures vente ouvertes. Le chiffre qui figure entre parenthäses correspond au nombre de factures ouvertes.];
+                SourceExpr=GetAmountOnOutstandingInvoices;
+                CaptionClass=STRSUBSTNO(OutstandingInvoicesCap,FORMAT(NoOutstandingInvoices));
+                OnDrillDown=BEGIN
+                              MiniCustomerMgt.DrillDownOnUnpostedInvoices("No.")
+                            END;
+                             }
+
+    { 73  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies your expected refunds to the customer in the current fiscal year based on open sales credit memos. The figure in parenthesis shows the number of open credit memos.;
+                           FRA=Indique les remboursements prÇvus au client pour l'exercice comptable en cours sur la base des avoirs vente ouverts. Le chiffre qui figure entre parenthäses correspond au nombre d'avoirs ouverts.];
+                SourceExpr=GetAmountOnOutstandingCrMemos;
+                CaptionClass=STRSUBSTNO(OutstandingCrMemosCap,FORMAT(NoOutstandingCrMemos));
+                OnDrillDown=BEGIN
+                              MiniCustomerMgt.DrillDownOnUnpostedCrMemos("No.")
+                            END;
+                             }
+
+    { 75  ;3   ;Field     ;
+                CaptionML=[ENU=Total Sales;
+                           FRA=Total des ventes];
+                ToolTipML=[ENU=Specifies your total sales turnover with the customer in the current fiscal year. It is calculated from amounts excluding VAT on all completed and open sales invoices and credit memos.;
+                           FRA=Indique votre chiffre de vente total avec le client pour l'exercice comptable en cours. Il est calculÇ Ö partir des montants HT sur toutes les factures vente et avoirs terminÇs et ouverts.];
+                SourceExpr=Totals;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+    { 74  ;3   ;Field     ;
+                CaptionML=[ENU=Invoice Discounts;
+                           FRA=Remises facture];
+                ToolTipML=[ENU=Specifies the total of all invoice discounts that you have granted to the customer in the current fiscal year.;
+                           FRA=Indique le total de toutes les remises facture que vous avez accordÇs au client pour l'exercice comptable en cours.];
+                SourceExpr=CustInvDiscAmountLCY }
+
+    { 24  ;2   ;Part      ;
+                Name=AgedAccReceivableChart;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page768;
+                Visible=ShowCharts;
+                PartType=Page }
+
+    { 86  ;1   ;Part      ;
+                Name=PriceAndLineDisc;
+                PagePartID=Page1345;
+                PartType=Page }
+
+    { 13  ;    ;Container ;
+                ContainerType=FactBoxArea }
+
+    { 159 ;1   ;Part      ;
+                CaptionML=[ENU=Details;
+                           FRA=DÇtails];
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page1611;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 49  ;1   ;Part      ;
+                Name=AgedAccReceivableChart2;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page768;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 89  ;1   ;Part      ;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page5360;
+                Visible=CRMIsCoupledToRecord;
+                PartType=Page }
+
+    { 87  ;1   ;Part      ;
+                SubPageLink=Source Type=CONST(Customer),
+                            Source No.=FIELD(No.);
+                PagePartID=Page875;
+                Visible=SocialListeningVisible;
+                PartType=Page }
+
+    { 95  ;1   ;Part      ;
+                SubPageLink=Source Type=CONST(Customer),
+                            Source No.=FIELD(No.);
+                PagePartID=Page876;
+                Visible=SocialListeningSetupVisible;
+                PartType=Page;
+                UpdatePropagation=Both }
+
+    { 77  ;1   ;Part      ;
+                CaptionML=[ENU=Sales History;
+                           FRA=Historique ventes];
+                SubPageLink=No.=FIELD(No.),
+                            Currency Filter=FIELD(Currency Filter),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                PagePartID=Page1318;
+                PartType=Page }
+
+  }
+  CODE
+  {
+    VAR
+      MiniCustomerMgt@1000 : Codeunit 1302;
+      BlockedCustomer@1007 : Boolean;
+      DynamicEditable@1029 : Boolean;
+      OverduePaymentsCap@1005 : TextConst '@@@=Overdue Payments as of 27-02-2012;ENU=Overdue Payments as of %1;FRA=Paiements Çchus au %1';
+      ShowCharts@1028 : Boolean INDATASET;
+      CustSalesLCY@1010 : Decimal;
+      AdjmtCostLCY@1024 : Decimal;
+      AdjCustProfit@1009 : Decimal;
+      CustProfit@1011 : Decimal;
+      AdjProfitPct@1008 : Decimal;
+      CustInvDiscAmountLCY@1006 : Decimal;
+      CustPaymentsLCY@1004 : Decimal;
+      BalanceExhausted@1012 : Boolean;
+      PostedInvoicesCap@1014 : TextConst '@@@=Invoices (5);ENU=Posted Invoices (%1);FRA=Factures enregistrÇes (%1)';
+      CreditMemosCap@1015 : TextConst '@@@=Credit Memos (3);ENU=Posted Credit Memos (%1);FRA=Avoirs enregistrÇs (%1)';
+      OutstandingInvoicesCap@1016 : TextConst '@@@=Ongoing Invoices (4);ENU=Ongoing Invoices (%1);FRA=Factures en cours (%1)';
+      NoPostedInvoices@1018 : Integer;
+      NoPostedCrMemos@1017 : Integer;
+      NoOutstandingInvoices@1020 : Integer;
+      NoOutstandingCrMemos@1019 : Integer;
+      AmountOnPostedInvoices@1021 : Decimal;
+      AmountOnPostedCrMemos@1013 : Decimal;
+      OutstandingCrMemosCap@1022 : TextConst '@@@=Ongoing Credit Memos (4);ENU=Ongoing Credit Memos (%1);FRA=Avoirs en cours (%1)';
+      AmountOnOutstandingInvoices@1023 : Decimal;
+      AmountOnOutstandingCrMemos@1001 : Decimal;
+      Totals@1025 : Decimal;
+      DaysPastDueDate@1026 : Decimal;
+      AttentionToPaidDay@1027 : Boolean;
+      SocialListeningSetupVisible@1031 : Boolean INDATASET;
+      SocialListeningVisible@1030 : Boolean INDATASET;
+      CRMIntegrationEnabled@1033 : Boolean;
+      CRMIsCoupledToRecord@1032 : Boolean;
+
+    LOCAL PROCEDURE GetTotalSales@6() : Decimal;
+    BEGIN
+      NoPostedInvoices := 0;
+      NoPostedCrMemos := 0;
+      NoOutstandingInvoices := 0;
+      NoOutstandingCrMemos := 0;
+      Totals := 0;
+
+      AmountOnPostedInvoices := MiniCustomerMgt.CalcAmountsOnPostedInvoices("No.",NoPostedInvoices);
+      AmountOnPostedCrMemos := MiniCustomerMgt.CalcAmountsOnPostedCrMemos("No.",NoPostedCrMemos);
+
+      AmountOnOutstandingInvoices := MiniCustomerMgt.CalculateAmountsOnUnpostedInvoices("No.",NoOutstandingInvoices);
+      AmountOnOutstandingCrMemos := MiniCustomerMgt.CalculateAmountsOnUnpostedCrMemos("No.",NoOutstandingCrMemos);
+
+      Totals := AmountOnPostedInvoices + AmountOnPostedCrMemos + AmountOnOutstandingInvoices + AmountOnOutstandingCrMemos;
+
+      MiniCustomerMgt.CalculateStatistic(
+        Rec,
+        AdjmtCostLCY,AdjCustProfit,AdjProfitPct,
+        CustInvDiscAmountLCY,CustPaymentsLCY,CustSalesLCY,
+        CustProfit);
+      EXIT(Totals)
+    END;
+
+    LOCAL PROCEDURE GetAmountOnPostedInvoices@5() : Decimal;
+    BEGIN
+      EXIT(AmountOnPostedInvoices)
+    END;
+
+    LOCAL PROCEDURE GetAmountOnCrMemo@8() : Decimal;
+    BEGIN
+      EXIT(AmountOnPostedCrMemos)
+    END;
+
+    LOCAL PROCEDURE GetAmountOnOutstandingInvoices@9() : Decimal;
+    BEGIN
+      EXIT(AmountOnOutstandingInvoices)
+    END;
+
+    LOCAL PROCEDURE GetAmountOnOutstandingCrMemos@10() : Decimal;
+    BEGIN
+      EXIT(AmountOnOutstandingCrMemos)
+    END;
+
+    LOCAL PROCEDURE GetMoneyOwedExpected@11() : Decimal;
+    BEGIN
+      EXIT(MiniCustomerMgt.CalculateAmountsWithVATOnUnpostedDocuments("No."))
+    END;
+
+    LOCAL PROCEDURE GetSalesPricesAndSalesLineDisc@4();
+    BEGIN
+      IF "No." <> CurrPage.PriceAndLineDisc.PAGE.GetLoadedCustNo THEN BEGIN
+        CurrPage.PriceAndLineDisc.PAGE.LoadCustomer(Rec);
+        CurrPage.PriceAndLineDisc.PAGE.UPDATE(FALSE);
+      END;
+    END;
+
+    LOCAL PROCEDURE SetSocialListeningFactboxVisibility@1();
+    VAR
+      SocialListeningMgt@1000 : Codeunit 871;
+    BEGIN
+      SocialListeningMgt.GetCustFactboxVisibility(Rec,SocialListeningSetupVisible,SocialListeningVisible);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

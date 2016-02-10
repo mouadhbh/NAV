@@ -1,0 +1,457 @@
+OBJECT Report 10885 Export G/L Entries - Tax Audit
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Export G/L Entries - Tax Audit;
+               FRA=Exporter ‚critures comptables - Audit fiscal];
+    ProcessingOnly=Yes;
+    OnPreReport=BEGIN
+                  IF StartingDate = 0D THEN
+                    ERROR(MissingStartingDateErr);
+                  IF EndingDate = 0D THEN
+                    ERROR(MissingEndingDateErr);
+                  IF GLAccount.GETFILTER("No.") <> '' THEN
+                    GLAccNoFilter := GLAccount.GETFILTER("No.");
+                  GLEntry.SETRANGE("Posting Date",StartingDate,EndingDate);
+                  GLEntry.SETRANGE("Entry Type",GLEntry."Entry Type"::Definitive);
+                  GLEntry.SETFILTER("G/L Account No.",GLAccNoFilter);
+                  IF GLEntry.ISEMPTY THEN
+                    ERROR(NoEntriestoExportErr);
+
+                  CreateServerFile;
+                  WriteHeaderToFile;
+                END;
+
+    OnPostReport=VAR
+                   ClientTempFileName@1120004 : Text[250];
+                 BEGIN
+                   ToFileName := GetFileName;
+                   Writer.Close;
+
+                   IF ToFileFullName = '' THEN
+                     ToFileFullName := FileManagement.SaveFileDialog('',ToFileName,FileManagement.GetToFilterText('','.txt'));
+
+                   IF ToFileFullName = '' THEN BEGIN
+                     ERASE(OutputFileName);
+                     EXIT;
+                   END;
+
+                   CLEAR(oStream);
+
+                   ClientTempFileName := FileManagement.DownloadTempFile(OutputFileName);
+                   FileManagement.CopyClientFile(ClientTempFileName,ToFileFullName,TRUE);
+
+                   ERASE(OutputFileName);
+                   MESSAGE(FileCreatedMsg);
+                 END;
+
+  }
+  DATASET
+  {
+    { 8325;    ;DataItem;GLAccount           ;
+               DataItemTable=Table15;
+               DataItemTableView=SORTING(No.)
+                                 WHERE(Account Type=CONST(Posting));
+               OnPreDataItem=BEGIN
+                               SETFILTER("No.",GLAccNoFilter);
+                             END;
+
+               OnAfterGetRecord=BEGIN
+                                  IF IncludeOpeningBalances THEN
+                                    WriteGLAccountToFile(GLAccount);
+                                END;
+
+               ReqFilterFields=No. }
+
+    { 8321;    ;DataItem;GLEntry             ;
+               DataItemTable=Table17;
+               DataItemTableView=SORTING(Entry No.);
+               OnPreDataItem=BEGIN
+                               SETRANGE("Posting Date",StartingDate,EndingDate);
+                               SETRANGE("Entry Type","Entry Type"::Definitive);
+                               SETFILTER("G/L Account No.",GLAccount.GETFILTER("No."));
+                             END;
+
+               OnAfterGetRecord=BEGIN
+                                  IF "Posting Date" <> CLOSINGDATE("Posting Date") THEN
+                                    ProcessGLEntry;
+                                END;
+                                 }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+      SaveValues=Yes;
+    }
+    CONTROLS
+    {
+      { 1900000001;0;Container;
+                  ContainerType=ContentArea }
+
+      { 1900000002;1;Group  ;
+                  CaptionML=[ENU=Options;
+                             FRA=Options] }
+
+      { 1120010;2;Field     ;
+                  Name=StartingDate;
+                  CaptionML=[ENU=Starting Date;
+                             FRA=Date d‚but];
+                  ClosingDates=Yes;
+                  SourceExpr=StartingDate }
+
+      { 1120008;2;Field     ;
+                  Name=EndingDate;
+                  CaptionML=[ENU=Ending Date;
+                             FRA=Date fin];
+                  ClosingDates=Yes;
+                  SourceExpr=EndingDate }
+
+      { 1120012;2;Field     ;
+                  Name=Include Opening Balances;
+                  CaptionML=[ENU=Include Opening Balances;
+                             FRA=Inclure soldes d'ouverture];
+                  SourceExpr=IncludeOpeningBalances }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      FileManagement@1120021 : Codeunit 419;
+      OutputFile@1120007 : File;
+      oStream@1120006 : OutStream;
+      Writer@1120005 : DotNet "'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.IO.StreamWriter";
+      encoding@1120000 : DotNet "'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Text.Encoding";
+      OutputFileName@1120051 : Text[250];
+      StartingDate@1120001 : Date;
+      EndingDate@1120002 : Date;
+      GLAccNoFilter@1120008 : Code[250];
+      ToFileName@1120003 : Text[250];
+      ToFileFullName@1120019 : Text[250];
+      MissingStartingDateErr@1120017 : TextConst 'ENU=You must enter a Starting Date.;FRA=Vous devez entrer une date de d‚but.';
+      MissingEndingDateErr@1120016 : TextConst 'ENU=You must enter an Ending Date.;FRA=Vous devez entrer une date de fin.';
+      FileCreatedMsg@1120012 : TextConst 'ENU=The text file was created successfully.;FRA=Le fichier texte a bien ‚t‚ cr‚‚.';
+      NoEntriestoExportErr@1120011 : TextConst 'ENU=There are no entries to export within the defined filter. The file was not created.;FRA=Il n''y a pas d''‚criture … exporter dans le filtre d‚fini. Le fichier n''a pas ‚t‚ cr‚‚.';
+      InvalidWindowsChrStringTxt@1120004 : TextConst 'ENU="""""#%&*:<>?\/{|}~";FRA="""""#%&*:<>?\/{|}~"';
+      ServerFileExtensionTxt@1120052 : TextConst 'ENU=TXT;FRA=TXT';
+      IncludeOpeningBalances@1120034 : Boolean;
+      CurrentTransactionNo@1120037 : Integer;
+      CustVendLedgEntryPartyNo@1120066 : Code[20];
+      CustVendLedgEntryPartyName@1120067 : Text[50];
+      CustVendLedgEntryFCYAmount@1120068 : Text[250];
+      CustVendLedgEntryCurrencyCode@1120069 : Code[10];
+      PayRecAccount@1120070 : Code[20];
+
+    PROCEDURE Init@1120084(StartingDateValue@1120095 : Date;EndingDateValue@1120085 : Date;IncludeOpeningBalancesValue@1120086 : Boolean;AccNoFilter@1120088 : Code[250];ReportFileNameValue@1120087 : Text[250]);
+    BEGIN
+      StartingDate := StartingDateValue;
+      EndingDate := EndingDateValue;
+      IncludeOpeningBalances := IncludeOpeningBalancesValue;
+      GLAccNoFilter := AccNoFilter;
+      ToFileFullName := ReportFileNameValue;
+    END;
+
+    LOCAL PROCEDURE CreateServerFile@1120077();
+    BEGIN
+      OutputFileName := FileManagement.ServerTempFileName(ServerFileExtensionTxt);
+      IF EXISTS(OutputFileName) THEN
+        ERASE(OutputFileName);
+
+      OutputFile.TEXTMODE(TRUE);
+      OutputFile.WRITEMODE(TRUE);
+      OutputFile.CREATEOUTSTREAM(oStream);
+
+      Writer := Writer.StreamWriter(OutputFileName,FALSE,encoding.Default); // append = FALSE
+    END;
+
+    LOCAL PROCEDURE FindGLRegister@1120004(VAR GLRegister@1120000 : Record 45;EntryNo@1120001 : Integer);
+    BEGIN
+      GLRegister.SETFILTER("From Entry No.",'<=%1',EntryNo);
+      GLRegister.SETFILTER("To Entry No.",'>=%1',EntryNo);
+      GLRegister.FINDFIRST;
+    END;
+
+    LOCAL PROCEDURE FormatAmount@1120024(Amount@1120019 : Decimal) : Text[250];
+    BEGIN
+      EXIT(FORMAT(Amount,0,'<Precision,2:2><Sign><Integer><Decimals><comma,,>'));
+    END;
+
+    LOCAL PROCEDURE GetBankLedgerEntryData@1120020(BankAccountLedgerEntry@1120000 : Record 271;VAR PartyNo@1120001 : Code[20];VAR PartyName@1120002 : Text[50];VAR Amount@1120004 : Text[250];VAR CurrencyCode@1120003 : Code[10]);
+    VAR
+      BankAcc@1120010 : Record 270;
+    BEGIN
+      IF BankAcc.GET(BankAccountLedgerEntry."Bank Account No.") THEN BEGIN
+        PartyNo := BankAcc."No.";
+        PartyName := BankAcc.Name;
+      END;
+      IF BankAccountLedgerEntry."Currency Code" <> '' THEN BEGIN
+        Amount := FormatAmount(ABS(BankAccountLedgerEntry.Amount));
+        CurrencyCode := BankAccountLedgerEntry."Currency Code";
+      END
+    END;
+
+    LOCAL PROCEDURE GetCustomerLedgerEntryData@1120018(CustLedgerEntry@1120000 : Record 21;VAR PartyNo@1120001 : Code[20];VAR PartyName@1120002 : Text[50];VAR Amount@1120004 : Text[250];VAR CurrencyCode@1120003 : Code[10]);
+    VAR
+      Customer@1120008 : Record 18;
+      CountOfGLEntriesInTransaction@1120077 : Integer;
+    BEGIN
+      IF Customer.GET(CustLedgerEntry."Customer No.") THEN BEGIN
+        PartyNo := Customer."No.";
+        PartyName := Customer.Name;
+      END;
+
+      CountOfGLEntriesInTransaction := GetTransPayRecEntriesCount(CustLedgerEntry."Transaction No.",PayRecAccount);
+
+      IF (CustLedgerEntry."Currency Code" <> '') AND (CountOfGLEntriesInTransaction = 1) THEN BEGIN
+        CustLedgerEntry.CALCFIELDS("Original Amount");
+        Amount := FormatAmount(ABS(CustLedgerEntry."Original Amount"));
+        CurrencyCode := CustLedgerEntry."Currency Code";
+      END
+    END;
+
+    LOCAL PROCEDURE GetFileName@1120000() : Text[250];
+    VAR
+      CompanyInformation@1120000 : Record 79;
+      FileName@1120001 : Text[250];
+    BEGIN
+      CompanyInformation.GET;
+      FileName := FORMAT(CompanyInformation.GetSIREN) +
+        'FEC' +
+        GetFormattedDate(EndingDate) +
+        '.txt';
+      EXIT(DELCHR(FileName,'=',InvalidWindowsChrStringTxt));
+    END;
+
+    LOCAL PROCEDURE GetFormattedDate@1120026(GLEntryDate@1120000 : Date) : Text[8];
+    BEGIN
+      IF GLEntryDate <> 0D THEN
+        EXIT(FORMAT(GLEntryDate,8,'<Year4><Month,2><Day,2>'));
+      EXIT('')
+    END;
+
+    LOCAL PROCEDURE GetOpeningBalance@1120008() : Decimal;
+    BEGIN
+      GLAccount.SETFILTER("Date Filter",STRSUBSTNO('..%1',CLOSINGDATE(CALCDATE('<-1D>',StartingDate))));
+      GLAccount.CALCFIELDS("Balance at Date");
+      EXIT(GLAccount."Balance at Date")
+    END;
+
+    LOCAL PROCEDURE GetPayablesAccount@1120022(VendorPostingGroupCode@1120000 : Code[10]) : Code[20];
+    VAR
+      VendorPostingGroup@1120001 : Record 93;
+    BEGIN
+      VendorPostingGroup.GET(VendorPostingGroupCode);
+      EXIT(VendorPostingGroup."Payables Account")
+    END;
+
+    LOCAL PROCEDURE GetReceivablesAccount@1120021(CustomerPostingGroupCode@1120000 : Code[10]) : Code[20];
+    VAR
+      CustomerPostingGroup@1120001 : Record 92;
+    BEGIN
+      CustomerPostingGroup.GET(CustomerPostingGroupCode);
+      EXIT(CustomerPostingGroup."Receivables Account")
+    END;
+
+    LOCAL PROCEDURE GetSourceCodeDesc@1120002(Code@1120000 : Code[10]) : Text[50];
+    VAR
+      SourceCode@1120001 : Record 230;
+    BEGIN
+      IF SourceCode.GET(Code) THEN
+        EXIT(SourceCode.Description);
+    END;
+
+    LOCAL PROCEDURE GetVendorLedgerEntryData@1120019(VendorLedgerEntry@1120000 : Record 25;VAR PartyNo@1120001 : Code[20];VAR PartyName@1120002 : Text[50];VAR Amount@1120004 : Text[250];VAR CurrencyCode@1120003 : Code[10]);
+    VAR
+      Vendor@1120009 : Record 23;
+      CountOfGLEntriesInTransaction@1120066 : Integer;
+    BEGIN
+      IF Vendor.GET(VendorLedgerEntry."Vendor No.") THEN BEGIN
+        PartyNo := Vendor."No.";
+        PartyName := Vendor.Name;
+      END;
+      CountOfGLEntriesInTransaction := GetTransPayRecEntriesCount(VendorLedgerEntry."Transaction No.",PayRecAccount);
+
+      IF (VendorLedgerEntry."Currency Code" <> '') AND (CountOfGLEntriesInTransaction = 1) THEN BEGIN
+        VendorLedgerEntry.CALCFIELDS("Original Amount");
+        Amount := FormatAmount(ABS(VendorLedgerEntry."Original Amount"));
+        CurrencyCode := VendorLedgerEntry."Currency Code";
+      END
+    END;
+
+    PROCEDURE GetLedgerEntryDataForCustVend@1120007(TransactionNo@1120000 : Integer;VAR PartyNo@1120011 : Code[20];VAR PartyName@1120012 : Text[50];VAR FCYAmount@1120013 : Text[250];VAR CurrencyCode@1120014 : Code[10]);
+    VAR
+      CustLedgerEntry@1120005 : Record 21;
+      VendorLedgerEntry@1120006 : Record 25;
+    BEGIN
+      CustLedgerEntry.SETRANGE("Transaction No.",TransactionNo);
+      IF CustLedgerEntry.FINDFIRST THEN BEGIN
+        PayRecAccount := GetReceivablesAccount(CustLedgerEntry."Customer Posting Group");
+        CustLedgerEntry.SETFILTER("Customer No.",'<>%1',CustLedgerEntry."Customer No.");
+        IF CustLedgerEntry.FINDFIRST THEN BEGIN
+          PartyName := 'multi-clients';
+          PartyNo := '*';
+        END ELSE
+        GetCustomerLedgerEntryData(CustLedgerEntry,PartyNo,PartyName,FCYAmount,CurrencyCode);
+        EXIT;
+      END;
+
+      VendorLedgerEntry.SETRANGE("Transaction No.",TransactionNo);
+      IF VendorLedgerEntry.FINDFIRST THEN BEGIN
+        PayRecAccount := GetPayablesAccount(VendorLedgerEntry."Vendor Posting Group");
+          VendorLedgerEntry.SETFILTER("Vendor No.",'<>%1',VendorLedgerEntry."Vendor No.");
+          IF VendorLedgerEntry.FINDFIRST THEN BEGIN
+            PartyName := 'multi-fournisseurs';
+            PartyNo := '*';
+        END ELSE
+        GetVendorLedgerEntryData(VendorLedgerEntry,PartyNo,PartyName,FCYAmount,CurrencyCode);
+      END
+    END;
+
+    LOCAL PROCEDURE GetTransPayRecEntriesCount@1120029(TransactionNo@1120044 : Integer;PayRecAccount@1120000 : Code[20]) : Integer;
+    VAR
+      GLEntryCount@1120045 : Integer;
+      GLAccNoFilter@1120046 : Code[250];
+    BEGIN
+      GLAccNoFilter := GLEntry.GETFILTER("G/L Account No.");
+      GLEntry.SETRANGE("G/L Account No.",PayRecAccount);
+      GLEntry.SETRANGE("Transaction No.",TransactionNo);
+      GLEntryCount := GLEntry.COUNT;
+      GLEntry.SETRANGE("Transaction No.");
+      GLEntry.SETFILTER("G/L Account No.",GLAccNoFilter);
+      EXIT(GLEntryCount)
+    END;
+
+    LOCAL PROCEDURE ProcessGLEntry@1120003();
+    VAR
+      BankAccountLedgerEntry@1120004 : Record 271;
+      GLRegister@1120001 : Record 45;
+      PartyNo@1120003 : Code[20];
+      PartyName@1120002 : Text[50];
+      FCYAmount@1120031 : Text[250];
+      CurrencyCode@1120033 : Code[10];
+    BEGIN
+      IF GLEntry."Transaction No." <> CurrentTransactionNo THEN BEGIN
+        ResetTransactionData;
+        GetLedgerEntryDataForCustVend(
+          GLEntry."Transaction No.",
+          CustVendLedgEntryPartyNo,
+          CustVendLedgEntryPartyName,
+          CustVendLedgEntryFCYAmount,
+          CustVendLedgEntryCurrencyCode);
+
+        CurrentTransactionNo := GLEntry."Transaction No.";
+      END;
+
+      IF BankAccountLedgerEntry.GET(GLEntry."Entry No.") THEN
+        GetBankLedgerEntryData(BankAccountLedgerEntry,PartyNo,PartyName,FCYAmount,CurrencyCode);
+
+      IF GLEntry."G/L Account No." = PayRecAccount THEN BEGIN
+        PartyNo := CustVendLedgEntryPartyNo;
+        PartyName := CustVendLedgEntryPartyName;
+        FCYAmount := CustVendLedgEntryFCYAmount;
+        CurrencyCode := CustVendLedgEntryCurrencyCode;
+      END;
+
+      FindGLRegister(GLRegister,GLEntry."Entry No.");
+
+      WriteGLEntryToFile(
+        GLRegister."No.",
+        GLRegister."Creation Date",
+        PartyNo,
+        PartyName,
+        FCYAmount,
+        CurrencyCode);
+    END;
+
+    LOCAL PROCEDURE ResetTransactionData@1120088();
+    BEGIN
+      CustVendLedgEntryPartyNo := '';
+      CustVendLedgEntryPartyName := '';
+      CustVendLedgEntryFCYAmount := '';
+      CustVendLedgEntryCurrencyCode := '';
+      PayRecAccount := '';
+    END;
+
+    LOCAL PROCEDURE WriteHeaderToFile@1120040();
+    BEGIN
+      Writer.WriteLine('JournalCode|JournalLib|EcritureNum|EcritureDate|CompteNum|CompteLib|CompAuxNum|CompAuxLib|PieceRef|' +
+        'PieceDate|EcritureLib|Debit|Credit|EcritureLet|DateLet|ValidDate|Montantdevise|Idevise');
+    END;
+
+    LOCAL PROCEDURE WriteGLAccountToFile@1120005(GLAccount@1120000 : Record 15);
+    VAR
+      CreditAmount@1120001 : Decimal;
+      DebitAmount@1120002 : Decimal;
+      OpeningBalance@1120003 : Decimal;
+    BEGIN
+      OpeningBalance := GetOpeningBalance;
+      IF OpeningBalance = 0 THEN
+        EXIT;
+
+      IF GetOpeningBalance > 0 THEN
+        DebitAmount := OpeningBalance
+      ELSE
+        CreditAmount := ABS(OpeningBalance);
+
+      Writer.WriteLine('00000|' +
+        'BALANCE OUVERTURE|' +
+        '0|' +
+        GetFormattedDate(StartingDate) + '|' +
+        GLAccount."No." + '|' +
+        GLAccount.Name + '|' +
+        '||' +
+        '00000|' +
+        GetFormattedDate(StartingDate) + '|' +
+        'BAL OUV ' + GLAccount.Name + '|' +
+        FormatAmount(DebitAmount) + '|' +
+        FormatAmount(CreditAmount) + '|' +
+        '||' +
+        GetFormattedDate(StartingDate) +
+        '||');
+    END;
+
+    LOCAL PROCEDURE WriteGLEntryToFile@1120038(GLRegisterNo@1120090 : Integer;GLRegisterCreationDate@1120091 : Date;PartyNo@1120003 : Code[20];PartyName@1120002 : Text[50];FCYAmount@1120001 : Text[250];CurrencyCode@1120000 : Code[10]);
+    BEGIN
+      WITH GLEntry DO BEGIN
+        CALCFIELDS("G/L Account Name");
+        Writer.WriteLine(
+          "Source Code" + '|' +
+          GetSourceCodeDesc("Source Code") + '|' +
+          FORMAT(GLRegisterNo) + '|' +
+          GetFormattedDate("Posting Date") + '|' +
+          "G/L Account No." + '|' +
+          "G/L Account Name" + '|' +
+          FORMAT(PartyNo) + '|' +
+          PartyName + '|' +
+          "Document No." + '|' +
+          GetFormattedDate("Document Date") + '|' +
+          Description + '|' +
+          FormatAmount("Debit Amount") + '|' +
+          FormatAmount("Credit Amount") + '|' +
+          Letter + '|' +
+          GetFormattedDate("Letter Date") + '|' +
+          GetFormattedDate(GLRegisterCreationDate) + '|' +
+          FCYAmount + '|' +
+          CurrencyCode);
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

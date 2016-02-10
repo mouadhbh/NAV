@@ -1,0 +1,76 @@
+OBJECT Report 1141 Delete Old Cost Entries
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Delete Old Cost Entries;
+               FRA=Supprimer anciennes ‚critures de co–ts];
+    ProcessingOnly=Yes;
+  }
+  DATASET
+  {
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+      { 1   ;    ;Container ;
+                  ContainerType=ContentArea }
+
+      { 2   ;1   ;Field     ;
+                  Name=YearEndingDate;
+                  CaptionML=[ENU=Year Ending Date;
+                             FRA=Date cl“ture exercice];
+                  SourceExpr=YearEndDate;
+                  OnValidate=BEGIN
+                               IF YearEndDate <> CALCDATE('<CY>',YearEndDate) THEN
+                                 ERROR(Text001,YearEndDate);
+
+                               IF WORKDATE - YearEndDate < 365 THEN
+                                 ERROR(Text002,YearEndDate);
+
+                               IF NOT CONFIRM(Text003,FALSE,YearEndDate) THEN
+                                 EXIT;
+
+                               CostEntry.SETCURRENTKEY("Cost Type No.","Posting Date");
+                               CostEntry.SETRANGE("Posting Date",0D,YearEndDate);
+                               IF NOT CostEntry.ISEMPTY THEN BEGIN
+                                 CostEntry.DELETEALL;
+                                 MESSAGE(Text004,YearEndDate);
+                               END ELSE
+                                 ERROR(Text005,YearEndDate);
+                             END;
+                              }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      CostEntry@1006 : Record 1104;
+      YearEndDate@1000 : Date;
+      Text001@1005 : TextConst 'ENU=%1 is not at year''s end.;FRA=%1 n''est pas effectu‚ … la cl“ture de l''exercice.';
+      Text002@1004 : TextConst 'ENU=The selected year ending date %1 must be older than last year.;FRA=La date de cl“ture de l''exercice s‚lectionn‚ %1 doit ˆtre ant‚rieure … l''exercice pr‚c‚dent.';
+      Text003@1003 : TextConst 'ENU=Are you sure you want to delete all cost entries up to and including %1?;FRA=Òtes-vous s–r de vouloir supprimer toutes les ‚critures de co–ts jusqu''… %1 inclusÿ?';
+      Text004@1002 : TextConst 'ENU=All cost entries up to and including %1 deleted.;FRA=Toutes les ‚critures de co–ts jusqu''… %1 inclus ont ‚t‚ supprim‚es.';
+      Text005@1001 : TextConst 'ENU=No cost entries were found before %1.;FRA=Aucune ‚criture de co–ts n''a ‚t‚ trouv‚e avant %1.';
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

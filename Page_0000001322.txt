@@ -1,0 +1,383 @@
+OBJECT Page 1322 Mini Posted Sales Credit Memo
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posted Sales Credit Memo;
+               FRA=Avoir vente enregistrÇ];
+    InsertAllowed=No;
+    ModifyAllowed=No;
+    SourceTable=Table114;
+    PageType=Document;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Correct,Credit Memo;
+                                FRA=Nouveau,Traitement,êtat,Corriger,Avoir];
+    OnOpenPage=VAR
+                 FileManagement@1000 : Codeunit 419;
+               BEGIN
+                 SetSecurityFilterOnRespCenter;
+
+                 AllowDotNetAddIn := FileManagement.CanRunDotNetOnClient;
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       DocExchStatusStyle := GetDocExchStatusStyle;
+                     END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           DocExchStatusStyle := GetDocExchStatusStyle;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 8       ;0   ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 55      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Credit Memo;
+                                 FRA=Avoir];
+                      Image=Invoice }
+      { 11      ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Customer;
+                                 FRA=Client];
+                      ToolTipML=[ENU=View or edit detailed information about the customer on the posted sales document.;
+                                 FRA=Affichez ou modifiez des informations dÇtaillÇes concernant le client sur le document vente validÇ.];
+                      RunObject=Page 1300;
+                      RunPageLink=No.=FIELD(Sell-to Customer No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Customer;
+                      PromotedCategory=Category5 }
+      { 59      ;2   ;Action    ;
+                      CaptionML=[ENU=&Navigate;
+                                 FRA=&Naviguer];
+                      ToolTipML=[ENU=Find all entries and documents that exist for the document number and posting date on the posted sales document.;
+                                 FRA=Recherchez toutes les Çcritures et les documents qui existent pour le numÇro de document et la date de comptabilisation sur le document vente validÇ.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 Navigate;
+                               END;
+                                }
+      { 3       ;2   ;Action    ;
+                      Name=Dimensions;
+                      AccessByPermission=TableData 348=R;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      ToolTipML=[ENU=View or edit the dimension sets that are set up for the customer on the sales document.;
+                                 FRA=Affichez ou modifiez les ensembles de dimensions qui sont configurÇs pour le client sur le document vente.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Dimensions;
+                      PromotedCategory=Category5;
+                      OnAction=BEGIN
+                                 ShowDimensions;
+                               END;
+                                }
+      { 32      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Send;
+                                 FRA=Envoyer] }
+      { 5       ;2   ;Action    ;
+                      Name=SendCustom;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Send;
+                                 FRA=Envoyer];
+                      ToolTipML=[ENU=Send the posted sales document.;
+                                 FRA=Envoyez le document vente validÇ.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=SendToMultiple;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 SalesCrMemoHeader@1000 : Record 114;
+                               BEGIN
+                                 SalesCrMemoHeader := Rec;
+                                 CurrPage.SETSELECTIONFILTER(SalesCrMemoHeader);
+                                 SalesCrMemoHeader.SendRecords;
+                               END;
+                                }
+      { 13      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 FRA=Im&primer];
+                      ToolTipML=[ENU=Print the posted sales document.;
+                                 FRA=Imprimez le document vente validÇ.];
+                      PromotedIsBig=Yes;
+                      Image=Print;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 SalesCrMemoHeader := Rec;
+                                 CurrPage.SETSELECTIONFILTER(SalesCrMemoHeader);
+                                 SalesCrMemoHeader.PrintRecords(NOT AllowDotNetAddIn);
+                               END;
+                                }
+      { 62      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Email;
+                                 FRA=&E-mail];
+                      ToolTipML=[ENU=Attach the posted sales document to an email to the customer.;
+                                 FRA=Joignez le document vente validÇ Ö un e-mail adressÇ au client.];
+                      PromotedIsBig=Yes;
+                      Image=Email;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ReportDistributionManagement@1000 : Codeunit 452;
+                               BEGIN
+                                 ReportDistributionManagement.EmailDocumentReport(Rec);
+                               END;
+                                }
+      { 9       ;1   ;Action    ;
+                      Name=ActivityLog;
+                      CaptionML=[ENU=Activity Log;
+                                 FRA=Journal des activitÇs];
+                      Image=Log;
+                      OnAction=BEGIN
+                                 ShowActivityLog;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=Posted Sales Credit Memo;
+                           FRA=Avoir vente enregistrÇ];
+                GroupType=Group }
+
+    { 61  ;2   ;Field     ;
+                CaptionML=[ENU=Customer Name;
+                           FRA=Nom client];
+                ToolTipML=[ENU=Specifies the name of the customer that you shipped the items on the credit memo to.;
+                           FRA=Affiche le nom du client auquel vous avez expÇdiÇ les articles qui figurent sur l'avoir initial.];
+                SourceExpr="Sell-to Customer Name";
+                TableRelation=Customer.Name;
+                Editable=FALSE;
+                LookupPageID=Mini Customer List;
+                DrillDownPageID=Mini Customer List }
+
+    { 63  ;2   ;Field     ;
+                CaptionML=[ENU=Address;
+                           FRA=Adresse];
+                ToolTipML=[ENU=Specifies the address of the customer that the items on the credit memo were sent to.;
+                           FRA=SpÇcifie l'adresse du client Ö qui les articles de l'avoir ont ÇtÇ envoyÇs.];
+                SourceExpr="Sell-to Address";
+                Editable=FALSE }
+
+    { 65  ;2   ;Field     ;
+                CaptionML=[ENU=Address 2;
+                           FRA=Adresse 2];
+                ToolTipML=[ENU=Specifies an additional part of the address of the customer to whom you shipped the items on the credit memo.;
+                           FRA=Indique le complÇment Ö l'adresse du client auquel les articles de l'avoir sont expÇdiÇs.];
+                SourceExpr="Sell-to Address 2";
+                Editable=FALSE }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Post Code;
+                           FRA=Code postal];
+                ToolTipML=[ENU=Specifies the post code of the customer that the items were sold to.;
+                           FRA=SpÇcifie le code postal du client Ö qui les articles ont ÇtÇ vendus.];
+                SourceExpr="Sell-to Post Code";
+                Editable=FALSE }
+
+    { 67  ;2   ;Field     ;
+                CaptionML=[ENU=City;
+                           FRA=Ville];
+                ToolTipML=[ENU=Specifies the city name of the customer that the items on the credit memo were shipped to.;
+                           FRA=SpÇcifie le nom de la ville du client Ö qui les articles de l'avoir ont ÇtÇ expÇdiÇs.];
+                SourceExpr="Sell-to City";
+                Editable=FALSE }
+
+    { 69  ;2   ;Field     ;
+                CaptionML=[ENU=Contact;
+                           FRA=Contact];
+                ToolTipML=[ENU=Specifies the name of the person to contact when you communicate with the customer that you shipped the items on the credit memo to.;
+                           FRA=Indique le nom de la personne Ö contacter lorsque vous communiquez avec le client auquel vous avez livrÇ les articles qui figurent sur l'avoir.];
+                SourceExpr="Sell-to Contact";
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the date on which the credit memo was posted.;
+                           FRA=SpÇcifie la date de validation de l'avoir.];
+                SourceExpr="Posting Date";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 25  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the date on which you created the sales document.;
+                           FRA=Affiche la date de crÇation du document vente.];
+                SourceExpr="Document Date";
+                Editable=FALSE }
+
+    { 30  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the date on which the shipment is due for payment. The program calculates the date using the Payment Terms Code and Posting Date fields on the sales header.;
+                           FRA=Indique la date Ö laquelle l'expÇdition doit àtre payÇe. Le programme calcule la date Ö l'aide des champs Code condition paiement et Date comptabilisation de l'en-tàte vente.];
+                SourceExpr="Due Date";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the status of the document if you are using a document exchange service to send it as an electronic document. The status values are reported by the document exchange service.;
+                           FRA=Specifies the status of the document if you are using a document exchange service to send it as an electronic document. The status values are reported by the document exchange service.];
+                SourceExpr="Document Exchange Status";
+                Editable=FALSE;
+                StyleExpr=DocExchStatusStyle;
+                OnDrillDown=BEGIN
+                              DocExchStatusDrillDown;
+                            END;
+                             }
+
+    { 15  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted sales invoice that relates to this sales credit memo is paid.;
+                           FRA=Indique si la facture vente validÇe liÇe Ö cet avoir vente a ÇtÇ payÇe.];
+                SourceExpr=Paid }
+
+    { 21  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the posted sales invoice that relates to this sales credit memo has been either corrected or canceled.;
+                           FRA=Indique si la facture vente validÇe liÇe Ö cet avoir vente a ÇtÇ corrigÇe ou annulÇe.];
+                SourceExpr=Canceled;
+                Editable=FALSE;
+                LookupPageID=Mini Posted Sales Invoices;
+                DrillDownPageID=Mini Posted Sales Invoices;
+                Style=Unfavorable;
+                StyleExpr=Canceled;
+                OnDrillDown=VAR
+                              SalesInvoiceHeader@1000 : Record 112;
+                            BEGIN
+                              IF Canceled THEN BEGIN
+                                SalesInvoiceHeader.SETRANGE("No.","Applies-to Doc. No.");
+                                PAGE.RUN(PAGE::"Mini Posted Sales Invoices",SalesInvoiceHeader);
+                              END;
+                            END;
+                             }
+
+    { 14  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how many times the credit memo has been printed.;
+                           FRA=Affiche le nombre d'impressions de l'avoir.];
+                SourceExpr="No. Printed";
+                Editable=FALSE }
+
+    { 54  ;1   ;Part      ;
+                Name=SalesCrLines;
+                SubPageLink=Document No.=FIELD(No.);
+                PagePartID=Page1323;
+                PartType=Page }
+
+    { 10  ;1   ;Group     ;
+                Name=CreditMemoDetails;
+                CaptionML=[ENU=Credit Memo Details;
+                           FRA=DÇtails de l'avoir];
+                GroupType=Group }
+
+    { 87  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the currency code of the credit memo.;
+                           FRA=SpÇcifie le code devise de l'avoir.];
+                SourceExpr="Currency Code";
+                Importance=Promoted }
+
+    { 17  ;2   ;Field     ;
+                ToolTipML=[ENU=Copies the date for this field from the Shipment Date field on the sales header, which is used for planning purposes.;
+                           FRA=Copie la date de ce champ dans le champ Date de prÇparation de l'en-tàte vente, que le programme utilise Ö des fins de planification.];
+                SourceExpr="Shipment Date";
+                Editable=FALSE }
+
+    { 73  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the credit memo that the posted credit memo was created from.;
+                           FRA=SpÇcifie le numÇro de l'avoir Ö partir duquel l'avoir validÇ a ÇtÇ crÇÇ.];
+                SourceExpr="Pre-Assigned No.";
+                Editable=FALSE }
+
+    { 28  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the code to use to find the payment terms that apply to the credit memo.;
+                           FRA=Indique le code Ö utiliser pour trouver les conditions de paiement qui s'appliquent Ö l'avoir.];
+                SourceExpr="Payment Terms Code";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 82  ;2   ;Field     ;
+                ToolTipML=[ENU=Describes the customer's method of payment. The program has copied the code from the Payment Method Code field on the sales header.;
+                           FRA=DÇcrit le mode de räglement du client. Le programme a copiÇ le code Ö partir du champ Code mode de räglement sur l'en-tàte vente.];
+                SourceExpr="Payment Method Code";
+                Editable=FALSE }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Shows the transaction type of the sales header that this line was posted from.;
+                           FRA=Affiche le nature de la transaction de l'en-tàte vente Ö partir de laquelle cette ligne a ÇtÇ validÇe.];
+                SourceExpr="Transaction Type" }
+
+    { 4   ;1   ;Group     ;
+                CaptionML=[ENU=Bill-to Customer Addresses;
+                           FRA=Adresses client facturÇ];
+                GroupType=Group }
+
+    { 18  ;2   ;Field     ;
+                CaptionML=[ENU=Name;
+                           FRA=Nom];
+                ToolTipML=[ENU=Specifies the name of the customer that the credit memo was sent to.;
+                           FRA=SpÇcifie le nom du client Ö qui l'avoir a ÇtÇ envoyÇ.];
+                SourceExpr="Bill-to Name";
+                Editable=FALSE }
+
+    { 20  ;2   ;Field     ;
+                CaptionML=[ENU=Address;
+                           FRA=Adresse];
+                ToolTipML=[ENU=Specifies the address of the customer that the credit memo was sent to.;
+                           FRA=SpÇcifie l'adresse du client Ö qui l'avoir a ÇtÇ envoyÇ.];
+                SourceExpr="Bill-to Address";
+                Editable=FALSE }
+
+    { 22  ;2   ;Field     ;
+                CaptionML=[ENU=Address 2;
+                           FRA=Adresse 2];
+                ToolTipML=[ENU=Contains an additional part of the address of the customer that the credit memo was sent to.;
+                           FRA=Contient un complÇment Ö l'adresse du client Ö qui l'avoir a ÇtÇ envoyÇ.];
+                SourceExpr="Bill-to Address 2";
+                Editable=FALSE }
+
+    { 78  ;2   ;Field     ;
+                CaptionML=[ENU=Post Code;
+                           FRA=Code postal];
+                ToolTipML=[ENU=Specifies the post code of the customer's billing address.;
+                           FRA=Indique le code postal de l'adresse de facturation du client.];
+                SourceExpr="Bill-to Post Code";
+                Editable=FALSE }
+
+    { 24  ;2   ;Field     ;
+                CaptionML=[ENU=City;
+                           FRA=Ville];
+                ToolTipML=[ENU=Specifies the city name of the customer that the credit memo was sent to.;
+                           FRA=SpÇcifie le nom de la ville du client Ö qui l'avoir a ÇtÇ envoyÇ.];
+                SourceExpr="Bill-to City";
+                Editable=FALSE }
+
+    { 26  ;2   ;Field     ;
+                CaptionML=[ENU=Contact;
+                           FRA=Contact];
+                ToolTipML=[ENU=Specifies the name of the person you regularly contact when you communicate with the customer to whom the credit memo was sent.;
+                           FRA=Indique le nom de la personne que vous contactez rÇguliärement lorsque vous communiquez avec le client qui a reáu l'avoir.];
+                SourceExpr="Bill-to Contact";
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      SalesCrMemoHeader@1000 : Record 114;
+      AllowDotNetAddIn@1001 : Boolean INDATASET;
+      DocExchStatusStyle@1002 : Text;
+
+    BEGIN
+    END.
+  }
+}
+

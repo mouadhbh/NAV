@@ -1,0 +1,73 @@
+OBJECT Table 2000000100 Debugger Breakpoint
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Debugger Breakpoint;
+               FRA=Point d'arrˆt du d‚bogueur];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Breakpoint ID       ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=Breakpoint ID;
+                                                              FRA=ID de point d'arrˆt] }
+    { 7   ;   ;Object Type         ;Option        ;InitValue=Page;
+                                                   CaptionML=[ENU=Object Type;
+                                                              FRA=Type objet];
+                                                   OptionCaptionML=[ENU=,Table,,Report,,Codeunit,XMLport,,Page,Query;
+                                                                    FRA=,Table,,Report,,Codeunit,XMLport,,Page,Query];
+                                                   OptionString=,Table,,Report,,Codeunit,XMLport,,Page,Query }
+    { 9   ;   ;Object ID           ;Integer       ;TableRelation=AllObj."Object ID" WHERE (Object Type=FIELD(Object Type));
+                                                   CaptionML=[ENU=Object ID;
+                                                              FRA=ID objet] }
+    { 10  ;   ;Object Name         ;Text30        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(AllObjWithCaption."Object Name" WHERE (Object Type=FIELD(Object Type),
+                                                                                                             Object ID=FIELD(Object ID)));
+                                                   CaptionML=[ENU=Object Name;
+                                                              FRA=Nom objet] }
+    { 11  ;   ;Line No.            ;Integer       ;CaptionML=[ENU=Line No.;
+                                                              FRA=Nø ligne] }
+    { 13  ;   ;Column No.          ;Integer       ;CaptionML=[ENU=Column No.;
+                                                              FRA=Nø colonne] }
+    { 15  ;   ;End Line No.        ;Integer       ;CaptionML=[ENU=End Line No.;
+                                                              FRA=Nø ligne de fin] }
+    { 17  ;   ;End Column No.      ;Integer       ;CaptionML=[ENU=End Column No.;
+                                                              FRA=Nø colonne de fin] }
+    { 19  ;   ;Function Name       ;Text128       ;CaptionML=[ENU=Function Name;
+                                                              FRA=Nom de fonction] }
+    { 21  ;   ;Enabled             ;Boolean       ;InitValue=Yes;
+                                                   CaptionML=[ENU=Enabled;
+                                                              FRA=Activ‚] }
+    { 23  ;   ;Condition           ;Text250       ;CaptionML=[ENU=Condition;
+                                                              FRA=Condition] }
+    { 27  ;   ;Session Breakpoint ID;BigInteger   ;CaptionML=[ENU=Session Breakpoint ID;
+                                                              FRA=ID point d'arrˆt de la session] }
+    { 29  ;   ;Relative Line No.   ;Integer       ;CaptionML=[ENU=Relative Line No.;
+                                                              FRA=Nø ligne relative] }
+    { 31  ;   ;Relative End Line No.;Integer      ;CaptionML=[ENU=Relative End Line No.;
+                                                              FRA=Nø ligne de fin relative] }
+    { 33  ;   ;Function ID         ;Integer       ;CaptionML=[ENU=Function ID;
+                                                              FRA=ID fonction] }
+  }
+  KEYS
+  {
+    {    ;Breakpoint ID                           ;Clustered=Yes }
+    {    ;Object Type,Object ID,Line No.,Column No. }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

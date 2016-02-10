@@ -1,0 +1,50 @@
+OBJECT Table 2000000152 NAV App Data Archive
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=NAV App Data Archive;
+               FRA=Archive donn‚es app NAV];
+  }
+  FIELDS
+  {
+    { 1   ;   ;App ID              ;GUID          ;CaptionML=[ENU=App ID;
+                                                              FRA=ID appli] }
+    { 2   ;   ;Table ID            ;Integer       ;CaptionML=[ENU=Table ID;
+                                                              FRA=ID table] }
+    { 3   ;   ;Company Name        ;Text30        ;CaptionML=[ENU=Company Name;
+                                                              FRA=Nom de la soci‚t‚] }
+    { 4   ;   ;Version Major       ;Integer       ;CaptionML=[ENU=Version Major;
+                                                              FRA=Version majeure] }
+    { 5   ;   ;Version Minor       ;Integer       ;CaptionML=[ENU=Version Minor;
+                                                              FRA=Version mineure] }
+    { 6   ;   ;Version Build       ;Integer       ;CaptionML=[ENU=Version Build;
+                                                              FRA=Build version] }
+    { 7   ;   ;Version Revision    ;Integer       ;CaptionML=[ENU=Version Revision;
+                                                              FRA=R‚vision version] }
+    { 8   ;   ;Archive Table Name  ;Text128       ;CaptionML=[ENU=Archive Table Name;
+                                                              FRA=Nom table archive] }
+    { 9   ;   ;Metadata            ;BLOB          ;CaptionML=[ENU=Metadata;
+                                                              FRA=M‚tadonn‚es] }
+  }
+  KEYS
+  {
+    {    ;App ID,Table ID,Company Name            ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

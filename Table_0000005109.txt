@@ -1,0 +1,526 @@
+OBJECT Table 5109 Purchase Header Archive
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=NAVW19.00.00.43402;
+  }
+  PROPERTIES
+  {
+    DataCaptionFields=No.,Buy-from Vendor Name,Version No.;
+    OnDelete=VAR
+               PurchaseLineArchive@1001 : Record 5110;
+               DeferralHeaderArchive@1000 : Record 5127;
+               DeferralUtilities@1002 : Codeunit 1720;
+             BEGIN
+               PurchaseLineArchive.SETRANGE("Document Type","Document Type");
+               PurchaseLineArchive.SETRANGE("Document No.","No.");
+               PurchaseLineArchive.SETRANGE("Doc. No. Occurrence","Doc. No. Occurrence");
+               PurchaseLineArchive.SETRANGE("Version No.","Version No.");
+               PurchaseLineArchive.DELETEALL;
+
+               PurchCommentLineArch.SETRANGE("Document Type","Document Type");
+               PurchCommentLineArch.SETRANGE("No.","No.");
+               PurchCommentLineArch.SETRANGE("Doc. No. Occurrence","Doc. No. Occurrence");
+               PurchCommentLineArch.SETRANGE("Version No.","Version No.");
+               PurchCommentLineArch.DELETEALL;
+
+               DeferralHeaderArchive.SETRANGE("Deferral Doc. Type",DeferralUtilities.GetPurchDeferralDocType);
+               DeferralHeaderArchive.SETRANGE("Document Type","Document Type");
+               DeferralHeaderArchive.SETRANGE("Document No.","No.");
+               DeferralHeaderArchive.SETRANGE("Doc. No. Occurrence","Doc. No. Occurrence");
+               DeferralHeaderArchive.SETRANGE("Version No.","Version No.");
+               DeferralHeaderArchive.DELETEALL(TRUE);
+             END;
+
+    CaptionML=[ENU=Purchase Header Archive;
+               FRA=Archives en-tàte achat];
+    LookupPageID=Page5166;
+    DrillDownPageID=Page5166;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Document Type       ;Option        ;CaptionML=[ENU=Document Type;
+                                                              FRA=Type document];
+                                                   OptionCaptionML=[ENU=Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order;
+                                                                    FRA=Devis,Commande,Facture,Avoir,Commande ouverte,Retour];
+                                                   OptionString=Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order }
+    { 2   ;   ;Buy-from Vendor No. ;Code20        ;TableRelation=Vendor;
+                                                   CaptionML=[ENU=Buy-from Vendor No.;
+                                                              FRA=N¯ fournisseur] }
+    { 3   ;   ;No.                 ;Code20        ;CaptionML=[ENU=No.;
+                                                              FRA=N¯] }
+    { 4   ;   ;Pay-to Vendor No.   ;Code20        ;TableRelation=Vendor;
+                                                   CaptionML=[ENU=Pay-to Vendor No.;
+                                                              FRA=N¯ fournisseur Ö payer];
+                                                   NotBlank=Yes }
+    { 5   ;   ;Pay-to Name         ;Text50        ;CaptionML=[ENU=Pay-to Name;
+                                                              FRA=Nom] }
+    { 6   ;   ;Pay-to Name 2       ;Text50        ;CaptionML=[ENU=Pay-to Name 2;
+                                                              FRA=Nom 2] }
+    { 7   ;   ;Pay-to Address      ;Text50        ;CaptionML=[ENU=Pay-to Address;
+                                                              FRA=Adresse] }
+    { 8   ;   ;Pay-to Address 2    ;Text50        ;CaptionML=[ENU=Pay-to Address 2;
+                                                              FRA=Adresse (2äme ligne)] }
+    { 9   ;   ;Pay-to City         ;Text30        ;TableRelation="Post Code".City;
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Pay-to City;
+                                                              FRA=Ville] }
+    { 10  ;   ;Pay-to Contact      ;Text50        ;CaptionML=[ENU=Pay-to Contact;
+                                                              FRA=Contact] }
+    { 11  ;   ;Your Reference      ;Text35        ;CaptionML=[ENU=Your Reference;
+                                                              FRA=Votre rÇfÇrence] }
+    { 12  ;   ;Ship-to Code        ;Code10        ;CaptionML=[ENU=Ship-to Code;
+                                                              FRA=Code destinataire] }
+    { 13  ;   ;Ship-to Name        ;Text50        ;CaptionML=[ENU=Ship-to Name;
+                                                              FRA=Nom du destinataire] }
+    { 14  ;   ;Ship-to Name 2      ;Text50        ;CaptionML=[ENU=Ship-to Name 2;
+                                                              FRA=Nom du destinataire 2] }
+    { 15  ;   ;Ship-to Address     ;Text50        ;CaptionML=[ENU=Ship-to Address;
+                                                              FRA=Adresse destinataire] }
+    { 16  ;   ;Ship-to Address 2   ;Text50        ;CaptionML=[ENU=Ship-to Address 2;
+                                                              FRA=Adresse destinataire 2] }
+    { 17  ;   ;Ship-to City        ;Text30        ;TableRelation="Post Code".City;
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Ship-to City;
+                                                              FRA=Ville destinataire] }
+    { 18  ;   ;Ship-to Contact     ;Text50        ;CaptionML=[ENU=Ship-to Contact;
+                                                              FRA=Contact destinataire] }
+    { 19  ;   ;Order Date          ;Date          ;AccessByPermission=TableData 120=R;
+                                                   CaptionML=[ENU=Order Date;
+                                                              FRA=Date commande] }
+    { 20  ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              FRA=Date comptabilisation] }
+    { 21  ;   ;Expected Receipt Date;Date         ;CaptionML=[ENU=Expected Receipt Date;
+                                                              FRA=Date rÇception prÇvue] }
+    { 22  ;   ;Posting Description ;Text50        ;CaptionML=[ENU=Posting Description;
+                                                              FRA=LibellÇ Çcriture] }
+    { 23  ;   ;Payment Terms Code  ;Code10        ;TableRelation="Payment Terms";
+                                                   CaptionML=[ENU=Payment Terms Code;
+                                                              FRA=Code condition paiement] }
+    { 24  ;   ;Due Date            ;Date          ;CaptionML=[ENU=Due Date;
+                                                              FRA=Date d'ÇchÇance] }
+    { 25  ;   ;Payment Discount %  ;Decimal       ;CaptionML=[ENU=Payment Discount %;
+                                                              FRA=% escompte];
+                                                   DecimalPlaces=0:5;
+                                                   MinValue=0;
+                                                   MaxValue=100 }
+    { 26  ;   ;Pmt. Discount Date  ;Date          ;CaptionML=[ENU=Pmt. Discount Date;
+                                                              FRA=Date d'escompte] }
+    { 27  ;   ;Shipment Method Code;Code10        ;TableRelation="Shipment Method";
+                                                   CaptionML=[ENU=Shipment Method Code;
+                                                              FRA=Code condition livraison] }
+    { 28  ;   ;Location Code       ;Code10        ;TableRelation=Location WHERE (Use As In-Transit=CONST(No));
+                                                   CaptionML=[ENU=Location Code;
+                                                              FRA=Code magasin] }
+    { 29  ;   ;Shortcut Dimension 1 Code;Code20   ;TableRelation="Dimension Value".Code WHERE (Global Dimension No.=CONST(1));
+                                                   CaptionML=[ENU=Shortcut Dimension 1 Code;
+                                                              FRA=Code raccourci axe 1];
+                                                   CaptionClass='1,2,1' }
+    { 30  ;   ;Shortcut Dimension 2 Code;Code20   ;TableRelation="Dimension Value".Code WHERE (Global Dimension No.=CONST(2));
+                                                   CaptionML=[ENU=Shortcut Dimension 2 Code;
+                                                              FRA=Code raccourci axe 2];
+                                                   CaptionClass='1,2,2' }
+    { 31  ;   ;Vendor Posting Group;Code10        ;TableRelation="Vendor Posting Group";
+                                                   CaptionML=[ENU=Vendor Posting Group;
+                                                              FRA=Groupe compta. fournisseur] }
+    { 32  ;   ;Currency Code       ;Code10        ;TableRelation=Currency;
+                                                   CaptionML=[ENU=Currency Code;
+                                                              FRA=Code devise] }
+    { 33  ;   ;Currency Factor     ;Decimal       ;CaptionML=[ENU=Currency Factor;
+                                                              FRA=Facteur devise];
+                                                   DecimalPlaces=0:15;
+                                                   MinValue=0 }
+    { 35  ;   ;Prices Including VAT;Boolean       ;CaptionML=[ENU=Prices Including VAT;
+                                                              FRA=Prix TTC] }
+    { 37  ;   ;Invoice Disc. Code  ;Code20        ;CaptionML=[ENU=Invoice Disc. Code;
+                                                              FRA=Code remise facture] }
+    { 41  ;   ;Language Code       ;Code10        ;TableRelation=Language;
+                                                   CaptionML=[ENU=Language Code;
+                                                              FRA=Code langue] }
+    { 43  ;   ;Purchaser Code      ;Code10        ;TableRelation=Salesperson/Purchaser;
+                                                   CaptionML=[ENU=Purchaser Code;
+                                                              FRA=Code acheteur] }
+    { 45  ;   ;Order Class         ;Code10        ;CaptionML=[ENU=Order Class;
+                                                              FRA=Type commande] }
+    { 46  ;   ;Comment             ;Boolean       ;FieldClass=FlowField;
+                                                   CalcFormula=Exist("Purch. Comment Line Archive" WHERE (Document Type=FIELD(Document Type),
+                                                                                                          No.=FIELD(No.),
+                                                                                                          Document Line No.=CONST(0),
+                                                                                                          Doc. No. Occurrence=FIELD(Doc. No. Occurrence),
+                                                                                                          Version No.=FIELD(Version No.)));
+                                                   CaptionML=[ENU=Comment;
+                                                              FRA=Commentaires];
+                                                   Editable=No }
+    { 47  ;   ;No. Printed         ;Integer       ;CaptionML=[ENU=No. Printed;
+                                                              FRA=Nbre impressions] }
+    { 51  ;   ;On Hold             ;Code3         ;CaptionML=[ENU=On Hold;
+                                                              FRA=En attente] }
+    { 52  ;   ;Applies-to Doc. Type;Option        ;CaptionML=[ENU=Applies-to Doc. Type;
+                                                              FRA=Type doc. lettrage];
+                                                   OptionCaptionML=[ENU=" ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund";
+                                                                    FRA=" ,Paiement,Facture,Avoir,IntÇràts,Relance,Remboursement"];
+                                                   OptionString=[ ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund] }
+    { 53  ;   ;Applies-to Doc. No. ;Code20        ;CaptionML=[ENU=Applies-to Doc. No.;
+                                                              FRA=N¯ doc. lettrage] }
+    { 55  ;   ;Bal. Account No.    ;Code20        ;TableRelation=IF (Bal. Account Type=CONST(G/L Account)) "G/L Account"
+                                                                 ELSE IF (Bal. Account Type=CONST(Bank Account)) "Bank Account";
+                                                   CaptionML=[ENU=Bal. Account No.;
+                                                              FRA=N¯ compte contrepartie] }
+    { 57  ;   ;Receive             ;Boolean       ;CaptionML=[ENU=Receive;
+                                                              FRA=RÇceptionner] }
+    { 58  ;   ;Invoice             ;Boolean       ;CaptionML=[ENU=Invoice;
+                                                              FRA=Facturer] }
+    { 60  ;   ;Amount              ;Decimal       ;FieldClass=FlowField;
+                                                   CalcFormula=Sum("Purchase Line Archive".Amount WHERE (Document Type=FIELD(Document Type),
+                                                                                                         Document No.=FIELD(No.),
+                                                                                                         Doc. No. Occurrence=FIELD(Doc. No. Occurrence),
+                                                                                                         Version No.=FIELD(Version No.)));
+                                                   CaptionML=[ENU=Amount;
+                                                              FRA=Montant];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 61  ;   ;Amount Including VAT;Decimal       ;FieldClass=FlowField;
+                                                   CalcFormula=Sum("Purchase Line Archive"."Amount Including VAT" WHERE (Document Type=FIELD(Document Type),
+                                                                                                                         Document No.=FIELD(No.),
+                                                                                                                         Doc. No. Occurrence=FIELD(Doc. No. Occurrence),
+                                                                                                                         Version No.=FIELD(Version No.)));
+                                                   CaptionML=[ENU=Amount Including VAT;
+                                                              FRA=Montant TTC];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 62  ;   ;Receiving No.       ;Code20        ;CaptionML=[ENU=Receiving No.;
+                                                              FRA=Utiliser B.R. n¯] }
+    { 63  ;   ;Posting No.         ;Code20        ;CaptionML=[ENU=Posting No.;
+                                                              FRA=N¯ validation] }
+    { 64  ;   ;Last Receiving No.  ;Code20        ;TableRelation="Purch. Rcpt. Header";
+                                                   CaptionML=[ENU=Last Receiving No.;
+                                                              FRA=N¯ dern. bon de rÇception] }
+    { 65  ;   ;Last Posting No.    ;Code20        ;TableRelation="Purch. Inv. Header";
+                                                   CaptionML=[ENU=Last Posting No.;
+                                                              FRA=N¯ dern. facture] }
+    { 66  ;   ;Vendor Order No.    ;Code35        ;CaptionML=[ENU=Vendor Order No.;
+                                                              FRA=N¯ commande fournisseur] }
+    { 67  ;   ;Vendor Shipment No. ;Code35        ;CaptionML=[ENU=Vendor Shipment No.;
+                                                              FRA=N¯ B.L. fournisseur] }
+    { 68  ;   ;Vendor Invoice No.  ;Code35        ;CaptionML=[ENU=Vendor Invoice No.;
+                                                              FRA=N¯ facture fournisseur] }
+    { 69  ;   ;Vendor Cr. Memo No. ;Code35        ;CaptionML=[ENU=Vendor Cr. Memo No.;
+                                                              FRA=N¯ avoir fournisseur] }
+    { 70  ;   ;VAT Registration No.;Text20        ;CaptionML=[ENU=VAT Registration No.;
+                                                              FRA=N¯ identif. intracomm.] }
+    { 72  ;   ;Sell-to Customer No.;Code20        ;TableRelation=Customer;
+                                                   CaptionML=[ENU=Sell-to Customer No.;
+                                                              FRA=N¯ donneur d'ordre] }
+    { 73  ;   ;Reason Code         ;Code10        ;TableRelation="Reason Code";
+                                                   CaptionML=[ENU=Reason Code;
+                                                              FRA=Code motif] }
+    { 74  ;   ;Gen. Bus. Posting Group;Code10     ;TableRelation="Gen. Business Posting Group";
+                                                   CaptionML=[ENU=Gen. Bus. Posting Group;
+                                                              FRA=Groupe compta. marchÇ] }
+    { 76  ;   ;Transaction Type    ;Code10        ;TableRelation="Transaction Type";
+                                                   CaptionML=[ENU=Transaction Type;
+                                                              FRA=Nature transaction] }
+    { 77  ;   ;Transport Method    ;Code10        ;TableRelation="Transport Method";
+                                                   CaptionML=[ENU=Transport Method;
+                                                              FRA=Mode de transport] }
+    { 78  ;   ;VAT Country/Region Code;Code10     ;TableRelation=Country/Region;
+                                                   CaptionML=[ENU=VAT Country/Region Code;
+                                                              FRA=Code pays/rÇgion TVA] }
+    { 79  ;   ;Buy-from Vendor Name;Text50        ;CaptionML=[ENU=Buy-from Vendor Name;
+                                                              FRA=Nom du fournisseur] }
+    { 80  ;   ;Buy-from Vendor Name 2;Text50      ;CaptionML=[ENU=Buy-from Vendor Name 2;
+                                                              FRA=Nom du fournisseur 2] }
+    { 81  ;   ;Buy-from Address    ;Text50        ;CaptionML=[ENU=Buy-from Address;
+                                                              FRA=Adresse fournisseur] }
+    { 82  ;   ;Buy-from Address 2  ;Text50        ;CaptionML=[ENU=Buy-from Address 2;
+                                                              FRA=Adresse fournisseur 2] }
+    { 83  ;   ;Buy-from City       ;Text30        ;TableRelation="Post Code".City;
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Buy-from City;
+                                                              FRA=Ville fournisseur] }
+    { 84  ;   ;Buy-from Contact    ;Text50        ;CaptionML=[ENU=Buy-from Contact;
+                                                              FRA=Contact fournisseur] }
+    { 85  ;   ;Pay-to Post Code    ;Code20        ;TableRelation="Post Code";
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Pay-to Post Code;
+                                                              FRA=Code postal] }
+    { 86  ;   ;Pay-to County       ;Text30        ;CaptionML=[ENU=Pay-to County;
+                                                              FRA=RÇgion] }
+    { 87  ;   ;Pay-to Country/Region Code;Code10  ;TableRelation=Country/Region;
+                                                   CaptionML=[ENU=Pay-to Country/Region Code;
+                                                              FRA=Code pays/rÇgion paiement] }
+    { 88  ;   ;Buy-from Post Code  ;Code20        ;TableRelation="Post Code";
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Buy-from Post Code;
+                                                              FRA=Code postal fournisseur] }
+    { 89  ;   ;Buy-from County     ;Text30        ;CaptionML=[ENU=Buy-from County;
+                                                              FRA=RÇgion fournisseur] }
+    { 90  ;   ;Buy-from Country/Region Code;Code10;TableRelation=Country/Region;
+                                                   CaptionML=[ENU=Buy-from Country/Region Code;
+                                                              FRA=Code pays/rÇgion fournisseur] }
+    { 91  ;   ;Ship-to Post Code   ;Code20        ;TableRelation="Post Code";
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Ship-to Post Code;
+                                                              FRA=Code postal destinataire] }
+    { 92  ;   ;Ship-to County      ;Text30        ;CaptionML=[ENU=Ship-to County;
+                                                              FRA=RÇgion destinataire] }
+    { 93  ;   ;Ship-to Country/Region Code;Code10 ;TableRelation=Country/Region;
+                                                   CaptionML=[ENU=Ship-to Country/Region Code;
+                                                              FRA=Code pays/rÇgion destinataire] }
+    { 94  ;   ;Bal. Account Type   ;Option        ;CaptionML=[ENU=Bal. Account Type;
+                                                              FRA=Type compte contrepartie];
+                                                   OptionCaptionML=[ENU=G/L Account,Bank Account;
+                                                                    FRA=GÇnÇral,Banque];
+                                                   OptionString=G/L Account,Bank Account }
+    { 95  ;   ;Order Address Code  ;Code10        ;TableRelation="Order Address".Code WHERE (Vendor No.=FIELD(Buy-from Vendor No.));
+                                                   CaptionML=[ENU=Order Address Code;
+                                                              FRA=Code adresse commande] }
+    { 97  ;   ;Entry Point         ;Code10        ;TableRelation="Entry/Exit Point";
+                                                   CaptionML=[ENU=Entry Point;
+                                                              FRA=Pays provenance] }
+    { 98  ;   ;Correction          ;Boolean       ;CaptionML=[ENU=Correction;
+                                                              FRA=Correction] }
+    { 99  ;   ;Document Date       ;Date          ;CaptionML=[ENU=Document Date;
+                                                              FRA=Date document] }
+    { 101 ;   ;Area                ;Code10        ;TableRelation=Area;
+                                                   CaptionML=[ENU=Area;
+                                                              FRA=DÇpt destination/provenance] }
+    { 102 ;   ;Transaction Specification;Code10   ;TableRelation="Transaction Specification";
+                                                   CaptionML=[ENU=Transaction Specification;
+                                                              FRA=RÇgime] }
+    { 104 ;   ;Payment Method Code ;Code10        ;TableRelation="Payment Method";
+                                                   CaptionML=[ENU=Payment Method Code;
+                                                              FRA=Code mode de räglement] }
+    { 107 ;   ;No. Series          ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=No. Series;
+                                                              FRA=Souches de n¯] }
+    { 108 ;   ;Posting No. Series  ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Posting No. Series;
+                                                              FRA=Souches de n¯ validation] }
+    { 109 ;   ;Receiving No. Series;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Receiving No. Series;
+                                                              FRA=Souche de n¯ rÇception] }
+    { 114 ;   ;Tax Area Code       ;Code20        ;TableRelation="Tax Area";
+                                                   CaptionML=[ENU=Tax Area Code;
+                                                              FRA=Code zone recouvrement] }
+    { 115 ;   ;Tax Liable          ;Boolean       ;CaptionML=[ENU=Tax Liable;
+                                                              FRA=Soumis Ö recouvrement] }
+    { 116 ;   ;VAT Bus. Posting Group;Code10      ;TableRelation="VAT Business Posting Group";
+                                                   CaptionML=[ENU=VAT Bus. Posting Group;
+                                                              FRA=Groupe compta. marchÇ TVA] }
+    { 118 ;   ;Applies-to ID       ;Code50        ;CaptionML=[ENU=Applies-to ID;
+                                                              FRA=ID lettrage] }
+    { 119 ;   ;VAT Base Discount % ;Decimal       ;CaptionML=[ENU=VAT Base Discount %;
+                                                              FRA=% remise base TVA];
+                                                   DecimalPlaces=0:5;
+                                                   MinValue=0;
+                                                   MaxValue=100 }
+    { 120 ;   ;Status              ;Option        ;CaptionML=[ENU=Status;
+                                                              FRA=Statut];
+                                                   OptionCaptionML=[ENU=Open,Released;
+                                                                    FRA=Ouvert,LancÇ];
+                                                   OptionString=Open,Released }
+    { 121 ;   ;Invoice Discount Calculation;Option;CaptionML=[ENU=Invoice Discount Calculation;
+                                                              FRA=Calcul remise facture];
+                                                   OptionCaptionML=[ENU=None,%,Amount;
+                                                                    FRA=Aucun,%,Montant];
+                                                   OptionString=None,%,Amount }
+    { 122 ;   ;Invoice Discount Value;Decimal     ;CaptionML=[ENU=Invoice Discount Value;
+                                                              FRA=Valeur remise facture];
+                                                   AutoFormatType=1 }
+    { 123 ;   ;Send IC Document    ;Boolean       ;CaptionML=[ENU=Send IC Document;
+                                                              FRA=Envoyer le document IC] }
+    { 124 ;   ;IC Status           ;Option        ;CaptionML=[ENU=IC Status;
+                                                              FRA=Statut IC];
+                                                   OptionCaptionML=[ENU=New,Pending,Sent;
+                                                                    FRA=Nouveau,Suspendu,EnvoyÇ];
+                                                   OptionString=New,Pending,Sent }
+    { 125 ;   ;Buy-from IC Partner Code;Code20    ;TableRelation="IC Partner";
+                                                   CaptionML=[ENU=Buy-from IC Partner Code;
+                                                              FRA=Code parten IC fournisseur];
+                                                   Editable=No }
+    { 126 ;   ;Pay-to IC Partner Code;Code20      ;TableRelation="IC Partner";
+                                                   CaptionML=[ENU=Pay-to IC Partner Code;
+                                                              FRA=Code du partenaire IC Ö payer];
+                                                   Editable=No }
+    { 129 ;   ;IC Direction        ;Option        ;CaptionML=[ENU=IC Direction;
+                                                              FRA=Direction IC];
+                                                   OptionCaptionML=[ENU=Outgoing,Incoming;
+                                                                    FRA=Sortant,Entrant];
+                                                   OptionString=Outgoing,Incoming }
+    { 130 ;   ;Prepayment No.      ;Code20        ;CaptionML=[ENU=Prepayment No.;
+                                                              FRA=N¯ acompte] }
+    { 131 ;   ;Last Prepayment No. ;Code20        ;TableRelation="Sales Invoice Header";
+                                                   CaptionML=[ENU=Last Prepayment No.;
+                                                              FRA=N¯ dernier acompte] }
+    { 132 ;   ;Prepmt. Cr. Memo No.;Code20        ;CaptionML=[ENU=Prepmt. Cr. Memo No.;
+                                                              FRA=N¯ avoir acompte] }
+    { 133 ;   ;Last Prepmt. Cr. Memo No.;Code20   ;TableRelation="Sales Invoice Header";
+                                                   CaptionML=[ENU=Last Prepmt. Cr. Memo No.;
+                                                              FRA=N¯ avoir dernier acompte] }
+    { 134 ;   ;Prepayment %        ;Decimal       ;CaptionML=[ENU=Prepayment %;
+                                                              FRA=% acompte];
+                                                   DecimalPlaces=0:5;
+                                                   MinValue=0;
+                                                   MaxValue=100 }
+    { 135 ;   ;Prepayment No. Series;Code10       ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Prepayment No. Series;
+                                                              FRA=N¯ de sÇrie acompte] }
+    { 136 ;   ;Compress Prepayment ;Boolean       ;InitValue=Yes;
+                                                   CaptionML=[ENU=Compress Prepayment;
+                                                              FRA=Compresser acompte] }
+    { 137 ;   ;Prepayment Due Date ;Date          ;CaptionML=[ENU=Prepayment Due Date;
+                                                              FRA=êchÇance acompte] }
+    { 138 ;   ;Prepmt. Cr. Memo No. Series;Code10 ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Prepmt. Cr. Memo No. Series;
+                                                              FRA=N¯ de sÇrie avoir acompte] }
+    { 139 ;   ;Prepmt. Posting Description;Text50 ;CaptionML=[ENU=Prepmt. Posting Description;
+                                                              FRA=LibellÇ Çcriture acompte] }
+    { 142 ;   ;Prepmt. Pmt. Discount Date;Date    ;CaptionML=[ENU=Prepmt. Pmt. Discount Date;
+                                                              FRA=Date escompte acompte] }
+    { 143 ;   ;Prepmt. Payment Terms Code;Code10  ;TableRelation="Payment Terms";
+                                                   CaptionML=[ENU=Prepmt. Payment Terms Code;
+                                                              FRA=Code conditions paiement acompte] }
+    { 144 ;   ;Prepmt. Payment Discount %;Decimal ;CaptionML=[ENU=Prepmt. Payment Discount %;
+                                                              FRA=% escompte acompte];
+                                                   DecimalPlaces=0:5;
+                                                   MinValue=0;
+                                                   MaxValue=100 }
+    { 145 ;   ;No. of Archived Versions;Integer   ;FieldClass=FlowField;
+                                                   CalcFormula=Max("Purchase Header Archive"."Version No." WHERE (Document Type=FIELD(Document Type),
+                                                                                                                  No.=FIELD(No.),
+                                                                                                                  Doc. No. Occurrence=FIELD(Doc. No. Occurrence)));
+                                                   CaptionML=[ENU=No. of Archived Versions;
+                                                              FRA=Nbre versions archivÇes];
+                                                   Editable=No }
+    { 151 ;   ;Purchase Quote No.  ;Code20        ;TableRelation="Purchase Header".No. WHERE (Document Type=CONST(Quote),
+                                                                                              No.=FIELD(Purchase Quote No.));
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Purchase Quote No.;
+                                                              FRA=N¯ demande de prix];
+                                                   Editable=No }
+    { 480 ;   ;Dimension Set ID    ;Integer       ;TableRelation="Dimension Set Entry";
+                                                   OnLookup=BEGIN
+                                                              ShowDimensions;
+                                                            END;
+
+                                                   CaptionML=[ENU=Dimension Set ID;
+                                                              FRA=ID ensemble de dimensions];
+                                                   Editable=No }
+    { 5043;   ;Interaction Exist   ;Boolean       ;CaptionML=[ENU=Interaction Exist;
+                                                              FRA=Interaction] }
+    { 5044;   ;Time Archived       ;Time          ;CaptionML=[ENU=Time Archived;
+                                                              FRA=Heure d'archivage] }
+    { 5045;   ;Date Archived       ;Date          ;CaptionML=[ENU=Date Archived;
+                                                              FRA=Date d'archivage] }
+    { 5046;   ;Archived By         ;Code50        ;CaptionML=[ENU=Archived By;
+                                                              FRA=ArchivÇ par] }
+    { 5047;   ;Version No.         ;Integer       ;CaptionML=[ENU=Version No.;
+                                                              FRA=N¯ version] }
+    { 5048;   ;Doc. No. Occurrence ;Integer       ;CaptionML=[ENU=Doc. No. Occurrence;
+                                                              FRA=Occurrence n¯ doc.] }
+    { 5050;   ;Campaign No.        ;Code20        ;TableRelation=Campaign;
+                                                   CaptionML=[ENU=Campaign No.;
+                                                              FRA=N¯ campagne] }
+    { 5052;   ;Buy-from Contact No.;Code20        ;TableRelation=Contact;
+                                                   CaptionML=[ENU=Buy-from Contact No.;
+                                                              FRA=N¯ contact fournisseur] }
+    { 5053;   ;Pay-to Contact No.  ;Code20        ;TableRelation=Contact;
+                                                   CaptionML=[ENU=Pay-to Contact No.;
+                                                              FRA=N¯ contact Ö payer] }
+    { 5700;   ;Responsibility Center;Code10       ;TableRelation="Responsibility Center";
+                                                   CaptionML=[ENU=Responsibility Center;
+                                                              FRA=Centre de gestion] }
+    { 5752;   ;Completely Received ;Boolean       ;FieldClass=FlowField;
+                                                   CalcFormula=Min("Purchase Line Archive"."Completely Received" WHERE (Document Type=FIELD(Document Type),
+                                                                                                                        Document No.=FIELD(No.),
+                                                                                                                        Doc. No. Occurrence=FIELD(Doc. No. Occurrence),
+                                                                                                                        Version No.=FIELD(Version No.),
+                                                                                                                        Expected Receipt Date=FIELD(Date Filter),
+                                                                                                                        Location Code=FIELD(Location Filter)));
+                                                   CaptionML=[ENU=Completely Received;
+                                                              FRA=Entiärement rÇceptionnÇ];
+                                                   Editable=No }
+    { 5753;   ;Posting from Whse. Ref.;Integer    ;CaptionML=[ENU=Posting from Whse. Ref.;
+                                                              FRA=Validation Ö partir rÇf. entrepìt] }
+    { 5754;   ;Location Filter     ;Code10        ;FieldClass=FlowFilter;
+                                                   TableRelation=Location;
+                                                   CaptionML=[ENU=Location Filter;
+                                                              FRA=Filtre magasin] }
+    { 5790;   ;Requested Receipt Date;Date        ;AccessByPermission=TableData 99000880=R;
+                                                   CaptionML=[ENU=Requested Receipt Date;
+                                                              FRA=Date rÇception demandÇe] }
+    { 5791;   ;Promised Receipt Date;Date         ;CaptionML=[ENU=Promised Receipt Date;
+                                                              FRA=Date rÇception confirmÇe] }
+    { 5792;   ;Lead Time Calculation;DateFormula  ;AccessByPermission=TableData 120=R;
+                                                   CaptionML=[ENU=Lead Time Calculation;
+                                                              FRA=DÇlai de rÇappro.] }
+    { 5793;   ;Inbound Whse. Handling Time;DateFormula;
+                                                   AccessByPermission=TableData 14=R;
+                                                   CaptionML=[ENU=Inbound Whse. Handling Time;
+                                                              FRA=DÇlai enlogement] }
+    { 5796;   ;Date Filter         ;Date          ;FieldClass=FlowFilter;
+                                                   CaptionML=[ENU=Date Filter;
+                                                              FRA=Filtre date] }
+    { 5800;   ;Vendor Authorization No.;Code35    ;CaptionML=[ENU=Vendor Authorization No.;
+                                                              FRA=N¯ autorisation fournisseur] }
+    { 5801;   ;Return Shipment No. ;Code20        ;CaptionML=[ENU=Return Shipment No.;
+                                                              FRA=N¯ expÇdition retour] }
+    { 5802;   ;Return Shipment No. Series;Code10  ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Return Shipment No. Series;
+                                                              FRA=Souche de n¯ expÇdition retour] }
+    { 5803;   ;Ship                ;Boolean       ;CaptionML=[ENU=Ship;
+                                                              FRA=ExpÇdier] }
+    { 5804;   ;Last Return Shipment No.;Code20    ;TableRelation="Return Shipment Header";
+                                                   CaptionML=[ENU=Last Return Shipment No.;
+                                                              FRA=Dernier n¯ expÇdition retour] }
+    { 9000;   ;Assigned User ID    ;Code50        ;TableRelation="User Setup";
+                                                   CaptionML=[ENU=Assigned User ID;
+                                                              FRA=Code utilisateur affectÇ] }
+  }
+  KEYS
+  {
+    {    ;Document Type,No.,Doc. No. Occurrence,Version No.;
+                                                   Clustered=Yes }
+    {    ;Document Type,Buy-from Vendor No.        }
+    {    ;Document Type,Pay-to Vendor No.          }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      PurchCommentLineArch@1001 : Record 5125;
+      DimMgt@1002 : Codeunit 408;
+      UserSetupMgt@1000 : Codeunit 5700;
+
+    PROCEDURE ShowDimensions@1();
+    BEGIN
+      DimMgt.ShowDimensionSet("Dimension Set ID",STRSUBSTNO('%1 %2',"Document Type","No."));
+    END;
+
+    PROCEDURE SetSecurityFilterOnRespCenter@5();
+    BEGIN
+      IF UserSetupMgt.GetPurchasesFilter <> '' THEN BEGIN
+        FILTERGROUP(2);
+        SETRANGE("Responsibility Center",UserSetupMgt.GetPurchasesFilter);
+        FILTERGROUP(0);
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

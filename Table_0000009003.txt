@@ -1,0 +1,68 @@
+OBJECT Table 9003 User Group Permission Set
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=NAVW19.00.00.43402;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    OnInsert=VAR
+               UserGroupAccessControl@1000 : Record 9002;
+             BEGIN
+               UserGroupAccessControl.AddUserGroupPermissionSet("User Group Code","Role ID","App ID",Scope);
+             END;
+
+    OnDelete=VAR
+               UserGroupAccessControl@1000 : Record 9002;
+             BEGIN
+               UserGroupAccessControl.RemoveUserGroupPermissionSet("User Group Code","Role ID","App ID",Scope);
+             END;
+
+    CaptionML=[ENU=User Group Permission Set;
+               FRA=Ensemble d'autorisations groupe d'utilisateurs];
+  }
+  FIELDS
+  {
+    { 1   ;   ;User Group Code     ;Code20        ;TableRelation="User Group";
+                                                   CaptionML=[ENU=User Group Code;
+                                                              FRA=Code du groupe d'utilisateurs] }
+    { 2   ;   ;Role ID             ;Code20        ;TableRelation="Permission Set";
+                                                   CaptionML=[ENU=Role ID;
+                                                              FRA=ID r“le];
+                                                   Editable=No }
+    { 3   ;   ;User Group Name     ;Text30        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup("User Group".Name WHERE (Code=FIELD(User Group Code)));
+                                                   CaptionML=[ENU=User Group Name;
+                                                              FRA=Nom groupe d'utilisateurs];
+                                                   Editable=No }
+    { 4   ;   ;Role Name           ;Text30        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup("Permission Set".Name WHERE (Role ID=FIELD(Role ID)));
+                                                   CaptionML=[ENU=Role Name;
+                                                              FRA=Nom r“le];
+                                                   Editable=No }
+    { 5   ;   ;App ID              ;GUID          ;CaptionML=[ENU=App ID;
+                                                              FRA=ID appli] }
+    { 6   ;   ;Scope               ;Option        ;CaptionML=[ENU=Scope;
+                                                              FRA=Port‚e];
+                                                   OptionCaptionML=[ENU=System,Tenant;
+                                                                    FRA=SystŠme,Abonn‚];
+                                                   OptionString=System,Tenant }
+  }
+  KEYS
+  {
+    {    ;User Group Code,Role ID,Scope,App ID    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

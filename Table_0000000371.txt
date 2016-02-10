@@ -1,0 +1,56 @@
+OBJECT Table 371 Budget Buffer
+{
+  OBJECT-PROPERTIES
+  {
+    Date=05/11/08;
+    Time=12:00:00;
+    Version List=NAVW16.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Budget Buffer;
+               FRA=Tampon budget];
+  }
+  FIELDS
+  {
+    { 1   ;   ;G/L Account No.     ;Code20        ;TableRelation="G/L Account";
+                                                   CaptionML=[ENU=G/L Account No.;
+                                                              FRA=Nø compte g‚n‚ral] }
+    { 2   ;   ;Dimension Value Code 1;Code20      ;CaptionML=[ENU=Dimension Value Code 1;
+                                                              FRA=Code section analytique 1] }
+    { 3   ;   ;Dimension Value Code 2;Code20      ;CaptionML=[ENU=Dimension Value Code 2;
+                                                              FRA=Code section analytique 2] }
+    { 4   ;   ;Dimension Value Code 3;Code20      ;CaptionML=[ENU=Dimension Value Code 3;
+                                                              FRA=Code section analytique 3] }
+    { 5   ;   ;Dimension Value Code 4;Code20      ;CaptionML=[ENU=Dimension Value Code 4;
+                                                              FRA=Code section analytique 4] }
+    { 6   ;   ;Dimension Value Code 5;Code20      ;CaptionML=[ENU=Dimension Value Code 5;
+                                                              FRA=Code section analytique 5] }
+    { 7   ;   ;Dimension Value Code 6;Code20      ;CaptionML=[ENU=Dimension Value Code 6;
+                                                              FRA=Code section analytique 6] }
+    { 8   ;   ;Dimension Value Code 7;Code20      ;CaptionML=[ENU=Dimension Value Code 7;
+                                                              FRA=Code section analytique 7] }
+    { 9   ;   ;Dimension Value Code 8;Code20      ;CaptionML=[ENU=Dimension Value Code 8;
+                                                              FRA=Code section analytique 8] }
+    { 10  ;   ;Date                ;Date          ;CaptionML=[ENU=Date;
+                                                              FRA=Date] }
+    { 11  ;   ;Amount              ;Decimal       ;CaptionML=[ENU=Amount;
+                                                              FRA=Montant];
+                                                   AutoFormatType=1 }
+  }
+  KEYS
+  {
+    {    ;G/L Account No.,Dimension Value Code 1,Dimension Value Code 2,Dimension Value Code 3,Dimension Value Code 4,Dimension Value Code 5,Dimension Value Code 6,Dimension Value Code 7,Dimension Value Code 8,Date;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,56 @@
+OBJECT Table 1213 Data Exchange Type
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Data Exchange Type;
+               FRA=Type ‚change de donn‚es];
+    LookupPageID=Page1213;
+    DrillDownPageID=Page1213;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Code                ;Code20        ;CaptionML=[ENU=Code;
+                                                              FRA=Code];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Description         ;Text250       ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 3   ;   ;Data Exch. Def. Code;Code20        ;TableRelation="Data Exch. Def".Code;
+                                                   CaptionML=[ENU=Data Exch. Def. Code;
+                                                              FRA=Code d‚f. ‚chge donn‚es] }
+    { 4   ;   ;Entity Type         ;Option        ;CaptionML=[ENU=Entity Type;
+                                                              FRA=Type entit‚];
+                                                   OptionCaptionML=[ENU=Invoice,Credit Memo;
+                                                                    FRA=Facture,Avoir];
+                                                   OptionString=Invoice,Credit Memo }
+  }
+  KEYS
+  {
+    {    ;Code                                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE FindEntry@2(Type@1000 : Option) : Code[20];
+    BEGIN
+      RESET;
+      SETRANGE("Entity Type",Type);
+      IF NOT FINDFIRST THEN
+        EXIT('');
+
+      EXIT(Code);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

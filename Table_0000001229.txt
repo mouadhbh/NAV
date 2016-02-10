@@ -1,0 +1,38 @@
+OBJECT Table 1229 Payment Export Remittance Text
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/09/13;
+    Time=12:00:00;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Payment Export Remittance Text;
+               FRA=Texte remise exportation paiement];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Pmt. Export Data Entry No.;Integer ;TableRelation="Payment Export Data";
+                                                   CaptionML=[ENU=Pmt. Export Data Entry No.;
+                                                              FRA=Nø ‚criture donn‚es exportation paiem.] }
+    { 2   ;   ;Line No.            ;Integer       ;CaptionML=[ENU=Line No.;
+                                                              FRA=Nø ligne] }
+    { 3   ;   ;Text                ;Text140       ;CaptionML=[ENU=Text;
+                                                              FRA=Texte] }
+  }
+  KEYS
+  {
+    {    ;Pmt. Export Data Entry No.,Line No.     ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

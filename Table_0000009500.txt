@@ -1,0 +1,122 @@
+OBJECT Table 9500 Email Item
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Email Item;
+               FRA=êlÇment e-mail];
+  }
+  FIELDS
+  {
+    { 1   ;   ;ID                  ;GUID          ;CaptionML=[ENU=ID;
+                                                              FRA=ID] }
+    { 2   ;   ;From Name           ;Text100       ;CaptionML=[ENU=From Name;
+                                                              FRA=Nom expÇditeur] }
+    { 3   ;   ;From Address        ;Text250       ;OnValidate=VAR
+                                                                MailManagement@1000 : Codeunit 9520;
+                                                              BEGIN
+                                                                IF "From Address" <> '' THEN
+                                                                  MailManagement.CheckValidEmailAddresses("From Address");
+                                                              END;
+
+                                                   CaptionML=[ENU=From Address;
+                                                              FRA=Adresse expÇditeur] }
+    { 4   ;   ;Send to             ;Text250       ;OnValidate=BEGIN
+                                                                IF "Send to" <> '' THEN
+                                                                  CorrectAndValidateEmailList("Send to");
+                                                              END;
+
+                                                   CaptionML=[ENU=Send to;
+                                                              FRA=Envoyer Ö] }
+    { 5   ;   ;Send CC             ;Text250       ;OnValidate=BEGIN
+                                                                IF "Send CC" <> '' THEN
+                                                                  CorrectAndValidateEmailList("Send CC");
+                                                              END;
+
+                                                   CaptionML=[ENU=Send CC;
+                                                              FRA=Envoyer CC] }
+    { 6   ;   ;Send BCC            ;Text250       ;OnValidate=BEGIN
+                                                                IF "Send BCC" <> '' THEN
+                                                                  CorrectAndValidateEmailList("Send BCC");
+                                                              END;
+
+                                                   CaptionML=[ENU=Send BCC;
+                                                              FRA=Envoyer Cci] }
+    { 7   ;   ;Subject             ;Text250       ;CaptionML=[ENU=Subject;
+                                                              FRA=Sujet] }
+    { 8   ;   ;Body                ;BLOB          ;CaptionML=[ENU=Body;
+                                                              FRA=Corps] }
+    { 9   ;   ;Attachment File Path;Text250       ;CaptionML=[ENU=Attachment File Path;
+                                                              FRA=Chemin d'accäs au fichier joint] }
+    { 10  ;   ;Attachment Name     ;Text250       ;CaptionML=[ENU=Attachment Name;
+                                                              FRA=Nom document joint] }
+    { 11  ;   ;Plaintext Formatted ;Boolean       ;CaptionML=[ENU=Plaintext Formatted;
+                                                              FRA=Texte simple formatÇ] }
+  }
+  KEYS
+  {
+    {    ;ID                                      ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE Init@1();
+    BEGIN
+      ID := CREATEGUID;
+    END;
+
+    PROCEDURE Send@2(HideMailDialog@1000 : Boolean);
+    VAR
+      MailManagement@1001 : Codeunit 9520;
+    BEGIN
+      MailManagement.SendMailOrDownload(Rec,HideMailDialog);
+    END;
+
+    PROCEDURE SetBodyText@5(Value@1000 : Text);
+    VAR
+      DataStream@1001 : OutStream;
+      BodyText@1002 : BigText;
+    BEGIN
+      CLEAR(Body);
+      BodyText.ADDTEXT(Value);
+      Body.CREATEOUTSTREAM(DataStream);
+      BodyText.WRITE(DataStream);
+    END;
+
+    PROCEDURE GetBodyText@3() Value : Text;
+    VAR
+      DataStream@1000 : InStream;
+      BodyText@1001 : BigText;
+    BEGIN
+      // Note this is intended only to get the body in memory - not from the database.
+      Value := '';
+      IF Body.HASVALUE THEN BEGIN
+        Body.CREATEINSTREAM(DataStream);
+        BodyText.READ(DataStream);
+        BodyText.GETSUBTEXT(Value,1);
+      END;
+      EXIT(Value);
+    END;
+
+    LOCAL PROCEDURE CorrectAndValidateEmailList@6(VAR EmailAddresses@1000 : Text[250]);
+    VAR
+      MailManagement@1001 : Codeunit 9520;
+    BEGIN
+      EmailAddresses := CONVERTSTR(EmailAddresses,',',';');
+      EmailAddresses := DELCHR(EmailAddresses,'<>');
+      MailManagement.CheckValidEmailAddresses(EmailAddresses);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

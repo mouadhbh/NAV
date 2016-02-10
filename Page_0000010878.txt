@@ -1,0 +1,171 @@
+OBJECT Page 10878 Payment Slip Subform Archive
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVFR8.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Lines;
+               FRA=Lignes];
+    SourceTable=Table10868;
+    PageType=ListPart;
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1906907904;1 ;ActionGroup;
+                      CaptionML=[ENU=A&ccount;
+                                 FRA=&Compte];
+                      Image=ChartOfAccounts }
+      { 1904990104;2 ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Card;
+                                 FRA=Fiche];
+                      Image=EditLines;
+                      OnAction=BEGIN
+                                 ShowAccount;
+                               END;
+                                }
+      { 1900596004;2 ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 FRA=ê&critures comptables];
+                      OnAction=BEGIN
+                                 ShowEntries;
+                               END;
+                                }
+      { 1907935204;1 ;ActionGroup;
+                      CaptionML=[ENU=&Line;
+                                 FRA=&Ligne];
+                      Image=Line }
+      { 1900201904;2 ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 ShowDimensions;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Account Type" }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr="Account No." }
+
+    { 1120014;2;Field     ;
+                SourceExpr="Document ID" }
+
+    { 1120024;2;Field     ;
+                SourceExpr="External Document No." }
+
+    { 1120026;2;Field     ;
+                SourceExpr="Drawee Reference" }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr="Posting Group";
+                Visible=FALSE }
+
+    { 13  ;2   ;Field     ;
+                SourceExpr="Due Date" }
+
+    { 1120016;2;Field     ;
+                SourceExpr="Debit Amount" }
+
+    { 1120018;2;Field     ;
+                SourceExpr="Credit Amount" }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Amount }
+
+    { 1120000;2;Field     ;
+                SourceExpr="Bank Account" }
+
+    { 1120002;2;Field     ;
+                SourceExpr="Acceptation Code" }
+
+    { 1120022;2;Field     ;
+                SourceExpr="Payment Address Code" }
+
+    { 1120004;2;Field     ;
+                SourceExpr="Bank Branch No." }
+
+    { 1120008;2;Field     ;
+                SourceExpr="Agency Code" }
+
+    { 1120030;2;Field     ;
+                SourceExpr=IBAN }
+
+    { 1120032;2;Field     ;
+                SourceExpr="SWIFT Code" }
+
+    { 1120006;2;Field     ;
+                SourceExpr="Bank Account No." }
+
+    { 1120020;2;Field     ;
+                SourceExpr="Bank Account Name" }
+
+    { 1120028;2;Field     ;
+                SourceExpr="Bank City";
+                Visible=FALSE }
+
+    { 1120010;2;Field     ;
+                SourceExpr="RIB Key" }
+
+    { 1120012;2;Field     ;
+                SourceExpr="RIB Checked" }
+
+  }
+  CODE
+  {
+    VAR
+      Navigate@1120000 : Page 344;
+
+    PROCEDURE ShowDimensions@11();
+    BEGIN
+      ShowDimensions;
+    END;
+
+    PROCEDURE ShowAccount@1120001();
+    VAR
+      GenJnlLine@1120005 : Record 81;
+    BEGIN
+      GenJnlLine."Account Type" := "Account Type";
+      GenJnlLine."Account No." := "Account No.";
+      CODEUNIT.RUN(CODEUNIT::"Gen. Jnl.-Show Card",GenJnlLine);
+    END;
+
+    PROCEDURE ShowEntries@1120002();
+    VAR
+      GenJnlLine@1120000 : Record 81;
+    BEGIN
+      GenJnlLine."Account Type" := "Account Type";
+      GenJnlLine."Account No." := "Account No.";
+      CODEUNIT.RUN(CODEUNIT::"Gen. Jnl.-Show Entries",GenJnlLine);
+    END;
+
+    PROCEDURE NavigateLine@1120004(PostingDate@1120000 : Date);
+    BEGIN
+      Navigate.SetDoc(PostingDate,"Document ID");
+      Navigate.RUN;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

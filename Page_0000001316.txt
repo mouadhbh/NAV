@@ -1,0 +1,60 @@
+OBJECT Page 1316 Mini Extended Text List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/09/13;
+    Time=12:00:00;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Extended Text List;
+               FRA=Liste des textes ‚tendus];
+    SourceTable=Table279;
+    DataCaptionFields=No.;
+    PageType=List;
+    CardPageID=Mini Extended Text;
+  }
+  CONTROLS
+  {
+    { 7   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 5   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the content of the extended item description.;
+                           FRA=Sp‚cifie le contenu de la d‚signation ‚tendue de l'article.];
+                SourceExpr=Description }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the language code of the extended text.;
+                           FRA=Indique le code langue du texte ‚tendu.];
+                SourceExpr="Language Code" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies whether the text should be used for all language codes. If a language code has been chosen in the Language Code field, it will be overruled by this function.;
+                           FRA=Indique si le texte doit ˆtre utilis‚ pour tous les codes langue. Si un code langue a ‚t‚ choisi dans le champ Code langue, cette fonction pr‚vaut.];
+                SourceExpr="All Language Codes" }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a date from which the text will be used on the item, account, resource or standard text.;
+                           FRA=Indique une date … partir de laquelle le texte est utilis‚ pour l'article, le compte, la ressource ou le texte standard.];
+                SourceExpr="Starting Date" }
+
+    { 1   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a date on which the text will no longer be used on the item, account, resource or standard text.;
+                           FRA=Sp‚cifie une date … partir de laquelle le texte n'est plus utilis‚ pour l'article, le compte, la ressource ou le texte standard.];
+                SourceExpr="Ending Date" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

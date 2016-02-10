@@ -1,0 +1,84 @@
+OBJECT Table 9057 Job Cue
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Job Cue;
+               FRA=Pile travail];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Primary Key         ;Code10        ;CaptionML=[ENU=Primary Key;
+                                                              FRA=Cl‚ primaire] }
+    { 2   ;   ;Jobs w/o Resource   ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count(Job WHERE (Scheduled Res. Qty.=FILTER(0)));
+                                                   CaptionML=[ENU=Jobs w/o Resource;
+                                                              FRA=Projets sans ressource];
+                                                   Editable=No }
+    { 3   ;   ;Upcoming Invoices   ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count(Job WHERE (Status=FILTER(<>Completed),
+                                                                                Next Invoice Date=FIELD(Date Filter)));
+                                                   CaptionML=[ENU=Upcoming Invoices;
+                                                              FRA=Factures … venir];
+                                                   Editable=No }
+    { 4   ;   ;Invoices Due - Not Created;Integer ;FieldClass=FlowField;
+                                                   CalcFormula=Count(Job WHERE (Status=CONST(Order),
+                                                                                Next Invoice Date=FIELD(Date Filter2)));
+                                                   CaptionML=[ENU=Invoices Due - Not Created;
+                                                              FRA=Factures ‚chues - Non cr‚‚es];
+                                                   Editable=No }
+    { 5   ;   ;WIP Not Posted      ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count(Job WHERE (WIP Entries Exist=CONST(Yes)));
+                                                   CaptionML=[ENU=WIP Not Posted;
+                                                              FRA=TEC non enregistr‚s];
+                                                   Editable=No }
+    { 6   ;   ;Completed - WIP Not Calculated;Integer;
+                                                   FieldClass=FlowField;
+                                                   CalcFormula=Count(Job WHERE (Status=FILTER(Completed),
+                                                                                WIP Completion Calculated=CONST(No),
+                                                                                WIP Completion Posted=CONST(No)));
+                                                   CaptionML=[ENU=Completed - WIP Not Calculated;
+                                                              FRA=Termin‚ - TEC non calcul‚s];
+                                                   Editable=No }
+    { 7   ;   ;Available Resources ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count(Resource WHERE (Qty. on Order (Job)=FILTER(0),
+                                                                                     Qty. Quoted (Job)=FILTER(0),
+                                                                                     Qty. on Service Order=FILTER(0),
+                                                                                     Date Filter=FIELD(Date Filter)));
+                                                   CaptionML=[ENU=Available Resources;
+                                                              FRA=Ressources disponibles];
+                                                   Editable=No }
+    { 8   ;   ;Unassigned Resource Groups;Integer ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Resource Group" WHERE (No. of Resources Assigned=FILTER(0)));
+                                                   CaptionML=[ENU=Unassigned Resource Groups;
+                                                              FRA=Groupes ressources non affect‚s];
+                                                   Editable=No }
+    { 20  ;   ;Date Filter         ;Date          ;FieldClass=FlowFilter;
+                                                   CaptionML=[ENU=Date Filter;
+                                                              FRA=Filtre date];
+                                                   Editable=No }
+    { 21  ;   ;Date Filter2        ;Date          ;FieldClass=FlowFilter;
+                                                   CaptionML=[ENU=Date Filter2;
+                                                              FRA=Filtre date2];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Primary Key                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

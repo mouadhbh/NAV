@@ -1,0 +1,65 @@
+OBJECT Table 5934 Service Register
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Service Register;
+               FRA=Hist. transactions service];
+    LookupPageID=Page5931;
+  }
+  FIELDS
+  {
+    { 1   ;   ;No.                 ;Integer       ;CaptionML=[ENU=No.;
+                                                              FRA=Nø] }
+    { 2   ;   ;From Entry No.      ;Integer       ;TableRelation="Service Ledger Entry";
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=From Entry No.;
+                                                              FRA=Nø s‚quence d‚but] }
+    { 3   ;   ;To Entry No.        ;Integer       ;TableRelation="Service Ledger Entry";
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=To Entry No.;
+                                                              FRA=Nø s‚quence fin] }
+    { 4   ;   ;From Warranty Entry No.;Integer    ;TableRelation="Warranty Ledger Entry";
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=From Warranty Entry No.;
+                                                              FRA=Nø ‚criture garantie d‚but] }
+    { 5   ;   ;To Warranty Entry No.;Integer      ;TableRelation="Warranty Ledger Entry";
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=To Warranty Entry No.;
+                                                              FRA=Nø ‚criture garantie fin] }
+    { 6   ;   ;Creation Date       ;Date          ;CaptionML=[ENU=Creation Date;
+                                                              FRA=Date cr‚ation] }
+    { 7   ;   ;Source Code         ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Source Code;
+                                                              FRA=Code journal] }
+    { 8   ;   ;User ID             ;Code50        ;TableRelation=User."User Name";
+                                                   OnLookup=VAR
+                                                              UserMgt@1000 : Codeunit 418;
+                                                            BEGIN
+                                                              UserMgt.LookupUserID("User ID");
+                                                            END;
+
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=User ID;
+                                                              FRA=Code utilisateur] }
+  }
+  KEYS
+  {
+    {    ;No.                                     ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

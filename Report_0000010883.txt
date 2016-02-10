@@ -1,0 +1,486 @@
+OBJECT Report 10883 SEPA ISO20022
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=SEPA ISO20022;
+               FRA=SEPA ISO20022];
+    ProcessingOnly=Yes;
+    OnPreReport=VAR
+                  FileMgt@1120000 : Codeunit 419;
+                BEGIN
+                  // Perform Checks
+                  CompanyInfo.GET;
+                  CompanyInfo.TESTFIELD("Country/Region Code");
+                  CompanyInfo.TESTFIELD("VAT Registration No.");
+
+                  FileName := FileMgt.ServerTempFileName('');
+
+                  IF DELCHR(FileName,'<>') = '' THEN
+                    ERROR(Text002);
+                END;
+
+    OnPostReport=VAR
+                   ToFile@1120000 : Text;
+                 BEGIN
+                   ToFile := Text009;
+                   IF NOT DOWNLOAD(FileName,Text000,'',Text001,ToFile) THEN
+                     ERROR(Text010);
+                 END;
+
+  }
+  DATASET
+  {
+    { 6483;    ;DataItem;                    ;
+               DataItemTable=Table10865;
+               OnAfterGetRecord=BEGIN
+                                  TESTFIELD(IBAN);
+                                  TESTFIELD("SWIFT Code");
+                                  TESTFIELD("Bank Country/Region Code");
+                                  IF NOT CheckBankCountrySEPAAllowed("Bank Country/Region Code") THEN
+                                    ERROR(SEPANotEnabledForPaymentErr,"Bank Country/Region Code");
+                                  PaymentLine.RESET;
+                                  PaymentLine.SETRANGE("No.","No.");
+                                  CheckPaymentLines;
+                                  ExportSEPAFile;
+                                END;
+
+               OnPostDataItem=BEGIN
+                                PaymentHeader := "Payment Header";
+                                PaymentHeader."File Export Completed" := TRUE;
+                                PaymentHeader.MODIFY;
+                              END;
+                               }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      PaymentHeader@1120014 : Record 10865;
+      PaymentLine@1120004 : Record 10866;
+      CompanyInfo@1120006 : Record 79;
+      SEPACountry@1120012 : Record 9;
+      XMLDomDoc@1120005 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlDocument";
+      FileName@1120000 : Text;
+      Text000@1120002 : TextConst 'ENU=Save As;FRA=Enregistrer sous';
+      Text001@1120001 : TextConst '@@@="Only translate ''XML Files'' and ''All Files'' {Split=r""[\|\(]\*\.[^ |)]*[|) ]?""}";ENU=XML Files (*.xml)|*.xml|All Files|*.*;FRA=Fichiers XML (*.xml)|*.xml|Tous les fichiers|*.*';
+      Text002@1120008 : TextConst 'ENU=File name must be specified.;FRA=Le nom du fichier doit ˆtre sp‚cifi‚.';
+      SEPANotEnabledForVendorErr@1120009 : TextConst 'ENU=The SEPA Allowed field is not enabled for the Country/Region: %1 of the Vendor Bank Account: %2.;FRA=Le champ SEPA autoris‚ n''est pas activ‚ pour le champ Pays/r‚gionÿ: %1 du Compte bancaire fournisseurÿ: %2.';
+      PaymentLineCount@1120010 : Integer;
+      SEPANotEnabledForPaymentErr@1120013 : TextConst 'ENU=The SEPA Allowed field is not enabled for the Country/Region: %1 of the Payment Header: Bank Country/Region Code.;FRA=Le champ SEPA autoris‚ n''est pas activ‚ pour le champ Pays/r‚gionÿ: %1 de l''En-tˆte bordereauÿ: Code pays/r‚gion banque.';
+      Text004@1120007 : TextConst 'ENU=Currency is not Euro in the %1, %2: %3.;FRA=La devise n''est pas l''euro dans le %1, %2ÿ: %3.';
+      Text005@1120011 : TextConst 'ENU=Payment Lines can only be of type Customer or Vendor for SEPA.;FRA=Les lignes paiement peuvent ˆtre uniquement de type Client ou Fournisseur pour SEPA.';
+      Text009@1120018 : TextConst 'ENU=default.xml;FRA=default.xml';
+      Text010@1120020 : TextConst 'ENU=File download failed.;FRA=Le t‚l‚chargement de fichiers a ‚chou‚.';
+      Text011@1120021 : TextConst 'ENU=Amount cannot be negative in the %1, %2: %3.;FRA=Le montant ne peut pas ˆtre n‚gatif dans le %1, %2ÿ: %3.';
+
+    LOCAL PROCEDURE ExportSEPAFile@1120008();
+    VAR
+      XMLRootElement@1120002 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlElement";
+      XMLNodeCurr@1120001 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode";
+      XMLNewChild@1120000 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode";
+    BEGIN
+      XMLDomDoc := XMLDomDoc.XmlDocument;
+      XMLDomDoc.LoadXml('<?xml version="1.0" encoding="UTF-8"?><Document></Document>');
+      XMLRootElement := XMLDomDoc.DocumentElement;
+      XMLRootElement.SetAttribute('xmlns','urn:iso:std:iso:20022:tech:xsd:pain.001.001.02');
+      XMLRootElement.SetAttribute('xmlns:xsi','http://www.w3.org/2001/XMLSchemainstance');
+      XMLNodeCurr := XMLDomDoc.SelectSingleNode('Document');
+      AddElement(XMLNodeCurr,'pain.001.001.02','','',XMLNewChild);
+
+      ExportGroupHeader(XMLNewChild);
+      ExportPaymentInformation(XMLNewChild);
+
+      XMLDomDoc.Save(FileName);
+      CLEAR(XMLDomDoc);
+    END;
+
+    LOCAL PROCEDURE ExportGroupHeader@1120000(XMLNodeCurr@1120001 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode");
+    VAR
+      XMLNewChild@1120002 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode";
+      MessageId@1120000 : Text[50];
+    BEGIN
+      AddElement(XMLNodeCurr,'GrpHdr','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      MessageId := "Payment Header"."No.";
+      IF STRLEN(MessageId) > 35 THEN
+        MessageId := COPYSTR(MessageId,STRLEN(MessageId) - 34);
+
+      AddElement(XMLNodeCurr,'MsgId',MessageId,'',XMLNewChild);
+      AddElement(XMLNodeCurr,'CreDtTm',FORMAT(CURRENTDATETIME,19,9),'',XMLNewChild);
+
+      PaymentLine.RESET;
+      PaymentLine.SETRANGE("No.","Payment Header"."No.");
+      AddElement(XMLNodeCurr,'NbOfTxs',FORMAT(PaymentLineCount,0,9),'',XMLNewChild);
+      "Payment Header".CALCFIELDS(Amount);
+      AddElement(XMLNodeCurr,'CtrlSum',FORMAT("Payment Header".Amount,0,'<Precision,2:2><Standard Format,9>'),'',XMLNewChild);
+      AddElement(XMLNodeCurr,'Grpg','MIXD','',XMLNewChild);
+      AddElement(XMLNodeCurr,'InitgPty','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'Nm',CompanyInfo.Name,'',XMLNewChild);
+      AddElement(XMLNodeCurr,'Id','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'OrgId','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'TaxIdNb',FORMAT(DELCHR(CompanyInfo."VAT Registration No."),0,9),'',XMLNewChild);
+
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+    END;
+
+    LOCAL PROCEDURE ExportPaymentInformation@1120001(XMLNodeCurr@1120000 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode");
+    VAR
+      XMLNewChild@1120001 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode";
+      AddressLine1@1120004 : Text[110];
+      AddressLine2@1120003 : Text[60];
+      EndtoEndIdTxt@1120005 : Text[30];
+      UstrdRemitInfo@1120002 : Text[140];
+    BEGIN
+      AddElement(XMLNodeCurr,'PmtInf','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'PmtInfId',"Payment Header"."No.",'',XMLNewChild);
+      AddElement(XMLNodeCurr,'PmtMtd','TRF','',XMLNewChild);
+      AddElement(XMLNodeCurr,'PmtTpInf','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'SvcLvl','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'Cd','SEPA','',XMLNewChild);
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+
+      AddElement(XMLNodeCurr,'ReqdExctnDt',FORMAT("Payment Header"."Posting Date",0,9),'',XMLNewChild);
+      AddElement(XMLNodeCurr,'Dbtr','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'Nm',CompanyInfo.Name,'',XMLNewChild);
+
+      AddElement(XMLNodeCurr,'PstlAdr','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddressLine1 := DELCHR(CompanyInfo.Address,'<>') + ' ' + DELCHR(CompanyInfo."Address 2",'<>');
+      IF DELCHR(AddressLine1) <> '' THEN
+        AddElement(XMLNodeCurr,'AdrLine',COPYSTR(AddressLine1,1,70),'',XMLNewChild);
+
+      AddressLine2 := DELCHR(CompanyInfo."Post Code",'<>') + ' ' + DELCHR(CompanyInfo.City,'<>');
+      IF DELCHR(AddressLine2) <> '' THEN
+        AddElement(XMLNodeCurr,'AdrLine',COPYSTR(AddressLine2,1,70),'',XMLNewChild);
+
+      AddElement(XMLNodeCurr,'Ctry',COPYSTR(CompanyInfo."Country/Region Code",1,2),'',XMLNewChild);
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+
+      AddElement(XMLNodeCurr,'DbtrAcct','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'Id','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'IBAN',COPYSTR(DELCHR("Payment Header".IBAN),1,34),'',XMLNewChild);
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+
+      AddElement(XMLNodeCurr,'Ccy','EUR','',XMLNewChild);
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+
+      AddElement(XMLNodeCurr,'DbtrAgt','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'FinInstnId','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddElement(XMLNodeCurr,'BIC',COPYSTR(DELCHR("Payment Header"."SWIFT Code"),1,11),'',XMLNewChild);
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+
+      AddElement(XMLNodeCurr,'ChrgBr','SLEV','',XMLNewChild);
+
+      IF PaymentLine.FIND('-') THEN
+        REPEAT
+          AddElement(XMLNodeCurr,'CdtTrfTxInf','','',XMLNewChild);
+          XMLNodeCurr := XMLNewChild;
+
+          AddElement(XMLNodeCurr,'PmtId','','',XMLNewChild);
+          XMLNodeCurr := XMLNewChild;
+
+          EndtoEndIdTxt := PaymentLine."Document No.";
+          IF DELCHR(EndtoEndIdTxt,'<>') = '' THEN
+            EndtoEndIdTxt := 'NOTPROVIDED';
+
+          AddElement(XMLNodeCurr,'EndToEndId',COPYSTR(EndtoEndIdTxt,1,35),'',XMLNewChild);
+          XMLNodeCurr := XMLNodeCurr.ParentNode;
+
+          AddElement(XMLNodeCurr,'Amt','','',XMLNewChild);
+          XMLNodeCurr := XMLNewChild;
+          IF PaymentLine.Amount < 0 THEN
+            ERROR(Text011,PaymentLine.TABLECAPTION,PaymentLine.FIELDCAPTION("Line No."),PaymentLine."Line No.");
+          AddElement(XMLNodeCurr,'InstdAmt',FORMAT(PaymentLine.Amount,0,'<Precision,2:2><Standard Format,9>'),'',XMLNewChild);
+          AddAttribute(XMLDomDoc,XMLNewChild,'Ccy','EUR');
+          XMLNodeCurr := XMLNodeCurr.ParentNode;
+
+          AddElement(XMLNodeCurr,'CdtrAgt','','',XMLNewChild);
+          XMLNodeCurr := XMLNewChild;
+
+          AddElement(XMLNodeCurr,'FinInstnId','','',XMLNewChild);
+          XMLNodeCurr := XMLNewChild;
+
+          AddElement(XMLNodeCurr,'BIC',COPYSTR(DELCHR(PaymentLine."SWIFT Code"),1,11),'',XMLNewChild);
+          XMLNodeCurr := XMLNodeCurr.ParentNode;
+          XMLNodeCurr := XMLNodeCurr.ParentNode;
+
+          AddElement(XMLNodeCurr,'Cdtr','','',XMLNewChild);
+          XMLNodeCurr := XMLNewChild;
+
+          AddAccountInformation(XMLNodeCurr);
+
+          AddElement(XMLNodeCurr,'CdtrAcct','','',XMLNewChild);
+          XMLNodeCurr := XMLNewChild;
+
+          AddElement(XMLNodeCurr,'Id','','',XMLNewChild);
+          XMLNodeCurr := XMLNewChild;
+
+          AddElement(XMLNodeCurr,'IBAN',COPYSTR(DELCHR(PaymentLine.IBAN),1,34),'',XMLNewChild);
+          XMLNodeCurr := XMLNodeCurr.ParentNode;
+          XMLNodeCurr := XMLNodeCurr.ParentNode;
+
+          UstrdRemitInfo := CreateUstrdRemitInfo;
+          IF DELCHR(UstrdRemitInfo) <> '' THEN BEGIN
+            AddElement(XMLNodeCurr,'RmtInf','','',XMLNewChild);
+            XMLNodeCurr := XMLNewChild;
+            AddElement(XMLNodeCurr,'Ustrd',UstrdRemitInfo,'',XMLNewChild);
+            XMLNodeCurr := XMLNodeCurr.ParentNode;
+          END;
+
+          XMLNodeCurr := XMLNodeCurr.ParentNode;
+        UNTIL PaymentLine.NEXT = 0;
+
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+    END;
+
+    LOCAL PROCEDURE AddElement@1000010(VAR XMLNode@1000004 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode";NodeName@1000003 : Text[250];NodeText@1000002 : Text[250];NameSpace@1000001 : Text[250];VAR CreatedXMLNode@1000000 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode") : Boolean;
+    VAR
+      StringConversionMgt@1120000 : Codeunit 47;
+      NewChildNode@1000005 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode";
+    BEGIN
+      NewChildNode := XMLNode.OwnerDocument.CreateNode('element',NodeName,NameSpace);
+      IF ISNULL(NewChildNode) THEN
+        EXIT(FALSE);
+
+      IF NodeText <> '' THEN
+        NewChildNode.InnerText := StringConversionMgt.WindowsToASCII(NodeText);
+      XMLNode.AppendChild(NewChildNode);
+      CreatedXMLNode := NewChildNode;
+      CLEAR(NewChildNode);
+      EXIT(TRUE);
+    END;
+
+    LOCAL PROCEDURE AddAttribute@1000009(VAR XMLDomDocParam@1000000 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlDocument";VAR XMLDomNode@1000001 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode";AttribName@1000002 : Text[250];AttribValue@1000003 : Text[250]) : Boolean;
+    VAR
+      XMLDomAttribute@1000004 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlAttribute";
+    BEGIN
+      XMLDomAttribute := XMLDomDocParam.CreateAttribute(AttribName);
+      IF ISNULL(XMLDomAttribute) THEN
+        EXIT(FALSE);
+
+      IF AttribValue <> '' THEN
+        XMLDomAttribute.Value := AttribValue;
+      XMLDomNode.Attributes.SetNamedItem(XMLDomAttribute);
+      CLEAR(XMLDomAttribute);
+      EXIT(TRUE);
+    END;
+
+    LOCAL PROCEDURE AddAccountInformation@1120054(VAR XMLNodeCurr@1120005 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode");
+    VAR
+      Cust@1120003 : Record 18;
+      Vend@1120002 : Record 23;
+    BEGIN
+      CASE PaymentLine."Account Type" OF
+        PaymentLine."Account Type"::Customer:
+          BEGIN
+            Cust.GET(PaymentLine."Account No.");
+            AddAccountTags(XMLNodeCurr,Cust.Name,Cust.Address,Cust."Address 2",Cust."Post Code",Cust.City,Cust."Country/Region Code");
+          END;
+        PaymentLine."Account Type"::Vendor:
+          BEGIN
+            Vend.GET(PaymentLine."Account No.");
+            AddAccountTags(XMLNodeCurr,Vend.Name,Vend.Address,Vend."Address 2",Vend."Post Code",Vend.City,Vend."Country/Region Code");
+          END;
+      END;
+    END;
+
+    LOCAL PROCEDURE AddAccountTags@1120057(VAR XMLNodeCurr@1120006 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode";AccountName@1120000 : Text[70];Address@1120002 : Text[70];Address2@1120001 : Text[70];PostCode@1120004 : Text[70];City@1120005 : Text[70];CountryCode@1120003 : Text[10]);
+    VAR
+      XMLNewChild@1120007 : DotNet "'System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.System.Xml.XmlNode";
+      AddressLine1@1120008 : Text[150];
+      AddressLine2@1120009 : Text[150];
+    BEGIN
+      AddElement(XMLNodeCurr,'Nm',AccountName,'',XMLNewChild);
+      AddElement(XMLNodeCurr,'PstlAdr','','',XMLNewChild);
+      XMLNodeCurr := XMLNewChild;
+
+      AddressLine1 := DELCHR(Address,'<>') + ' ' + DELCHR(Address2,'<>');
+      IF DELCHR(AddressLine1) <> '' THEN
+        AddElement(XMLNodeCurr,'AdrLine',COPYSTR(AddressLine1,1,70),'',XMLNewChild);
+      AddressLine2 := DELCHR(PostCode,'<>') + ' ' + DELCHR(City,'<>');
+      IF DELCHR(AddressLine2) <> '' THEN
+        AddElement(XMLNodeCurr,'AdrLine',COPYSTR(AddressLine2,1,70),'',XMLNewChild);
+      AddElement(XMLNodeCurr,'Ctry',COPYSTR(CountryCode,1,2),'',XMLNewChild);
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+      XMLNodeCurr := XMLNodeCurr.ParentNode;
+    END;
+
+    LOCAL PROCEDURE CheckBankCountrySEPAAllowed@1120003(CountryCode@1120000 : Code[10]) : Boolean;
+    BEGIN
+      IF SEPACountry.Code <> CountryCode THEN
+        SEPACountry.GET(CountryCode);
+      EXIT(SEPACountry."SEPA Allowed");
+    END;
+
+    LOCAL PROCEDURE CheckPaymentLines@1120007();
+    VAR
+      VendorBankAcc@1120000 : Record 288;
+      CustomerBankAcc@1120001 : Record 287;
+    BEGIN
+      // Loop through all Payment lines and perform validations
+      PaymentLineCount := 0;
+      IF PaymentLine.FIND('-') THEN
+        REPEAT
+          PaymentLine.TESTFIELD(IBAN);
+          PaymentLine.TESTFIELD("SWIFT Code");
+          CASE PaymentLine."Account Type" OF
+            PaymentLine."Account Type"::Vendor:
+              BEGIN
+                VendorBankAcc.GET(PaymentLine."Account No.",PaymentLine."Bank Account Code");
+                VendorBankAcc.TESTFIELD("Country/Region Code");
+                IF NOT CheckBankCountrySEPAAllowed(VendorBankAcc."Country/Region Code") THEN
+                  ERROR(SEPANotEnabledForVendorErr,SEPACountry.Code,
+                    VendorBankAcc."Vendor No." + ',' + VendorBankAcc.Code);
+              END;
+            PaymentLine."Account Type"::Customer:
+              BEGIN
+                CustomerBankAcc.GET(PaymentLine."Account No.",PaymentLine."Bank Account Code");
+                CustomerBankAcc.TESTFIELD("Country/Region Code");
+                IF NOT CheckBankCountrySEPAAllowed(CustomerBankAcc."Country/Region Code") THEN
+                  ERROR(SEPANotEnabledForVendorErr,SEPACountry.Code,
+                    CustomerBankAcc."Customer No." + ',' + CustomerBankAcc.Code);
+              END;
+          END;
+          CheckEUCurrencyInLines(PaymentLine."Currency Code");
+          IF NOT (PaymentLine."Account Type" IN [PaymentLine."Account Type"::Customer,PaymentLine."Account Type"::Vendor]) THEN
+            ERROR(Text005);
+          PaymentLineCount := PaymentLineCount + 1;
+        UNTIL PaymentLine.NEXT = 0;
+    END;
+
+    LOCAL PROCEDURE CheckEUCurrencyInLines@1120005(CurrencyCode@1120001 : Code[10]);
+    VAR
+      GLSetup@1120000 : Record 98;
+    BEGIN
+      // Check whether the currency being used is Euro
+      GLSetup.GET;
+      CASE GLSetup."Local Currency" OF
+        GLSetup."Local Currency"::Euro:
+          BEGIN
+            IF CurrencyCode <> '' THEN
+              ERROR(Text004,PaymentLine.TABLECAPTION,PaymentLine.FIELDCAPTION("Line No."),PaymentLine."Line No.");
+          END;
+        GLSetup."Local Currency"::Other:
+          BEGIN
+            GLSetup.TESTFIELD("Currency Euro");
+            IF CurrencyCode <> GLSetup."Currency Euro" THEN
+              ERROR(Text004,PaymentLine.TABLECAPTION,PaymentLine.FIELDCAPTION("Line No."),PaymentLine."Line No.");
+          END;
+      END;
+    END;
+
+    PROCEDURE CreateUstrdRemitInfo@1120002() : Text[140];
+    VAR
+      VendLedgEntry@1120000 : Record 25;
+      CustLedgEntry@1120001 : Record 21;
+      UstrdRemitInfo@1120002 : Text[140];
+      Separator@1120003 : Text[1];
+      LoopBreak@1120004 : Boolean;
+    BEGIN
+      UstrdRemitInfo := '';
+      LoopBreak := FALSE;
+      IF ((DELCHR(PaymentLine."Applies-to Doc. No.") = '') AND
+          (DELCHR(PaymentLine."Applies-to ID") = ''))
+      THEN
+        EXIT(UstrdRemitInfo);
+      CASE PaymentLine."Account Type" OF
+        PaymentLine."Account Type"::Vendor:
+          IF DELCHR(PaymentLine."Applies-to Doc. No.") <> '' THEN
+            UstrdRemitInfo := DELCHR(PaymentLine."Applies-to Doc. No.")
+          ELSE BEGIN
+            VendLedgEntry.SETCURRENTKEY("Vendor No.","Applies-to ID");
+            VendLedgEntry.SETRANGE("Vendor No.",PaymentLine."Account No.");
+            VendLedgEntry.SETRANGE("Applies-to ID",PaymentLine."Applies-to ID");
+            IF VendLedgEntry.FINDSET THEN
+              REPEAT
+                IF UstrdRemitInfo = '' THEN
+                  Separator := ''
+                ELSE
+                  Separator := ',';
+                IF DELCHR(VendLedgEntry."External Document No.") <> '' THEN
+                  IF STRLEN(UstrdRemitInfo + Separator + DELCHR(VendLedgEntry."External Document No.")) <= 140 THEN
+                    UstrdRemitInfo := UstrdRemitInfo + Separator + DELCHR(VendLedgEntry."External Document No.")
+                  ELSE
+                    LoopBreak := TRUE;
+              UNTIL (VendLedgEntry.NEXT = 0) OR LoopBreak;
+          END;
+        PaymentLine."Account Type"::Customer:
+          IF DELCHR(PaymentLine."Applies-to Doc. No.") <> '' THEN
+            UstrdRemitInfo := PaymentLine."Applies-to Doc. No."
+          ELSE BEGIN
+            CustLedgEntry.SETCURRENTKEY("Customer No.","Applies-to ID");
+            CustLedgEntry.SETRANGE("Customer No.",PaymentLine."Account No.");
+            CustLedgEntry.SETRANGE("Applies-to ID",PaymentLine."Applies-to ID");
+            IF CustLedgEntry.FINDSET THEN
+              REPEAT
+                IF UstrdRemitInfo = '' THEN
+                  Separator := ''
+                ELSE
+                  Separator := ',';
+                IF DELCHR(CustLedgEntry."Document No.") <> '' THEN
+                  IF STRLEN(UstrdRemitInfo + Separator + DELCHR(CustLedgEntry."Document No.")) <= 140 THEN
+                    UstrdRemitInfo := UstrdRemitInfo + Separator + DELCHR(CustLedgEntry."Document No.")
+                  ELSE
+                    LoopBreak := TRUE;
+              UNTIL (CustLedgEntry.NEXT = 0) OR LoopBreak;
+          END;
+      END;
+      EXIT(UstrdRemitInfo);
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

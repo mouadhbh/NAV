@@ -1,0 +1,64 @@
+OBJECT Page 9817 Permission Sets Factbox
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Permission Sets;
+               FRA=Ensembles d'autorisations];
+    SourceTable=Table2000000053;
+    PageType=ListPart;
+    OnAfterGetRecord=BEGIN
+                       IF User."User Name" <> '' THEN
+                         CurrPage.CAPTION := User."User Name";
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                CaptionML=[ENU=User Permissions;
+                           FRA=Autorisations utilisateur];
+                GroupType=Repeater }
+
+    { 3   ;2   ;Field     ;
+                Name=<Permission Set>;
+                CaptionML=[ENU=Permission Set;
+                           FRA=Ensemble d'autorisations];
+                SourceExpr="Role ID" }
+
+    { 4   ;2   ;Field     ;
+                Name=<Description>;
+                DrillDown=No;
+                CaptionML=[ENU=Description;
+                           FRA=D‚signation];
+                SourceExpr="Role Name";
+                Visible=FALSE;
+                Editable=FALSE }
+
+    { 5   ;2   ;Field     ;
+                Name=<Company>;
+                CaptionML=[ENU=Company;
+                           FRA=Soci‚t‚];
+                SourceExpr="Company Name" }
+
+  }
+  CODE
+  {
+    VAR
+      User@1000 : Record 2000000120;
+
+    BEGIN
+    END.
+  }
+}
+

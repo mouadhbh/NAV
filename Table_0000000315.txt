@@ -1,0 +1,53 @@
+OBJECT Table 315 Jobs Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Jobs Setup;
+               FRA=ParamŠtres projets];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Primary Key         ;Code10        ;CaptionML=[ENU=Primary Key;
+                                                              FRA=Cl‚ primaire] }
+    { 2   ;   ;Job Nos.            ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Job Nos.;
+                                                              FRA=Nø projet] }
+    { 3   ;   ;Apply Usage Link by Default;Boolean;CaptionML=[ENU=Apply Usage Link by Default;
+                                                              FRA=Appliquer le lien d'utilisation par d‚faut] }
+    { 4   ;   ;Default WIP Method  ;Code20        ;TableRelation="Job WIP Method".Code;
+                                                   CaptionML=[ENU=Default WIP Method;
+                                                              FRA=M‚thode TEC par d‚faut] }
+    { 5   ;   ;Default Job Posting Group;Code10   ;TableRelation="Job Posting Group".Code;
+                                                   CaptionML=[ENU=Default Job Posting Group;
+                                                              FRA=Groupe de comptabilisation projet par d‚faut] }
+    { 6   ;   ;Default WIP Posting Method;Option  ;CaptionML=[ENU=Default WIP Posting Method;
+                                                              FRA=M‚thode de comptabilisation TEC par d‚faut];
+                                                   OptionCaptionML=[ENU=Per Job,Per Job Ledger Entry;
+                                                                    FRA=Par projet,Par ‚criture comptable projet];
+                                                   OptionString=Per Job,Per Job Ledger Entry }
+    { 1001;   ;Automatic Update Job Item Cost;Boolean;
+                                                   AccessByPermission=TableData 27=R;
+                                                   CaptionML=[ENU=Automatic Update Job Item Cost;
+                                                              FRA=Mise … jour automatique du Co–t de l'article projet] }
+  }
+  KEYS
+  {
+    {    ;Primary Key                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

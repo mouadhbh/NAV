@@ -1,0 +1,615 @@
+OBJECT Page 1302 Mini Item Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=NAVW19.00.00.43402;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Item Card;
+               FRA=Fiche article];
+    SourceTable=Table27;
+    PageType=Card;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Item,History,View;
+                                FRA=Nouveau,Traitement,êtat,Article,Historique, Afficher];
+    OnInit=BEGIN
+             InventoryItemEditable := TRUE;
+             "Costing Method" := "Costing Method"::FIFO;
+             UnitCostEditable := TRUE;
+           END;
+
+    OnOpenPage=BEGIN
+                 EnableControls;
+                 VisualizingControls;
+                 CurrPage.PriceAndLineDisc.PAGE.InitPage(TRUE);
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       EnableControls;
+                     END;
+
+    OnNewRecord=VAR
+                  MiniItemTemplate@1002 : Record 1301;
+                  Item@1004 : Record 27;
+                  NewItemCode@1001 : Code[20];
+                BEGIN
+                  EnableControls;
+                  IF "No." = '' THEN
+                    NewItemCode := MiniItemTemplate.NewItemFromTemplate;
+                  IF NewItemCode = '' THEN BEGIN
+                    CurrPage.CLOSE;
+                    EXIT;
+                  END;
+                  GET(NewItemCode);
+                  IF Item.GET("No.") THEN
+                    Item.DELETE(TRUE);
+                END;
+
+    OnInsertRecord=BEGIN
+                     InsertItemUnitOfMeasure;
+                   END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           GetSalesPricesAndSalesLineDisc;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 10      ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 42      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Item;
+                                 FRA=Article];
+                      Image=<DataEntry> }
+      { 28      ;2   ;Action    ;
+                      CaptionML=[ENU=&Units of Measure;
+                                 FRA=&UnitÇs];
+                      ToolTipML=[ENU=Set up the different units that the item can be traded in, such as piece, box, or hour.;
+                                 FRA=Configurez les diffÇrentes unitÇs dans lesquelles l'article peut àtre nÇgociÇ, par exemple piäce, boåte ou heure.];
+                      RunObject=Page 5404;
+                      RunPageLink=Item No.=FIELD(No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=UnitOfMeasure;
+                      PromotedCategory=Category4 }
+      { 27      ;2   ;Action    ;
+                      CaptionML=[ENU=Cross Re&ferences;
+                                 FRA=&RÇfÇrences externes];
+                      ToolTipML=[ENU=Set up a customer's own identification of the item. Cross-references to the customer's item number means that that item number is automatically shown on sales documents instead of the number that you use.;
+                                 FRA=Configurez la maniäre dont un client identifie l'article. Les rÇfÇrences externes au numÇro d'article du client impliquent que le numÇro d'article est automatiquement affichÇ sur les documents vente au lieu du numÇro que vous utilisez.];
+                      RunObject=Page 5721;
+                      RunPageLink=Item No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Change;
+                      PromotedCategory=Category4 }
+      { 26      ;2   ;Action    ;
+                      CaptionML=[ENU=E&xtended Texts;
+                                 FRA=T&extes Çtendus];
+                      ToolTipML=[ENU=Set up additional text for the description of the item. Extended text can be inserted under the Description field on document lines for the item.;
+                                 FRA=DÇfinissez un texte supplÇmentaire pour la description de l'article. Un texte plus long peut àtre insÇrÇ sous le champ DÇsignation sur les lignes document de l'article.];
+                      RunObject=Page 1316;
+                      RunPageView=SORTING(Table Name,No.,Language Code,All Language Codes,Starting Date,Ending Date);
+                      RunPageLink=Table Name=CONST(Item),
+                                  No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Text;
+                      PromotedCategory=Category4 }
+      { 23      ;2   ;Action    ;
+                      CaptionML=[ENU=Translations;
+                                 FRA=Traductions];
+                      ToolTipML=[ENU=Set up translated item descriptions. Translated item descriptions are automatically inserted on documents according to the language code.;
+                                 FRA=DÇfinissez des descriptions d'article traduites. Les descriptions d'articles traduites sont automatiquement insÇrÇes dans les documents en fonction du code de langue.];
+                      RunObject=Page 35;
+                      RunPageLink=Item No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Translations;
+                      PromotedCategory=Category4 }
+      { 21      ;2   ;Action    ;
+                      CaptionML=[ENU=&Picture;
+                                 FRA=&Image];
+                      ToolTipML=[ENU=View or add a picture of the item.;
+                                 FRA=Affichez ou ajoutez une image de l'article.];
+                      RunObject=Page 346;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Location Filter=FIELD(Location Filter),
+                                  Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                                  Variant Filter=FIELD(Variant Filter);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Picture;
+                      PromotedCategory=Category4 }
+      { 5       ;2   ;Action    ;
+                      Name=AdjustInventory;
+                      CaptionML=[ENU=Adjust Inventory;
+                                 FRA=Ajuster stock];
+                      ToolTipML=[ENU=Increase or decrease the item's inventory quantity manually by entering a new quantity. Adjusting the inventory quantity manually may be relevant after a physical count or if you do not record purchased quantities.;
+                                 FRA=Vous pouvez augmenter ou diminuer manuellement la quantitÇ en stock d'un article en entrant une nouvelle quantitÇ. Il peut s'avÇrer utile d'ajuster manuellement la quantitÇ d'inventaire apräs un dÇcompte physique ou si vous n'enregistrez pas les quantitÇs achetÇes.];
+                      Enabled=InventoryItemEditable;
+                      Image=InventoryCalculation;
+                      OnAction=BEGIN
+                                 COMMIT;
+                                 PAGE.RUNMODAL(PAGE::"Mini Adjust Inventory",Rec)
+                               END;
+                                }
+      { 18      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      ToolTipML=[ENU=Set up default dimensions for the item, such as a department or project code. You can assign dimension codes to transactions to distribute costs and analyze historical information.;
+                                 FRA=Configurez des axes analytiques par dÇfaut pour l'article, comme un code projet ou dÇpartement. Vous pouvez affecter des codes axe aux transactions dans le but de rÇpartir les coñts et d'analyser les informations d'historique.];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(27),
+                                  No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=Dimensions;
+                      PromotedCategory=Category4 }
+      { 126     ;1   ;ActionGroup;
+                      CaptionML=[ENU=History;
+                                 FRA=Historique];
+                      Image=History }
+      { 101     ;2   ;ActionGroup;
+                      CaptionML=[ENU=E&ntries;
+                                 FRA=ê&critures];
+                      Image=Entries }
+      { 105     ;3   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 FRA=ê&critures comptables];
+                      ToolTipML=[ENU=View the history of positive and negative inventory changes that reflect transactions with the item.;
+                                 FRA=Permet d'afficher l'historique des modifications de stock positives et nÇgatives qui reflätent les transactions avec l'article.];
+                      RunObject=Page 38;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=ItemLedger;
+                      PromotedCategory=Category5 }
+      { 112     ;3   ;Action    ;
+                      CaptionML=[ENU=&Phys. Inventory Ledger Entries;
+                                 FRA=êcritures comptables &inventaire];
+                      ToolTipML=[ENU=View how many units of the item you had in stock at the last physical count.;
+                                 FRA=Affichez le nombre d'unitÇs de l'article que vous aviez en stock au dernier comptage physique.];
+                      RunObject=Page 390;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      PromotedIsBig=Yes;
+                      Image=PhysicalInventoryLedger;
+                      PromotedCategory=Category5 }
+      { 3       ;1   ;ActionGroup;
+                      Name=PricesandDiscounts;
+                      CaptionML=[ENU=Prices and Discounts;
+                                 FRA=Prix et remises] }
+      { 82      ;2   ;Action    ;
+                      CaptionML=[ENU=Prices;
+                                 FRA=Prix];
+                      ToolTipML=[ENU=Set up different prices for the item. An item price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.;
+                                 FRA=Configurez des prix diffÇrents pour l'article. Un prix article est automatiquement affectÇ sur les lignes facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le client, la quantitÇ ou la date de fin.];
+                      RunObject=Page 7002;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=Price }
+      { 80      ;2   ;Action    ;
+                      CaptionML=[ENU=Line Discounts;
+                                 FRA=Remises ligne];
+                      ToolTipML=[ENU=Set up different discounts for the item. An item discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.;
+                                 FRA=Configurez des remises diffÇrentes pour l'article. Une remise article est automatiquement affectÇe sur les lignes facture lorsque les critäres spÇcifiÇs sont satisfaits, par exemple le client, la quantitÇ ou la date de fin.];
+                      RunObject=Page 7004;
+                      RunPageView=SORTING(Type,Code);
+                      RunPageLink=Type=CONST(Item),
+                                  Code=FIELD(No.);
+                      Image=LineDiscount }
+      { 39      ;1   ;ActionGroup;
+                      Name=DataTemplate;
+                      CaptionML=[ENU=Data Template;
+                                 FRA=Modäle donnÇes] }
+      { 37      ;2   ;Action    ;
+                      Name=SaveAsTemplate;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Save as Template;
+                                 FRA=Sauvegarder comme modäle];
+                      ToolTipML=[ENU=Save the item card as a template that can be reused to create new item cards. Item templates contain preset information to help you fill in fields on item cards.;
+                                 FRA=Enregistrez la fiche article comme modäle que vous pourrez rÇutiliser pour crÇer de nouvelles fiches article. Les modäles article contiennent des informations prÇdÇfinies pour vous aider Ö complÇter les fiches article.];
+                      PromotedIsBig=Yes;
+                      Image=Save;
+                      PromotedCategory=New;
+                      OnAction=VAR
+                                 TempMiniItemTemplate@1002 : TEMPORARY Record 1301;
+                               BEGIN
+                                 TempMiniItemTemplate.SaveAsTemplate(Rec);
+                               END;
+                                }
+      { 8       ;2   ;Action    ;
+                      Name=Templates;
+                      CaptionML=[ENU=Templates;
+                                 FRA=Modäles];
+                      ToolTipML=[ENU=View or edit item templates.;
+                                 FRA=Affichez ou modifiez des modäles article.];
+                      RunObject=Page 1340;
+                      RunPageView=WHERE(Table ID=CONST(27));
+                      PromotedIsBig=Yes;
+                      Image=Template }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                Name=Item;
+                CaptionML=[ENU=Item;
+                           FRA=Article];
+                GroupType=Group }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the item. The field is either filled automatically from a defined number series, or you enter the number manually because you have enabled manual number entry in the number-series setup.;
+                           FRA=Indique le numÇro de l'article. Le champ est renseignÇ soit automatiquement Ö partir d'une souche de numÇros dÇfinie, soit vous entrez manuellement le numÇro car vous avez activÇ la saisie manuelle de numÇro dans le paramÇtrage de la souche de numÇros.];
+                SourceExpr="No.";
+                Importance=Additional;
+                OnAssistEdit=BEGIN
+                               IF AssistEdit THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a description of the item. You can enter a maximum of 30 characters, both numbers and letters.;
+                           FRA=Indique la dÇsignation de l'article. Vous pouvez entrer au maximum 30ˇcaractäres alphanumÇriques.];
+                SourceExpr=Description;
+                ShowMandatory=TRUE }
+
+    { 20  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if transactions with the item should be blocked, for example, because the item is in quarantine.;
+                           FRA=SpÇcifie si les transactions avec l'article doivent àtre bloquÇes, par exemple, parce que l'article est en contrìle.];
+                SourceExpr=Blocked }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the item card represents a physical item (Inventory) or a service (Service).;
+                           FRA=SpÇcifie si la fiche article reprÇsente un article physique (Stock) ou un service (Service).];
+                SourceExpr=Type;
+                OnValidate=BEGIN
+                             EnableControls;
+                           END;
+                            }
+
+    { 11  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit in which the item is held on inventory. The base unit of measure also serves as the conversion basis for alternate units of measure.;
+                           FRA=Indique l'unitÇ dans laquelle l'article est stockÇ. L'unitÇ de base sert Çgalement de base de conversion pour les unitÇs de remplacement.];
+                SourceExpr="Base Unit of Measure";
+                Importance=Promoted;
+                ShowMandatory=TRUE }
+
+    { 50  ;2   ;Field     ;
+                ToolTipML=[ENU=Shows when the item card was last modified.;
+                           FRA=Affiche la date Ö laquelle la fiche article a ÇtÇ modifiÇe pour la derniäre fois.];
+                SourceExpr="Last Date Modified";
+                Importance=Additional }
+
+    { 51  ;2   ;Field     ;
+                ToolTipML=[ENU=Identifies the item in connection with electronic document sending and receiving. For the PEPPOL format, the field is used as follows: If the StandardItemIdentification/ID element has the SchemeID attribute set to GTIN, then the element is mapped to the GTIN field on the item card.;
+                           FRA=Identifie l'article en relation avec l'envoi et la rÇception de document Çlectronique. Selon le formatˇPEPPOL, le champ est utilisÇ comme suitˇ: si l'ÇlÇment StandardItemIdentification/ID a l'attribut SchemeID dÇfinit sur GTIN, alors l'ÇlÇment est mappÇ au champ GTIN sur la fiche article.];
+                SourceExpr=GTIN;
+                Importance=Additional }
+
+    { 12  ;1   ;Group     ;
+                Name=InventoryGrp;
+                CaptionML=[ENU=Inventory;
+                           FRA=Stocks];
+                GroupType=Group }
+
+    { 14  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies how many units, such as pieces, boxes, or cans, of the item are on inventory.;
+                           FRA=Indique le nombre d'unitÇs (par exemple des piäces, des boåtes ou des palettes) en stock.];
+                SourceExpr=Inventory;
+                Importance=Promoted;
+                Enabled=InventoryItemEditable }
+
+    { 47  ;2   ;Field     ;
+                CaptionML=[ENU=Stockout Warning;
+                           FRA=Alerte rupture stock];
+                ToolTipML=[ENU=Specifies if a warning is displayed when you enter a quantity on a sales document that brings the item's inventory below zero. The calculation includes all sales document lines that have not yet been posted.;
+                           FRA=Indique si un avertissement s'affiche lorsque vous entrez une quantitÇ sur un document vente qui entraåne un stock d'article nÇgatif. Le calcul inclut toutes les lignes document vente qui n'ont pas encore ÇtÇ validÇes.];
+                OptionCaptionML=[ENU=Default (Yes),No,Yes;
+                                 FRA=Par dÇfaut (Oui),Non,Oui];
+                SourceExpr="Stockout Warning";
+                Visible=ShowStockoutWarningDefaultYes }
+
+    { 46  ;2   ;Field     ;
+                Name=StockoutWarningDefNo;
+                CaptionML=[ENU=Stockout Warning;
+                           FRA=Alerte rupture stock];
+                ToolTipML=[ENU=Specifies if a warning is displayed when you enter a quantity on a sales document that brings the item's inventory below zero. The calculation includes all sales document lines that have not yet been posted.;
+                           FRA=Indique si un avertissement s'affiche lorsque vous entrez une quantitÇ sur un document vente qui entraåne un stock d'article nÇgatif. Le calcul inclut toutes les lignes document vente qui n'ont pas encore ÇtÇ validÇes.];
+                OptionCaptionML=[ENU=Default (No),No,Yes;
+                                 FRA=Par dÇfaut (Non),Non,Oui];
+                SourceExpr="Stockout Warning";
+                Visible=ShowStockoutWarningDefaultNo }
+
+    { 45  ;2   ;Field     ;
+                CaptionML=[ENU=Prevent Negative Inventory;
+                           FRA=êviter stock nÇgatif];
+                ToolTipML=[ENU=Specifies if you can post a transaction that will bring the item's inventory below zero.;
+                           FRA=Indique si vous pouvez valider une transaction qui entraånerait un stock de l'article nÇgatif.];
+                OptionCaptionML=[ENU=Default (Yes),No,Yes;
+                                 FRA=Par dÇfaut (Oui),Non,Oui];
+                SourceExpr="Prevent Negative Inventory";
+                Importance=Additional;
+                Visible=PreventNegInventoryDefaultYes }
+
+    { 43  ;2   ;Field     ;
+                Name=PreventNegativeInventoryDefNo;
+                CaptionML=[ENU=Prevent Negative Inventory;
+                           FRA=êviter stock nÇgatif];
+                ToolTipML=[ENU=Specifies if you can post a transaction that will bring the item's inventory below zero.;
+                           FRA=Indique si vous pouvez valider une transaction qui entraånerait un stock de l'article nÇgatif.];
+                OptionCaptionML=[ENU=Default (No),No,Yes;
+                                 FRA=Par dÇfaut (Non),Non,Oui];
+                SourceExpr=["Prevent Negative Inventory" ];
+                Importance=Additional;
+                Visible=PreventNegInventoryDefaultNo }
+
+    { 22  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the net weight of the item.;
+                           FRA=Indique le poids net de l'article.];
+                SourceExpr="Net Weight";
+                Importance=Additional }
+
+    { 49  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies that an extended text that you have set up will be added automatically on sales or purchase documents for this item.;
+                           FRA=Indique qu'un texte Çtendu que vous avez dÇfini sera automatiquement ajoutÇ aux documents vente ou achat de cet article.];
+                SourceExpr="Automatic Ext. Texts";
+                Importance=Additional }
+
+    { 9   ;1   ;Group     ;
+                Name=Price & Posting;
+                CaptionML=[ENU=Price & Posting;
+                           FRA=Prix et validation];
+                GroupType=Group }
+
+    { 38  ;2   ;Field     ;
+                Name=Price;
+                CaptionML=[ENU=Price;
+                           FRA=Prix];
+                ToolTipML=[ENU=Specifies the price for one unit of the item, in LCY. You can enter a price manually or have it entered according to the Price/Profit Calculation field.;
+                           FRA=SpÇcifie le prix d'une unitÇ de l'article, en devise sociÇtÇ. Vous pouvez saisir manuellement un prix ou qu'il soit indiquÇ en fonction du champ Calcul prix ou marge.];
+                SourceExpr="Unit Price";
+                Editable=PriceEditable }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr=CalcUnitPriceExclVAT;
+                CaptionClass='2,0,' + FIELDCAPTION("Unit Price");
+                Importance=Additional }
+
+    { 29  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Unit Price and Line Amount fields on sales document lines for this item should be shown with or without VAT.;
+                           FRA=SpÇcifie si les champs Prix unitaire et Montant ligne des lignes document vente pour cet article sont affichÇs avec ou sans la TVA.];
+                SourceExpr="Price Includes VAT";
+                Importance=Additional;
+                OnValidate=BEGIN
+                             IF "Price Includes VAT" = xRec."Price Includes VAT" THEN
+                               EXIT;
+
+                             CurrPage.PriceAndLineDisc.PAGE.RunUpdatePriceIncludesVatAndPrices("Price Includes VAT");
+                           END;
+                            }
+
+    { 34  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the Profit % field, the Unit Price field, or neither field is calculated and filled. The value in the Profit % field is what is generally understood as the profit margin.;
+                           FRA=SpÇcifie si le champ % marge sur vente, le champ Prix unitaire, ou aucun des deux champs est calculÇ et renseignÇ. GÇnÇralement, la valeur du champ % marge sur vente correspond Ö la marge bÇnÇficiaire.];
+                SourceExpr="Price/Profit Calculation";
+                Importance=Additional;
+                OnValidate=BEGIN
+                             EnableControls;
+                           END;
+                            }
+
+    { 36  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the profit margin that you want to sell the item at. You can enter a profit percentage manually or have it entered according to the Price/Profit Calculation field.;
+                           FRA=SpÇcifie la marge bÇnÇficiaire avec laquelle vous souhaitez vendre l'article. Vous pouvez saisir manuellement un pourcentage de marge ou qu'il soit indiquÇ en fonction du champ Calcul prix ou marge.];
+                DecimalPlaces=2:2;
+                SourceExpr="Profit %";
+                Editable=ProfitEditable }
+
+    { 30  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the most recent average cost for one unit of the item. After each sale, the unit cost is updated by automatic cost adjustment.;
+                           FRA=Indique le coñt moyen le plus rÇcent d'une unitÇ de l'article. Apräs chaque vente, le coñt unitaire est mis Ö jour par l'ajustement automatique des coñts.];
+                SourceExpr="Unit Cost";
+                Editable=UnitCostEditable;
+                OnDrillDown=VAR
+                              ShowAvgCalcItem@1000 : Codeunit 5803;
+                            BEGIN
+                              ShowAvgCalcItem.DrillDownAvgCostAdjmtPoint(Rec)
+                            END;
+                             }
+
+    { 44  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if the item should be included in the calculation of an invoice discount on documents where the item is traded.;
+                           FRA=SpÇcifie si l'article doit àtre inclus dans le calcul d'une remise facture sur les documents dans lesquels l'article est achetÇ ou vendu.];
+                SourceExpr="Allow Invoice Disc.";
+                Importance=Additional }
+
+    { 48  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies an item group code that can be used as a criterion to grant a discount when the item is sold to a certain customer.;
+                           FRA=Indique le code groupe articles qui peut àtre utilisÇ comme critäre pour obtenir un escompte lorsque l'article est vendu Ö un certain client.];
+                SourceExpr="Item Disc. Group";
+                Importance=Additional }
+
+    { 1905885101;2;Group  ;
+                Name=Cost Details;
+                CaptionML=[ENU=Cost Details;
+                           FRA=DÇtails de coñts];
+                GroupType=Group }
+
+    { 24  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies how the item's cost flow is recorded and whether an actual or budgeted value is capitalized and used in the cost calculation.;
+                           FRA=SpÇcifie la maniäre dont le flux des coñts de l'article est enregistrÇ et si une valeur rÇelle ou budgÇtÇe est capitalisÇe et utilisÇe dans le calcul des coñts.];
+                SourceExpr="Costing Method";
+                Importance=Additional;
+                Enabled=FALSE }
+
+    { 155 ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies the percentage of the item's last purchase cost that includes indirect costs, such as freight that is associated with the purchase of the item.;
+                           FRA=SpÇcifie le pourcentage du dernier coñt d'achat de l'article qui inclut les coñts indirects comme la gestion du fret et des entrepìts associÇs Ö l'achat de l'article.];
+                SourceExpr="Indirect Cost %";
+                Importance=Additional }
+
+    { 32  ;3   ;Field     ;
+                CaptionML=[ENU=Last Purchase Cost;
+                           FRA=Dernier coñt d'achat];
+                ToolTipML=[ENU=Specifies the item's most recent purchase cost as invoiced by your vendor in the last posted purchase invoice for the item.;
+                           FRA=SpÇcifie le coñt d'achat le plus rÇcent de l'article tel qu'il a ÇtÇ facturÇ par votre fournisseur sur la derniäre facture achat enregistrÇe pour l'article.];
+                SourceExpr="Last Direct Cost";
+                Importance=Additional }
+
+    { 17  ;2   ;Group     ;
+                Name=Financial Details;
+                CaptionML=[ENU=Financial Details;
+                           FRA=DÇtails financiers];
+                GroupType=Group }
+
+    { 95  ;3   ;Field     ;
+                ToolTipML=[ENU=Links business transactions made for this item with the general ledger to account for the value of trade with the item.;
+                           FRA=Lie les transactions effectuÇes pour cet article avec les Çcritures comptables pour reprÇsenter la valeur commerciale de l'article.];
+                SourceExpr="Gen. Prod. Posting Group";
+                Importance=Additional;
+                ShowMandatory=TRUE }
+
+    { 66  ;3   ;Field     ;
+                ToolTipML=[ENU=Links business transactions made for this item with the general ledger to account for VAT amounts that result from trade with the item.;
+                           FRA=Lie les transactions effectuÇes pour cet article avec les Çcritures comptables pour reprÇsenter les montants de TVA dÇcoulant de la vente de l'article.];
+                SourceExpr="VAT Prod. Posting Group";
+                Importance=Additional;
+                ShowMandatory=TRUE }
+
+    { 40  ;3   ;Field     ;
+                ToolTipML=[ENU=Links business transactions made for the item with an inventory account in the general ledger to group amounts for that item type.;
+                           FRA=Lie les transactions commerciales effectuÇes pour l'article avec un compte stock en comptabilitÇ pour regrouper les montants de ce type d'article.];
+                SourceExpr="Inventory Posting Group";
+                Importance=Additional;
+                Editable=InventoryItemEditable;
+                ShowMandatory=TRUE }
+
+    { 19  ;3   ;Field     ;
+                ToolTipML=[ENU=Specifies a code for the item's tariff number. To see the tariff numbers in the Tariff Numbers window, choose the field.;
+                           FRA=Indique un code pour la nomenclature produit de l'article. Pour afficher les nomenclatures produits de la fenàtre Nomenclatures produits, cliquez sur le champ.];
+                SourceExpr="Tariff No.";
+                Importance=Additional }
+
+    { 7   ;3   ;Field     ;
+                CaptionML=[ENU=Default Deferral Template;
+                           FRA=Modäle Çchelonnement par dÇfaut];
+                SourceExpr="Default Deferral Template Code" }
+
+    { 41  ;1   ;Part      ;
+                Name=PriceAndLineDisc;
+                PagePartID=Page1345;
+                PartType=Page }
+
+    { 31  ;0   ;Container ;
+                ContainerType=FactBoxArea }
+
+    { 13  ;1   ;Part      ;
+                SubPageLink=Source Type=CONST(Item),
+                            Source No.=FIELD(No.);
+                PagePartID=Page875;
+                Visible=SocialListeningVisible;
+                PartType=Page }
+
+    { 15  ;1   ;Part      ;
+                SubPageLink=Source Type=CONST(Item),
+                            Source No.=FIELD(No.);
+                PagePartID=Page876;
+                Visible=SocialListeningSetupVisible;
+                PartType=Page;
+                UpdatePropagation=Both }
+
+  }
+  CODE
+  {
+    VAR
+      InventoryItemEditable@1000 : Boolean INDATASET;
+      UnitCostEditable@1001 : Boolean INDATASET;
+      ShowStockoutWarningDefaultYes@1007 : Boolean;
+      ShowStockoutWarningDefaultNo@1006 : Boolean;
+      PreventNegInventoryDefaultYes@1005 : Boolean;
+      PreventNegInventoryDefaultNo@1004 : Boolean;
+      SocialListeningSetupVisible@1008 : Boolean INDATASET;
+      SocialListeningVisible@1002 : Boolean INDATASET;
+      ProfitEditable@1003 : Boolean;
+      PriceEditable@1009 : Boolean;
+
+    LOCAL PROCEDURE EnableControls@3();
+    VAR
+      ItemLedgerEntry@1000 : Record 32;
+    BEGIN
+      InventoryItemEditable := Type = Type::Inventory;
+
+      IF Type = Type::Inventory THEN BEGIN
+        ItemLedgerEntry.SETRANGE("Item No.","No.");
+        UnitCostEditable := ItemLedgerEntry.ISEMPTY;
+      END ELSE
+        UnitCostEditable := TRUE;
+
+      ProfitEditable := TRUE;
+      PriceEditable := TRUE;
+      CASE "Price/Profit Calculation" OF
+        "Price/Profit Calculation"::"Profit=Price-Cost":
+          ProfitEditable := FALSE;
+        "Price/Profit Calculation"::"Price=Cost+Profit":
+          PriceEditable := FALSE;
+      END;
+
+      SetSocialListeningFactboxVisibility
+    END;
+
+    LOCAL PROCEDURE VisualizingControls@5();
+    VAR
+      SalesSetup@1001 : Record 311;
+      InventorySetup@1002 : Record 313;
+    BEGIN
+      SalesSetup.GET;
+      ShowStockoutWarningDefaultYes := SalesSetup."Stockout Warning";
+      ShowStockoutWarningDefaultNo := NOT ShowStockoutWarningDefaultYes;
+      InventorySetup.GET;
+      PreventNegInventoryDefaultYes := InventorySetup."Prevent Negative Inventory";
+      PreventNegInventoryDefaultNo := NOT PreventNegInventoryDefaultYes;
+    END;
+
+    LOCAL PROCEDURE GetSalesPricesAndSalesLineDisc@4();
+    BEGIN
+      IF "No." <> CurrPage.PriceAndLineDisc.PAGE.GetLoadedItemNo THEN BEGIN
+        CurrPage.PriceAndLineDisc.PAGE.LoadItem(Rec);
+        CurrPage.PriceAndLineDisc.PAGE.UPDATE(FALSE);
+      END;
+    END;
+
+    LOCAL PROCEDURE InsertItemUnitOfMeasure@1();
+    VAR
+      ItemUnitOfMeasure@1000 : Record 5404;
+    BEGIN
+      IF "Base Unit of Measure" <> '' THEN BEGIN
+        ItemUnitOfMeasure.INIT;
+        ItemUnitOfMeasure."Item No." := "No.";
+        ItemUnitOfMeasure.VALIDATE(Code,"Base Unit of Measure");
+        ItemUnitOfMeasure."Qty. per Unit of Measure" := 1;
+        ItemUnitOfMeasure.INSERT;
+      END;
+    END;
+
+    LOCAL PROCEDURE SetSocialListeningFactboxVisibility@6();
+    VAR
+      SocialListeningMgt@1000 : Codeunit 871;
+    BEGIN
+      SocialListeningMgt.GetItemFactboxVisibility(Rec,SocialListeningSetupVisible,SocialListeningVisible);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,72 @@
+OBJECT Table 8617 Config. Package Error
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Config. Package Error;
+               FRA=Erreur package config.];
+    LookupPageID=Page8616;
+    DrillDownPageID=Page8616;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Package Code        ;Code20        ;TableRelation="Config. Package";
+                                                   CaptionML=[ENU=Package Code;
+                                                              FRA=Code package];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Table ID            ;Integer       ;TableRelation=AllObj."Object ID" WHERE (Object Type=CONST(Table));
+                                                   CaptionML=[ENU=Table ID;
+                                                              FRA=ID table];
+                                                   NotBlank=Yes;
+                                                   Editable=No }
+    { 3   ;   ;Record No.          ;Integer       ;TableRelation="Config. Package Record".No. WHERE (Table ID=FIELD(Table ID));
+                                                   CaptionML=[ENU=Record No.;
+                                                              FRA=Nombre enregistrements];
+                                                   NotBlank=Yes;
+                                                   Editable=No }
+    { 4   ;   ;Field ID            ;Integer       ;CaptionML=[ENU=Field ID;
+                                                              FRA=ID champ];
+                                                   NotBlank=Yes;
+                                                   Editable=No }
+    { 5   ;   ;Field Name          ;Text30        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(Field.FieldName WHERE (TableNo=FIELD(Table ID),
+                                                                                             No.=FIELD(Field ID)));
+                                                   CaptionML=[ENU=Field Name;
+                                                              FRA=Nom de champ];
+                                                   Editable=No }
+    { 6   ;   ;Error Text          ;Text250       ;CaptionML=[ENU=Error Text;
+                                                              FRA=Texte erreur];
+                                                   Editable=No }
+    { 7   ;   ;Field Caption       ;Text250       ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(Field."Field Caption" WHERE (TableNo=FIELD(Table ID),
+                                                                                                   No.=FIELD(Field ID)));
+                                                   CaptionML=[ENU=Field Caption;
+                                                              FRA=L‚gende champ];
+                                                   Editable=No }
+    { 8   ;   ;Error Type          ;Option        ;CaptionML=[ENU=Error Type;
+                                                              FRA=Type d'erreur];
+                                                   OptionCaptionML=[ENU=,TableRelation;
+                                                                    FRA=,TableRelation];
+                                                   OptionString=,TableRelation }
+  }
+  KEYS
+  {
+    {    ;Package Code,Table ID,Record No.,Field ID;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

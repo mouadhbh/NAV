@@ -1,0 +1,70 @@
+OBJECT Page 10800 FR Account Schedule Names
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/09/13;
+    Time=12:00:00;
+    Version List=NAVFR7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=FR Account Schedule Names;
+               FRA=Noms tableau d'analyse B/R];
+    SourceTable=Table10800;
+    PageType=List;
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 13      ;1   ;Action    ;
+                      Name=EditAccountSchedule;
+                      ShortCutKey=Return;
+                      CaptionML=[ENU=Edit Account Schedule;
+                                 FRA=Modifier tableau d'analyse];
+                      Promoted=Yes;
+                      Image=Edit;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 AccSchedule@1120000 : Page 10801;
+                               BEGIN
+                                 AccSchedule.SetAccSchedName(Name);
+                                 AccSchedule.RUN;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 10800;2  ;Field     ;
+                SourceExpr="Caption Column 1" }
+
+    { 10802;2  ;Field     ;
+                SourceExpr="Caption Column 2" }
+
+    { 10804;2  ;Field     ;
+                SourceExpr="Caption Column 3" }
+
+    { 10806;2  ;Field     ;
+                SourceExpr="Caption Column Previous Year" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

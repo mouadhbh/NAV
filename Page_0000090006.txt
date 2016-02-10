@@ -1,0 +1,170 @@
+OBJECT Page 90006 Test Statements Page
+{
+  OBJECT-PROPERTIES
+  {
+    Date=01/02/16;
+    Time=09:18:35;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    ActionList=ACTIONS
+    {
+      { 1000000010;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1000000011;1 ;Action    ;
+                      CaptionML=ENU=Execute IF;
+                      OnAction=BEGIN
+                                 IF Quantity=0 THEN
+                                   EXIT;
+                                 Result:=Quantity*"Unit Price";
+                                 IF Result<0 THEN
+                                   "Total Credits":="Total Credits"+Result
+                                 ELSE
+                                   "Total Sales":="Total Sales"+Result;
+                                 "Grand Total":="Grand Total"+Result;
+                               END;
+                                }
+      { 1000000012;1 ;Action    ;
+                      CaptionML=ENU=Clear;
+                      OnAction=BEGIN
+                                 Quantity:=0;
+                                 "Unit Price":=0;
+                                 Result:=0;
+                                 "Total Sales":=0;
+                                 "Total Credits":=0;
+                                 "Grand Total":=0;
+                               END;
+                                }
+      { 1000000016;1 ;Action    ;
+                      CaptionML=ENU=Execute Compound;
+                      OnAction=BEGIN
+                                 IF Quantity=0 THEN
+                                   EXIT;
+                                 Result:=Quantity*"Unit Price";
+                                 IF Result<0 THEN BEGIN
+                                   "Total Credits":="Total Credits"+Result;
+                                   TotalQtyCredits:=TotalQtyCredits+Quantity;
+                                 END ELSE BEGIN
+                                   "Total Sales":="Total Sales"+Result;
+                                   TotalQtySales:=TotalQtySales+Quantity;
+                                 END;
+                                 "Grand Total":="Grand Total"+Result;
+                                 GrandQtyTotal:=GrandQtyTotal+Quantity;
+                               END;
+                                }
+      { 1000000017;1 ;Action    ;
+                      CaptionML=ENU=Execute Action;
+                      OnAction=BEGIN
+                                 CASE TRUE OF
+                                   Quantity=0: EXIT;
+                                   Quantity<0: BEGIN
+                                               "Total Credits":="Total Credits"+Result;
+                                               TotalQtyCredits:=TotalQtyCredits+Quantity;
+                                               END;
+                                   Quantity>0: BEGIN
+                                               "Total Sales":="Total Sales"+Result;
+                                               TotalQtySales:=TotalQtySales+Quantity;
+                                               END;
+                                 END;
+                                 "Grand Total":="Grand Total"+Result;
+                                 GrandQtyTotal:=GrandQtyTotal+Quantity;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1000000000;;Container;
+                Name=My Test Page 1;
+                CaptionML=ENU=Test Statement Page;
+                ContainerType=ContentArea }
+
+    { 1000000001;1;Group  ;
+                Name=General;
+                CaptionML=ENU=General;
+                GroupType=Group }
+
+    { 1000000002;2;Group  ;
+                Name=Input;
+                CaptionML=ENU=Input;
+                GroupType=Group }
+
+    { 1000000003;3;Field  ;
+                Name=Quantity;
+                CaptionML=ENU=Quantity;
+                SourceExpr=Quantity }
+
+    { 1000000004;3;Field  ;
+                Name=Unit Price;
+                CaptionML=ENU=Unit Price;
+                SourceExpr="Unit Price";
+                MinValue=0 }
+
+    { 1000000005;2;Group  ;
+                Name=Output;
+                CaptionML=ENU=Output;
+                GroupType=Group }
+
+    { 1000000006;3;Field  ;
+                Name=Result;
+                CaptionML=ENU=Result;
+                SourceExpr=Result;
+                Editable=FALSE }
+
+    { 1000000007;3;Field  ;
+                Name=Total Sales;
+                CaptionML=ENU=Total Sales;
+                SourceExpr="Total Sales";
+                Editable=FALSE }
+
+    { 1000000008;3;Field  ;
+                Name=Total Credits;
+                CaptionML=ENU=Total Credits;
+                SourceExpr="Total Credits";
+                Editable=FALSE }
+
+    { 1000000009;3;Field  ;
+                Name=Grand Total;
+                CaptionML=ENU=Grand Total;
+                SourceExpr="Grand Total";
+                Editable=FALSE }
+
+    { 1000000013;3;Field  ;
+                Name=Tota lQt ySales;
+                CaptionML=ENU=Tota lQt ySales;
+                SourceExpr=TotalQtySales;
+                Editable=FALSE }
+
+    { 1000000014;3;Field  ;
+                Name=Total Qty Credits;
+                CaptionML=ENU=Total Qty Credits;
+                SourceExpr=TotalQtyCredits;
+                Editable=FALSE }
+
+    { 1000000015;3;Field  ;
+                Name=Grand Qty Total;
+                CaptionML=ENU=Grand Qty Total;
+                SourceExpr=GrandQtyTotal;
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      Quantity@1000000000 : Integer;
+      "Unit Price"@1000000001 : Decimal;
+      "Total Sales"@1000000002 : Decimal;
+      "Total Credits"@1000000003 : Decimal;
+      "Grand Total"@1000000004 : Decimal;
+      Result@1000000005 : Decimal;
+      TotalQtySales@1000000006 : Integer;
+      TotalQtyCredits@1000000007 : Integer;
+      GrandQtyTotal@1000000008 : Integer;
+
+    BEGIN
+    END.
+  }
+}
+

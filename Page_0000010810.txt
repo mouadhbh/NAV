@@ -1,0 +1,135 @@
+OBJECT Page 10810 Simulation Registers
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/09/13;
+    Time=12:00:00;
+    Version List=NAVFR7.10;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Simulation Registers;
+               FRA=Hist. transactions simulation];
+    SourceTable=Table45;
+    SourceTableView=SORTING(No.)
+                    ORDER(Descending)
+                    WHERE(No.=FILTER(<0));
+    PageType=List;
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 10      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Register;
+                                 FRA=His&torique];
+                      Image=Register }
+      { 11      ;2   ;Action    ;
+                      CaptionML=[ENU=General Ledger;
+                                 FRA=Comptabilit‚];
+                      RunObject=Codeunit 235;
+                      Image=GLRegisters }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1900670506;1 ;Action    ;
+                      CaptionML=[ENU=Detail Trial Balance;
+                                 FRA=Grand livre];
+                      RunObject=Report 4;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904082706;1 ;Action    ;
+                      CaptionML=[ENU=Trial Balance;
+                                 FRA=Balance];
+                      RunObject=Report 8;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902174606;1 ;Action    ;
+                      CaptionML=[ENU=Trial Balance by Period;
+                                 FRA=Balance par p‚riode];
+                      RunObject=Report 38;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900210206;1 ;Action    ;
+                      CaptionML=[ENU=G/L Register;
+                                 FRA=Hist. trans. comptabilit‚];
+                      RunObject=Report 3;
+                      Promoted=Yes;
+                      Image=GLRegisters;
+                      PromotedCategory=Report }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1120000 ;1   ;ActionGroup;
+                      CaptionML=[ENU=Functions;
+                                 FRA=Fonctions];
+                      Image=Action }
+      { 1120001 ;2   ;Action    ;
+                      Name=Delete;
+                      CaptionML=[ENU=Delete;
+                                 FRA=Supprimer];
+                      Image=Delete;
+                      OnAction=BEGIN
+                                 SimulManagement.Delete(Rec);
+                               END;
+                                }
+      { 1120002 ;2   ;Action    ;
+                      Name=Transfer;
+                      CaptionML=[ENU=Transfer;
+                                 FRA=Transfert];
+                      Promoted=Yes;
+                      Image=Change;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 SimulManagement.DeleteCreate(Rec);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Creation Date" }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="User ID" }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Source Code" }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr="Journal Batch Name" }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="From Entry No." }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="To Entry No." }
+
+    { 27  ;2   ;Field     ;
+                SourceExpr="From VAT Entry No." }
+
+    { 29  ;2   ;Field     ;
+                SourceExpr="To VAT Entry No." }
+
+  }
+  CODE
+  {
+    VAR
+      SimulManagement@1120000 : Codeunit 10810;
+
+    BEGIN
+    END.
+  }
+}
+

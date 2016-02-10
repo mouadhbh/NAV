@@ -1,0 +1,164 @@
+OBJECT Page 209 Units of Measure
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Units of Measure;
+               FRA=Unit‚s de mesure];
+    SourceTable=Table204;
+    PageType=List;
+    OnOpenPage=VAR
+                 CRMIntegrationManagement@1000 : Codeunit 5330;
+               BEGIN
+                 CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
+               END;
+
+    OnAfterGetCurrRecord=VAR
+                           CRMCouplingManagement@1001 : Codeunit 5331;
+                         BEGIN
+                           CRMIsCoupledToRecord := CRMIntegrationEnabled AND CRMCouplingManagement.IsRecordCoupledToCRM(RECORDID);
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 9       ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Unit;
+                                 FRA=&Unit‚];
+                      Image=UnitOfMeasure }
+      { 22      ;2   ;Action    ;
+                      CaptionML=[ENU=Translations;
+                                 FRA=Traductions];
+                      RunObject=Page 5402;
+                      RunPageLink=Code=FIELD(Code);
+                      Image=Translations }
+      { 11      ;1   ;ActionGroup;
+                      Name=ActionGroupCRM;
+                      CaptionML=[ENU=Dynamics CRM;
+                                 FRA=Dynamics CRM];
+                      Visible=CRMIntegrationEnabled;
+                      Image=Administration }
+      { 10      ;2   ;Action    ;
+                      Name=CRMGotoUnitsOfMeasure;
+                      CaptionML=[ENU=Unit of Measure;
+                                 FRA=Unit‚];
+                      ToolTipML=[ENU=Open the coupled Microsoft Dynamics CRM unit of measure.;
+                                 FRA=Ouvrez l'unit‚ Microsoft Dynamics CRM coupl‚e.];
+                      Image=CoupledUnitOfMeasure;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.ShowCRMEntityFromRecordID(RECORDID);
+                               END;
+                                }
+      { 8       ;2   ;Action    ;
+                      Name=CRMSynchronizeNow;
+                      AccessByPermission=TableData 5331=IM;
+                      CaptionML=[ENU=Synchronize Now;
+                                 FRA=Synchroniser maintenant];
+                      ToolTipML=[ENU=Send updated data to Microsoft Dynamics CRM.;
+                                 FRA=Envoyez des donn‚es mises … jour … Microsoft Dynamics CRM.];
+                      Image=Refresh;
+                      OnAction=VAR
+                                 UnitOfMeasure@1000 : Record 204;
+                                 CRMIntegrationManagement@1001 : Codeunit 5330;
+                                 UnitOfMeasureRecordRef@1002 : RecordRef;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(UnitOfMeasure);
+                                 UnitOfMeasure.NEXT;
+
+                                 IF UnitOfMeasure.COUNT = 1 THEN
+                                   CRMIntegrationManagement.UpdateOneNow(UnitOfMeasure.RECORDID)
+                                 ELSE BEGIN
+                                   UnitOfMeasureRecordRef.GETTABLE(UnitOfMeasure);
+                                   CRMIntegrationManagement.UpdateMultipleNow(UnitOfMeasureRecordRef);
+                                 END
+                               END;
+                                }
+      { 7       ;2   ;ActionGroup;
+                      Name=Coupling;
+                      CaptionML=[@@@=Coupling is a noun;
+                                 ENU=Coupling;
+                                 FRA=Couplage];
+                      ToolTipML=[ENU=Create, change, or delete a coupling between the Microsoft Dynamics NAV record and a Microsoft Dynamics CRM record.;
+                                 FRA=Cr‚ez, modifiez ou supprimez un couplage entre l'enregistrement Microsoft Dynamics NAV et un enregistrement Microsoft Dynamics CRM.];
+                      Image=LinkAccount }
+      { 6       ;3   ;Action    ;
+                      Name=ManageCRMCoupling;
+                      AccessByPermission=TableData 5331=IM;
+                      CaptionML=[ENU=Set Up Coupling;
+                                 FRA=Configurer le couplage];
+                      ToolTipML=[ENU=Create or modify the coupling to a Microsoft Dynamics CRM Unit of Measure.;
+                                 FRA=Cr‚ez ou modifiez le couplage avec une unit‚ Microsoft Dynamics CRM.];
+                      Image=LinkAccount;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.CreateOrUpdateCoupling(RECORDID);
+                               END;
+                                }
+      { 5       ;3   ;Action    ;
+                      Name=DeleteCRMCoupling;
+                      AccessByPermission=TableData 5331=IM;
+                      CaptionML=[ENU=Delete Coupling;
+                                 FRA=Supprimer le couplage];
+                      ToolTipML=[ENU=Delete the coupling to a Microsoft Dynamics CRM Unit of Measure.;
+                                 FRA=Supprimez le couplage avec une unit‚ Microsoft Dynamics CRM.];
+                      Enabled=CRMIsCoupledToRecord;
+                      Image=UnLinkAccount;
+                      OnAction=VAR
+                                 CRMCouplingManagement@1000 : Codeunit 5331;
+                               BEGIN
+                                 CRMCouplingManagement.RemoveCoupling(RECORDID);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Code }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="International Standard Code" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      CRMIntegrationEnabled@1001 : Boolean;
+      CRMIsCoupledToRecord@1000 : Boolean;
+
+    BEGIN
+    END.
+  }
+}
+

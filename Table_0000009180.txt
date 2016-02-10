@@ -1,0 +1,95 @@
+OBJECT Table 9180 Generic Chart Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Generic Chart Setup;
+               FRA=Param‚trage graphique g‚n‚rique];
+  }
+  FIELDS
+  {
+    { 2   ;   ;ID                  ;Code20        ;CaptionML=[ENU=ID;
+                                                              FRA=ID];
+                                                   NotBlank=Yes }
+    { 3   ;   ;Source Type         ;Option        ;CaptionML=[ENU=Source Type;
+                                                              FRA=Type origine];
+                                                   OptionCaptionML=[ENU=" ,Table,Query";
+                                                                    FRA=" ,Table,Requˆte"];
+                                                   OptionString=[ ,Table,Query] }
+    { 10  ;   ;Name                ;Text50        ;OnValidate=BEGIN
+                                                                Title := Name;
+                                                              END;
+
+                                                   CaptionML=[ENU=Name;
+                                                              FRA=Nom] }
+    { 11  ;   ;Title               ;Text250       ;CaptionML=[ENU=Title;
+                                                              FRA=Titre] }
+    { 12  ;   ;Filter Text         ;Text250       ;CaptionML=[ENU=Filter Text;
+                                                              FRA=Texte filtre] }
+    { 15  ;   ;Type                ;Option        ;CaptionML=[ENU=Type;
+                                                              FRA=Type];
+                                                   OptionCaptionML=[ENU=Column,Point;
+                                                                    FRA=Colonne,Point];
+                                                   OptionString=Column,Point }
+    { 16  ;   ;Source ID           ;Integer       ;CaptionML=[ENU=Source ID;
+                                                              FRA=ID origine] }
+    { 17  ;   ;Object Name         ;Text30        ;CaptionML=[ENU=Object Name;
+                                                              FRA=Nom objet];
+                                                   Editable=No }
+    { 20  ;   ;X-Axis Field ID     ;Integer       ;CaptionML=[ENU=X-Axis Field ID;
+                                                              FRA=ID champ axe X] }
+    { 21  ;   ;X-Axis Field Name   ;Text80        ;CaptionML=[ENU=X-Axis Field Name;
+                                                              FRA=Nom champ axe X] }
+    { 22  ;   ;X-Axis Field Caption;Text250       ;CaptionML=[ENU=X-Axis Field Caption;
+                                                              FRA=Libell‚ champ axe X] }
+    { 23  ;   ;X-Axis Title        ;Text250       ;CaptionML=[ENU=X-Axis Title;
+                                                              FRA=Titre axe X] }
+    { 24  ;   ;X-Axis Show Title   ;Boolean       ;InitValue=Yes;
+                                                   CaptionML=[ENU=X-Axis Show Title;
+                                                              FRA=Afficher titre axe X] }
+    { 30  ;   ;Y-Axis Fields       ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Generic Chart Y-Axis" WHERE (ID=FIELD(ID)));
+                                                   CaptionML=[ENU=Y-Axis Fields;
+                                                              FRA=Champs axe Y];
+                                                   Editable=No }
+    { 31  ;   ;Y-Axis Title        ;Text250       ;CaptionML=[ENU=Y-Axis Title;
+                                                              FRA=Titre axe Y] }
+    { 32  ;   ;Y-Axis Show Title   ;Boolean       ;InitValue=Yes;
+                                                   CaptionML=[ENU=Y-Axis Show Title;
+                                                              FRA=Afficher titre axe Y] }
+    { 34  ;   ;Z-Axis Field ID     ;Integer       ;CaptionML=[ENU=Z-Axis Field ID;
+                                                              FRA=ID champ axe Z] }
+    { 35  ;   ;Z-Axis Field Name   ;Text80        ;CaptionML=[ENU=Z-Axis Field Name;
+                                                              FRA=Nom champ axe Z] }
+    { 36  ;   ;Z-Axis Field Caption;Text250       ;CaptionML=[ENU=Z-Axis Field Caption;
+                                                              FRA=Libell‚ champ axe Z] }
+    { 38  ;   ;Z-Axis Title        ;Text250       ;CaptionML=[ENU=Z-Axis Title;
+                                                              FRA=Titre axe Z] }
+    { 39  ;   ;Z-Axis Show Title   ;Boolean       ;CaptionML=[ENU=Z-Axis Show Title;
+                                                              FRA=Afficher titre axe Z] }
+    { 40  ;   ;Chart Exists        ;Boolean       ;FieldClass=FlowField;
+                                                   CalcFormula=Exist(Chart WHERE (ID=FIELD(ID)));
+                                                   CaptionML=[ENU=Chart Exists;
+                                                              FRA=Le graphique existe];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;ID                                      ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

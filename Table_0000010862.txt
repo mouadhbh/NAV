@@ -1,0 +1,120 @@
+OBJECT Table 10862 Payment Step
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVFR8.00;
+  }
+  PROPERTIES
+  {
+    OnDelete=BEGIN
+               IF Line = 0 THEN
+                 ERROR(Text000);
+             END;
+
+    CaptionML=[ENU=Payment Step;
+               FRA=Etape räglement];
+    LookupPageID=Page10873;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Payment Class       ;Text30        ;TableRelation="Payment Class";
+                                                   CaptionML=[ENU=Payment Class;
+                                                              FRA=Type de räglement] }
+    { 2   ;   ;Line                ;Integer       ;CaptionML=[ENU=Line;
+                                                              FRA=Ligne] }
+    { 3   ;   ;Name                ;Text50        ;CaptionML=[ENU=Name;
+                                                              FRA=Nom] }
+    { 4   ;   ;Previous Status     ;Integer       ;TableRelation="Payment Status".Line WHERE (Payment Class=FIELD(Payment Class));
+                                                   CaptionML=[ENU=Previous Status;
+                                                              FRA=Statut prÇcÇdent] }
+    { 5   ;   ;Next Status         ;Integer       ;TableRelation="Payment Status".Line WHERE (Payment Class=FIELD(Payment Class));
+                                                   CaptionML=[ENU=Next Status;
+                                                              FRA=Statut suivant] }
+    { 6   ;   ;Action Type         ;Option        ;CaptionML=[ENU=Action Type;
+                                                              FRA=Type action];
+                                                   OptionCaptionML=[ENU=None,Ledger,Report,File,Create New Document;
+                                                                    FRA=Aucune,Comptabilisation,êdition,Fichier,CrÇation document];
+                                                   OptionString=None,Ledger,Report,File,Create New Document }
+    { 7   ;   ;Report No.          ;Integer       ;TableRelation=IF (Action Type=CONST(Report)) AllObj."Object ID" WHERE (Object Type=CONST(Report));
+                                                   CaptionML=[ENU=Report No.;
+                                                              FRA=ID Çtat] }
+    { 8   ;   ;Export No.          ;Integer       ;TableRelation=IF (Action Type=CONST(File),
+                                                                     Export Type=CONST(Report)) AllObj."Object ID" WHERE (Object Type=CONST(Report))
+                                                                     ELSE IF (Action Type=CONST(File),
+                                                                              Export Type=CONST(XMLport)) AllObj."Object ID" WHERE (Object Type=CONST(XMLport));
+                                                   CaptionML=[ENU=Export No.;
+                                                              FRA=N¯ exportation] }
+    { 9   ;   ;Previous Status Name;Text50        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup("Payment Status".Name WHERE (Payment Class=FIELD(Payment Class),
+                                                                                                   Line=FIELD(Previous Status)));
+                                                   CaptionML=[ENU=Previous Status Name;
+                                                              FRA=Nom Çtat prÇcÇdent] }
+    { 10  ;   ;Next Status Name    ;Text50        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup("Payment Status".Name WHERE (Payment Class=FIELD(Payment Class),
+                                                                                                   Line=FIELD(Next Status)));
+                                                   CaptionML=[ENU=Next Status Name;
+                                                              FRA=Nom Çtat suivant] }
+    { 11  ;   ;Verify Lines RIB    ;Boolean       ;CaptionML=[ENU=Verify Lines RIB;
+                                                              FRA=VÇrifier RIB lignes] }
+    { 12  ;   ;Header Nos. Series  ;Code10        ;TableRelation="No. Series";
+                                                   OnValidate=VAR
+                                                                NoSeriesLine@1120000 : Record 309;
+                                                              BEGIN
+                                                                IF "Header Nos. Series" <> '' THEN BEGIN
+                                                                  NoSeriesLine.SETRANGE("Series Code","Header Nos. Series");
+                                                                  IF NoSeriesLine.FINDLAST THEN
+                                                                    IF (STRLEN(NoSeriesLine."Starting No.") > 10) OR (STRLEN(NoSeriesLine."Ending No.") > 10) THEN
+                                                                      ERROR(Text001);
+                                                                END;
+                                                              END;
+
+                                                   CaptionML=[ENU=Header Nos. Series;
+                                                              FRA=N¯ de souche en-tàte] }
+    { 13  ;   ;Reason Code         ;Code10        ;TableRelation="Reason Code";
+                                                   CaptionML=[ENU=Reason Code;
+                                                              FRA=Code motif] }
+    { 14  ;   ;Source Code         ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Source Code;
+                                                              FRA=Code journal];
+                                                   Editable=Yes }
+    { 15  ;   ;Acceptation Code<>No;Boolean       ;CaptionML=[ENU=Acceptation Code<>No;
+                                                              FRA=Code acceptation <> Non] }
+    { 16  ;   ;Correction          ;Boolean       ;CaptionML=[ENU=Correction;
+                                                              FRA=Correction] }
+    { 17  ;   ;Verify Header RIB   ;Boolean       ;CaptionML=[ENU=Verify Header RIB;
+                                                              FRA=VÇrifier RIB en-tàte] }
+    { 18  ;   ;Verify Due Date     ;Boolean       ;CaptionML=[ENU=Verify Due Date;
+                                                              FRA=VÇrifier date d'ÇchÇance] }
+    { 19  ;   ;Realize VAT         ;Boolean       ;CaptionML=[ENU=Realize VAT;
+                                                              FRA=RÇaliser TVA] }
+    { 30  ;   ;Export Type         ;Option        ;InitValue=XMLport;
+                                                   OnValidate=BEGIN
+                                                                "Export No." := 0;
+                                                              END;
+
+                                                   CaptionML=[ENU=Export Type;
+                                                              FRA=Type exportation];
+                                                   OptionCaptionML=[ENU=,,,Report,,,XMLport;
+                                                                    FRA=,,,êtat,,,XMLport];
+                                                   OptionString=,,,Report,,,XMLport }
+  }
+  KEYS
+  {
+    {    ;Payment Class,Line                      ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      Text000@1120000 : TextConst 'ENU=Deleting the default report is not allowed.;FRA=Vous n''avez pas le droit de supprimer l''Çtat par dÇfaut.';
+      Text001@1120001 : TextConst 'ENU=You cannot assign a number series with numbers longer than 10 characters.;FRA=Vous ne pouvez pas affecter des souches de numÇros de plus de 10 caractäres.';
+
+    BEGIN
+    END.
+  }
+}
+

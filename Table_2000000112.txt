@@ -1,0 +1,53 @@
+OBJECT Table 2000000112 Server Instance
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Server Instance;
+               FRA=Instance de serveurˇ];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Server Instance ID  ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=Server Instance ID;
+                                                              FRA=ID instance de serveur] }
+    { 2   ;   ;Service Name        ;Text250       ;CaptionML=[ENU=Service Name;
+                                                              FRA=Nom de service] }
+    { 3   ;   ;Server Computer Name;Text250       ;CaptionML=[ENU=Server Computer Name;
+                                                              FRA=Nom du serveur] }
+    { 4   ;   ;Last Active         ;DateTime      ;Volatile=Yes;
+                                                   CaptionML=[ENU=Last Active;
+                                                              FRA=Dernier ÇlÇment actif] }
+    { 5   ;   ;Server Instance Name;Text250       ;CaptionML=[ENU=Server Instance Name;
+                                                              FRA=Nom d'instance de serveur] }
+    { 6   ;   ;Server Port         ;Integer       ;CaptionML=[ENU=Server Port;
+                                                              FRA=Port du serveur] }
+    { 7   ;   ;Management Port     ;Integer       ;CaptionML=[ENU=Management Port;
+                                                              FRA=Port gestion] }
+    { 8   ;   ;Status              ;Option        ;CaptionML=[ENU=Status;
+                                                              FRA=Statut];
+                                                   OptionCaptionML=[ENU=Started,Stopped,Crashed;
+                                                                    FRA=DÇmarrÇ,StoppÇ,êchouÇ];
+                                                   OptionString=Started,Stopped,Crashed }
+  }
+  KEYS
+  {
+    {    ;Server Instance ID                      ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

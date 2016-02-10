@@ -1,0 +1,50 @@
+OBJECT Table 8615 Config. Package Data
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Config. Package Data;
+               FRA=Donn‚es package config.];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Package Code        ;Code20        ;TableRelation="Config. Package";
+                                                   CaptionML=[ENU=Package Code;
+                                                              FRA=Code package];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Table ID            ;Integer       ;TableRelation=AllObj."Object ID" WHERE (Object Type=CONST(Table));
+                                                   CaptionML=[ENU=Table ID;
+                                                              FRA=ID table];
+                                                   NotBlank=Yes }
+    { 3   ;   ;No.                 ;Integer       ;TableRelation="Config. Package Record".No. WHERE (Table ID=FIELD(Table ID));
+                                                   CaptionML=[ENU=No.;
+                                                              FRA=Nø] }
+    { 4   ;   ;Field ID            ;Integer       ;TableRelation="Config. Package Field"."Field ID" WHERE (Table ID=FIELD(Table ID));
+                                                   CaptionML=[ENU=Field ID;
+                                                              FRA=ID champ] }
+    { 5   ;   ;Value               ;Text250       ;CaptionML=[ENU=Value;
+                                                              FRA=Valeur] }
+    { 6   ;   ;Invalid             ;Boolean       ;CaptionML=[ENU=Invalid;
+                                                              FRA=Non valide] }
+  }
+  KEYS
+  {
+    {    ;Package Code,Table ID,No.,Field ID      ;Clustered=Yes }
+    {    ;Package Code,Table ID,Field ID           }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,101 @@
+OBJECT Table 5127 Deferral Header Archive
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    OnDelete=BEGIN
+               DeleteLines("Deferral Doc. Type","Document Type","Document No.","Doc. No. Occurrence","Version No.","Line No.");
+             END;
+
+    CaptionML=[ENU=Deferral Header Archive;
+               FRA=Archives en-tàte Çchelonnement];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Deferral Doc. Type  ;Option        ;CaptionML=[ENU=Deferral Doc. Type;
+                                                              FRA=Type doc. Çchelonnement];
+                                                   OptionCaptionML=[ENU=Purchase,Sales,G/L;
+                                                                    FRA=Achats,Ventes,ComptabilitÇ];
+                                                   OptionString=Purchase,Sales,G/L }
+    { 4   ;   ;Document Type       ;Integer       ;CaptionML=[ENU=Document Type;
+                                                              FRA=Type document] }
+    { 5   ;   ;Document No.        ;Code20        ;CaptionML=[ENU=Document No.;
+                                                              FRA=N¯ document] }
+    { 6   ;   ;Line No.            ;Integer       ;CaptionML=[ENU=Line No.;
+                                                              FRA=N¯ ligne] }
+    { 7   ;   ;Deferral Code       ;Code10        ;CaptionML=[ENU=Deferral Code;
+                                                              FRA=Code Çchelonnement];
+                                                   NotBlank=Yes }
+    { 8   ;   ;Amount to Defer     ;Decimal       ;CaptionML=[ENU=Amount to Defer;
+                                                              FRA=Montant Ö Çchelonner];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 9   ;   ;Amount to Defer (LCY);Decimal      ;CaptionML=[ENU=Amount to Defer (LCY);
+                                                              FRA=Montant Ö Çchelonner DS];
+                                                   AutoFormatType=1 }
+    { 10  ;   ;Calc. Method        ;Option        ;CaptionML=[ENU=Calc. Method;
+                                                              FRA=MÇthode de calcul];
+                                                   OptionCaptionML=[ENU=Straight-Line,Equal per Period,Days per Period,User-Defined;
+                                                                    FRA=LinÇaire,êgal par pÇriode,Jours par pÇriode,DÇfinie par l'utilisateur];
+                                                   OptionString=Straight-Line,Equal per Period,Days per Period,User-Defined }
+    { 11  ;   ;Start Date          ;Date          ;CaptionML=[ENU=Start Date;
+                                                              FRA=Date dÇbut] }
+    { 12  ;   ;No. of Periods      ;Integer       ;CaptionML=[ENU=No. of Periods;
+                                                              FRA=Nombre de pÇriodes];
+                                                   NotBlank=Yes;
+                                                   BlankZero=Yes }
+    { 13  ;   ;Schedule Description;Text50        ;CaptionML=[ENU=Schedule Description;
+                                                              FRA=Description tableau] }
+    { 14  ;   ;Initial Amount to Defer;Decimal    ;CaptionML=[ENU=Initial Amount to Defer;
+                                                              FRA=Montant initial Ö Çchelonner] }
+    { 15  ;   ;Currency Code       ;Code10        ;TableRelation=Currency.Code;
+                                                   CaptionML=[ENU=Currency Code;
+                                                              FRA=Code devise] }
+    { 5047;   ;Version No.         ;Integer       ;CaptionML=[ENU=Version No.;
+                                                              FRA=N¯ version] }
+    { 5048;   ;Doc. No. Occurrence ;Integer       ;CaptionML=[ENU=Doc. No. Occurrence;
+                                                              FRA=Occurrence n¯ doc.] }
+  }
+  KEYS
+  {
+    {    ;Deferral Doc. Type,Document Type,Document No.,Doc. No. Occurrence,Version No.,Line No.;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE DeleteHeader@1(DeferralDocType@1000 : Integer;DocumentType@1003 : Integer;DocumentNo@1001 : Code[20];DocNoOcurrence@1005 : Integer;VersionNo@1004 : Integer;LineNo@1002 : Integer);
+    BEGIN
+      IF GET(DeferralDocType,DocumentType,DocumentNo,LineNo) THEN BEGIN
+        DELETE;
+        DeleteLines(DeferralDocType,DocumentType,DocumentNo,DocNoOcurrence,VersionNo,LineNo);
+      END;
+    END;
+
+    LOCAL PROCEDURE DeleteLines@2(DeferralDocType@1003 : Integer;DocumentType@1002 : Integer;DocumentNo@1001 : Code[20];DocNoOcurrence@1005 : Integer;VersionNo@1006 : Integer;LineNo@1000 : Integer);
+    VAR
+      DeferralLineArchive@1004 : Record 5128;
+    BEGIN
+      DeferralLineArchive.SETRANGE("Deferral Doc. Type",DeferralDocType);
+      DeferralLineArchive.SETRANGE("Document Type",DocumentType);
+      DeferralLineArchive.SETRANGE("Document No.",DocumentNo);
+      DeferralLineArchive.SETRANGE("Doc. No. Occurrence",DocNoOcurrence);
+      DeferralLineArchive.SETRANGE("Version No.",VersionNo);
+      DeferralLineArchive.SETRANGE("Line No.",LineNo);
+      IF DeferralLineArchive.FINDFIRST THEN
+        DeferralLineArchive.DELETEALL;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

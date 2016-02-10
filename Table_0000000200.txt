@@ -1,0 +1,42 @@
+OBJECT Table 200 Work Type
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Work Type;
+               FRA=Type travail];
+    LookupPageID=Page208;
+    DrillDownPageID=Page208;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Code                ;Code10        ;CaptionML=[ENU=Code;
+                                                              FRA=Code];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Description         ;Text50        ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 3   ;   ;Unit of Measure Code;Code10        ;TableRelation="Unit of Measure";
+                                                   CaptionML=[ENU=Unit of Measure Code;
+                                                              FRA=Code unit‚] }
+  }
+  KEYS
+  {
+    {    ;Code                                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+    { 1   ;DropDown            ;Code,Description,Unit of Measure Code    }
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

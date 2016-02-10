@@ -1,0 +1,53 @@
+OBJECT Table 9656 Report Layout Update Log
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Report Layout Update Log;
+               FRA=Journal mise … jour pr‚sentation ‚tat];
+  }
+  FIELDS
+  {
+    { 1   ;   ;No.                 ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=No.;
+                                                              FRA=Nø] }
+    { 2   ;   ;Status              ;Option        ;CaptionML=[ENU=Status;
+                                                              FRA=Statut];
+                                                   OptionCaptionML=[ENU=None,NoUpgradeApplied,UpgradeSuccess,UpgradeIgnoreSuccess,UpgradeWarnings,UpgradeErrors;
+                                                                    FRA=None,NoUpgradeApplied,UpgradeSuccess,UpgradeIgnoreSuccess,UpgradeWarnings,UpgradeErrors];
+                                                   OptionString=None,NoUpgradeApplied,UpgradeSuccess,UpgradeIgnoreSuccess,UpgradeWarnings,UpgradeErrors }
+    { 3   ;   ;Field Name          ;Text80        ;CaptionML=[ENU=Field Name;
+                                                              FRA=Nom de champ] }
+    { 4   ;   ;Message             ;Text250       ;CaptionML=[ENU=Message;
+                                                              FRA=Message] }
+    { 5   ;   ;Report ID           ;Integer       ;CaptionML=[ENU=Report ID;
+                                                              FRA=ID ‚tat] }
+    { 6   ;   ;Layout Description  ;Text80        ;CaptionML=[ENU=Layout Description;
+                                                              FRA=Description pr‚sentation] }
+    { 7   ;   ;Layout Type         ;Option        ;CaptionML=[ENU=Layout Type;
+                                                              FRA=Type pr‚sentation];
+                                                   OptionCaptionML=[ENU=RDLC,Word;
+                                                                    FRA=RDLC,Word];
+                                                   OptionString=RDLC,Word }
+  }
+  KEYS
+  {
+    {    ;No.                                     ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

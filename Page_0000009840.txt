@@ -1,0 +1,43 @@
+OBJECT Page 9840 Tenant Permissions Factbox
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=NAVW19.00.00.43402;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Tenant Permissions Factbox;
+               FRA=R‚capitulatif autorisations abonn‚];
+    SourceTable=Table2000000166;
+    PageType=ListPart;
+  }
+  CONTROLS
+  {
+    { 5   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 3   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Object Type" }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Object ID" }
+
+    { 1   ;2   ;Field     ;
+                SourceExpr="Object Name" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

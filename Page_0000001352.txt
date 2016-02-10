@@ -1,0 +1,374 @@
+OBJECT Page 1352 Mini Company Information
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00,NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Company Information;
+               FRA=Informations sociÇtÇ];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table79;
+    PageType=Card;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,System Settings,Currencies,Codes,Regional Settings;
+                                FRA=Nouveau,Traitement,êtat,Paramätres systäme,Devises,Codes,Paramätres rÇgionaux];
+    OnInit=BEGIN
+             SetShowMandatoryContitions
+           END;
+
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END ELSE
+                   BankAcctPostingGroup := MiniCompanyInformationMgt.GetCompanyBankAccountPostingGroup;
+               END;
+
+    OnClosePage=BEGIN
+                  MiniCompanyInformationMgt.UpdateCompanyBankAccount(Rec,BankAcctPostingGroup);
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 31      ;    ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 32      ;1   ;Action    ;
+                      CaptionML=[ENU=Users;
+                                 FRA=Utilisateurs];
+                      ToolTipML=[ENU=Set up the employees who will work in Microsoft Dynamics NAV.;
+                                 FRA=ParamÇtrez les employÇs qui vont travailler dans Microsoft Dynamics NAV.];
+                      RunObject=Page 9800;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Users;
+                      PromotedCategory=Category4 }
+      { 22      ;1   ;Action    ;
+                      CaptionML=[ENU=Permission Sets;
+                                 FRA=Ensembles d'autorisations];
+                      ToolTipML=[ENU=Define which feature objects that users need to access and set up the related permissions in permission sets that you can assign to the users of the database.;
+                                 FRA=DÇfinissez les objets caractÇristiques auxquels les utilisateurs doivent accÇder et paramÇtrez les autorisations associÇes dans les ensembles d'autorisations que vous pouvez affecter aux utilisateurs de la base de donnÇes.];
+                      RunObject=Page 9802;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Permission;
+                      PromotedCategory=Category4 }
+      { 33      ;1   ;Action    ;
+                      CaptionML=[ENU=Currencies;
+                                 FRA=Devises];
+                      ToolTipML=[ENU=Set up the different currencies that you trade in by defining which general ledger accounts the involved transactions are posted to and how the foreign currency amounts are rounded.;
+                                 FRA=ParamÇtrez les diffÇrentes devises de nÇgociation en dÇfinissant les comptes gÇnÇraux dans lesquels les transactions impliquÇes sont validÇes et la mÇthode d'arrondi appliquÇe pour les montants en devise Çtrangäre.];
+                      RunObject=Page 5;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Currencies;
+                      PromotedCategory=Category5 }
+      { 34      ;1   ;Action    ;
+                      CaptionML=[ENU=No. Series;
+                                 FRA=Souches de n¯];
+                      ToolTipML=[ENU=Set up the number series from which a new number is automatically assigned to new cards and documents, such as item cards and sales invoices.;
+                                 FRA=ParamÇtrez les souches de numÇros Ö partir desquelles un nouveau numÇro est automatiquement affectÇ aux nouvelles fiches et nouveaux documents, par exemple les fiches articles et les factures vente.];
+                      RunObject=Page 456;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=NumberSetup;
+                      PromotedCategory=Category6 }
+      { 26      ;1   ;Action    ;
+                      CaptionML=[ENU=Report Layouts;
+                                 FRA=PrÇsentations Çtat];
+                      RunObject=Page 9652;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 25      ;1   ;Action    ;
+                      CaptionML=[ENU=SMTP Mail Setup;
+                                 FRA=ParamÇtrage courrier SMTP];
+                      ToolTipML=[ENU=Set up the integration and security of the mail server at your site that handles email.;
+                                 FRA=ParamÇtrez l'intÇgration et la sÇcuritÇ du serveur de messagerie sur votre site qui gäre le courrier Çlectronique.];
+                      RunObject=Page 409;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=MailSetup;
+                      PromotedCategory=Category4 }
+      { 30      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Regional Settings;
+                                 FRA=Paramätres rÇgionaux] }
+      { 35      ;2   ;Action    ;
+                      CaptionML=[ENU=Countries/Regions;
+                                 FRA=Pays/RÇgions];
+                      ToolTipML=[ENU=Set up the country/regions where your different business partners are located, so that you can assign Country/Region codes to business partners where special local procedures are required.;
+                                 FRA=ParamÇtrez le pays/la rÇgion oó se trouvent vos diffÇrents partenaires, de maniäre Ö pouvoir affecter les codes pays/rÇgion aux partenaires commerciaux pour lesquels des procÇdures locales spÇciales sont requises.];
+                      RunObject=Page 10;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CountryRegion;
+                      PromotedCategory=Category7 }
+      { 36      ;2   ;Action    ;
+                      CaptionML=[ENU=Post Codes;
+                                 FRA=Codes postaux];
+                      ToolTipML=[ENU=Set up the post codes of cities where your business partners are located.;
+                                 FRA=ParamÇtrez les codes postaux des villes oó se trouvent vos partenaires commerciaux.];
+                      RunObject=Page 367;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=MailSetup;
+                      PromotedCategory=Category6 }
+      { 37      ;2   ;Action    ;
+                      CaptionML=[ENU=Online Map Setup;
+                                 FRA=Configuration Online Map];
+                      ToolTipML=[ENU=Define which map provider to use and how routes and distances are displayed when you choose the Online Map field on business documents.;
+                                 FRA=DÇfinissez le fournisseur de carte Ö utiliser ainsi que le mode d'affichage des routes et des distances si vous choisissez le champ Online Map sur les documents commerciaux.];
+                      RunObject=Page 800;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=MapSetup;
+                      PromotedCategory=Category7 }
+      { 38      ;2   ;Action    ;
+                      CaptionML=[ENU=Languages;
+                                 FRA=Langues];
+                      ToolTipML=[ENU=Set up the languages that are spoken by your different business partners, so that you can print item names or descriptions in the appropriate language.;
+                                 FRA=ParamÇtrez les langues de vos diffÇrents partenaires commerciaux de faáon Ö pouvoir imprimer les noms d'articles ou leur description dans la langue appropriÇe.];
+                      RunObject=Page 9;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Language;
+                      PromotedCategory=Category7 }
+      { 39      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Codes;
+                                 FRA=Codes];
+                      ActionContainerType=NewDocumentItems }
+      { 40      ;2   ;Action    ;
+                      CaptionML=[ENU=Source Codes;
+                                 FRA=Codes journaux];
+                      ToolTipML=[ENU=Set up codes for your different types of business transactions, so that you can track the source of the transactions in an audit.;
+                                 FRA=ParamÇtrez les codes de vos diffÇrents types de transactions commerciales de faáon Ö pouvoir suivre la source des transactions en cours d'audit];
+                      RunObject=Page 257;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CodesList;
+                      PromotedCategory=Category6 }
+      { 41      ;2   ;Action    ;
+                      CaptionML=[ENU=Reason Codes;
+                                 FRA=Codes motif];
+                      ToolTipML=[ENU=Set up codes that specify reasons why entries were created, such as Return, to specify why a purchase credit memo was posted.;
+                                 FRA=ParamÇtrez des codes qui indiquent les raisons pour lesquelles des Çcritures ont ÇtÇ crÇÇes, par exemple Retour pour spÇcifier le motif de validation de l'avoir.];
+                      RunObject=Page 259;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CodesList;
+                      PromotedCategory=Category6 }
+    }
+  }
+  CONTROLS
+  {
+    { 101 ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 23  ;1   ;Group     ;
+                CaptionML=[ENU=Contact Details;
+                           FRA=DÇtails du contact];
+                GroupType=Group }
+
+    { 21  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's name and corporate form, for example, Inc. or Ltd.;
+                           FRA=Indique le nom de la sociÇtÇ et sa raison sociale, par exemple, S.A. ou SARL.];
+                SourceExpr=Name;
+                ShowMandatory=TRUE }
+
+    { 20  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's address.;
+                           FRA=Indique l'adresse de la sociÇtÇ.];
+                SourceExpr=Address;
+                ShowMandatory=TRUE }
+
+    { 19  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies an additional part of the company's address.;
+                           FRA=SpÇcifie un complÇment Ö l'adresse de la sociÇtÇ.];
+                SourceExpr="Address 2" }
+
+    { 18  ;2   ;Field     ;
+                ToolTipML=[ENU=Contains the company's post code.;
+                           FRA=Contient le code postal de la sociÇtÇ.];
+                SourceExpr="Post Code";
+                ShowMandatory=TRUE }
+
+    { 17  ;2   ;Field     ;
+                ToolTipML=[ENU=Contains the company's city.;
+                           FRA=Indique la ville de la sociÇtÇ.];
+                SourceExpr=City;
+                ShowMandatory=TRUE }
+
+    { 16  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the country/region code for your company. To see the country/region codes in the Country/Region table, choose the field.;
+                           FRA=SpÇcifie le code pays/rÇgion de la sociÇtÇ. Pour visualiser les codes pays/rÇgion de la table Pays/rÇgion, cliquez sur le champ.];
+                SourceExpr="Country/Region Code";
+                ShowMandatory=TRUE }
+
+    { 15  ;2   ;Field     ;
+                CaptionML=[ENU=Phone No.;
+                           FRA=N¯ tÇlÇphone];
+                ToolTipML=[ENU=Specifies the company's telephone number.;
+                           FRA=SpÇcifie le numÇro de tÇlÇphone de la sociÇtÇ.];
+                SourceExpr="Phone No." }
+
+    { 14  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's VAT registration number.;
+                           FRA=SpÇcifie le numÇro identifiant TVA de la sociÇtÇ.];
+                SourceExpr="VAT Registration No." }
+
+    { 10  ;2   ;Field     ;
+                ToolTipML=[ENU=Identifies your company in connection with electronic document exchange. For example, when sending documents in the PEPPOL file format, the value in this field is used to populate the EndPointID element in the Supplier group. The number is based on the GS1 standard, which is compliant with ISO 6523.;
+                           FRA=Identifie votre sociÇtÇ en relation avec l'Çchange de documents Çlectroniques. Par exemple, lors de l'envoi de documents au format PEPPOL, la valeur de ce champ est utilisÇe pour remplir l'ÇlÇment EndPointID du groupe Fournisseur. Le numÇro est basÇ sur le GS1 standard, qui est conforme Ö ISOˇ6523.];
+                SourceExpr=GLN }
+
+    { 13  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's email address. You can enter a maximum of 80 characters, both numbers and letters.;
+                           FRA=SpÇcifie l'adresse e-mail de la sociÇtÇ. Vous pouvez entrer au maximum 80ˇcaractäres, des chiffres ou des lettres.];
+                SourceExpr="E-Mail" }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's home page address. You can enter a maximum of 80 characters, both numbers and letters.;
+                           FRA=SpÇcifie l'adresse de la page d'accueil de la sociÇtÇ. Vous pouvez entrer au maximum 80ˇcaractäres, des chiffres ou des lettres.];
+                SourceExpr="Home Page" }
+
+    { 11  ;2   ;Field     ;
+                ToolTipML=[ENU="Shows the picture that has been set up for the company; a company logo, for example.";
+                           FRA=Montre l'image qui a ÇtÇ crÇÇe pour la sociÇtÇ, par exemple un logo.];
+                SourceExpr=Picture }
+
+    { 24  ;1   ;Group     ;
+                CaptionML=[ENU=Bank Account Details;
+                           FRA=DÇtails du compte bancaire];
+                GroupType=Group }
+
+    { 9   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the bank the company uses.;
+                           FRA=SpÇcifie le nom de la banque avec laquelle la sociÇtÇ travaille.];
+                SourceExpr="Bank Name";
+                ShowMandatory=TRUE }
+
+    { 8   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the bank's branch number.;
+                           FRA=Indique le numÇro de l'Çtablissement de la banque.];
+                SourceExpr="Bank Branch No.";
+                OnValidate=BEGIN
+                             SetShowMandatoryContitions
+                           END;
+
+                ShowMandatory=IBANMissing }
+
+    { 7   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's bank account number.;
+                           FRA=Indique le numÇro du compte bancaire de la sociÇtÇ.];
+                SourceExpr="Bank Account No.";
+                OnValidate=BEGIN
+                             SetShowMandatoryContitions
+                           END;
+
+                ShowMandatory=IBANMissing }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's payment routing number.;
+                           FRA=Indique le numÇro de paiement automatique de la sociÇtÇ.];
+                SourceExpr="Payment Routing No." }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the company's giro number.;
+                           FRA=Indique le numÇro de CCP de la sociÇtÇ.];
+                SourceExpr="Giro No." }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Contains the SWIFT code (international bank identifier code) of your primary bank.;
+                           FRA=Indique le code SWIFT (code international d'identification bancaire) de votre banque principale.];
+                SourceExpr="SWIFT Code";
+                OnValidate=BEGIN
+                             SetShowMandatoryContitions
+                           END;
+                            }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Contains the international bank account number of your primary bank account.;
+                           FRA=Indique le numÇro international de votre compte bancaire principal.];
+                SourceExpr=IBAN;
+                OnValidate=BEGIN
+                             SetShowMandatoryContitions
+                           END;
+
+                ShowMandatory=BankBranchNoOrAccountNoMissing }
+
+    { 1120000;2;Field     ;
+                ToolTipML=[ENU=Here you can enter the company's bank account used by default for payments. To see the available accounts in the Bank Account table, click the field.;
+                           FRA=Vous pouvez entrer ici le compte bancaire de la sociÇtÇ utilisÇ par dÇfaut pour les paiements. Pour afficher les comptes disponibles dans la table Compte bancaire, cliquez sur le champ.];
+                SourceExpr="Default Bank Account No." }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if you are allowed to create a sales invoice without filling the setup fields on this FastTab. If you select this check box, then you will not be warned about missing payment-setup values when you create a sales invoice.;
+                           FRA=Indique si vous àtes autorisÇ Ö crÇer une facture vente sans remplir les champs de configuration sur ce raccourci. Si vous activez cette case Ö cocher, vous ne serez pas averti des valeurs de paramätres de paiement manquantes lorsque vous crÇez une facture vente.];
+                SourceExpr="Allow Blank Payment Info." }
+
+    { 1   ;2   ;Field     ;
+                Name=BankAccountPostingGroup;
+                Lookup=Yes;
+                CaptionML=[ENU=Bank Account Posting Group;
+                           FRA=Groupe compta. banque];
+                SourceExpr=BankAcctPostingGroup;
+                TableRelation="Bank Account Posting Group".Code }
+
+    { 1906852801;1;Group  ;
+                CaptionML=[ENU=Trade Register;
+                           FRA=Registre du commerce] }
+
+    { 1120002;2;Field     ;
+                ToolTipML=[ENU=Specifies the company's registration number.;
+                           FRA=SpÇcifie le numÇro de SIRET de la sociÇtÇ.];
+                SourceExpr="Registration No." }
+
+    { 1120004;2;Field     ;
+                ToolTipML=[ENU="Here you can enter the company's RCS number (RCS = Registre du Commerce et des SociÇtÇs).";
+                           FRA="Vous pouvez entrer ici le numÇro RCS de la sociÇtÇ (RCSˇ= Registre du Commerce et des SociÇtÇs)."];
+                SourceExpr="Trade Register" }
+
+    { 1120006;2;Field     ;
+                ToolTipML=[ENU=Here you can enter the company's APE code.;
+                           FRA=Vous pouvez entrer ici le code APE de la sociÇtÇ.];
+                SourceExpr="APE Code" }
+
+    { 1120008;2;Field     ;
+                ToolTipML=[ENU=Here you can enter the company's legal form, for example, SA or SARL.;
+                           FRA=Vous pouvez entrer ici la forme juridique de la sociÇtÇ, par exemple SA ou SARL.];
+                SourceExpr="Legal Form" }
+
+    { 1120010;2;Field     ;
+                ToolTipML=[ENU=Enter in this field the stock capital of the company.;
+                           FRA=Entrez dans ce champ le capital social de la sociÇtÇ.];
+                SourceExpr="Stock Capital" }
+
+    { 1120014;2;Field     ;
+                ToolTipML=[ENU=Specifies the public organization in France that handles the EU Sales List and Intrastat declaration.;
+                           FRA=SpÇcifie l'organisation publique en France qui traite la dÇclaration de liste des ventes intracommunautaires et la dÇclaration D.E.B (Intrastat).];
+                SourceExpr=CISD }
+
+  }
+  CODE
+  {
+    VAR
+      MiniCompanyInformationMgt@1002 : Codeunit 1306;
+      BankAcctPostingGroup@1000 : Code[10];
+      IBANMissing@1003 : Boolean;
+      BankBranchNoOrAccountNoMissing@1001 : Boolean;
+
+    LOCAL PROCEDURE SetShowMandatoryContitions@1();
+    BEGIN
+      BankBranchNoOrAccountNoMissing := ("Bank Branch No." = '') OR ("Bank Account No." = '');
+      IBANMissing := IBAN = ''
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

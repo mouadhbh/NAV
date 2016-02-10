@@ -1,0 +1,733 @@
+OBJECT Page 9020 Small Business Owner RC
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00,NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               FRA=Tableau de bord];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 60      ;1   ;Action    ;
+                      CaptionML=[ENU=S&tatement;
+                                 FRA=&RelevÇ];
+                      RunObject=Report 116;
+                      Image=Report }
+      { 61      ;1   ;Separator  }
+      { 62      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer - Order Su&mmary;
+                                 FRA=Clients : Liste des co&mmandes];
+                      RunObject=Report 107;
+                      Image=Report }
+      { 63      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer - T&op 10 List;
+                                 FRA=Clien&ts : Palmaräs];
+                      RunObject=Report 111;
+                      Image=Report }
+      { 74      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer/&Item Sales;
+                                 FRA=Cl&ient/Ventes d'articles];
+                      RunObject=Report 113;
+                      Image=Report }
+      { 75      ;1   ;Separator  }
+      { 76      ;1   ;Action    ;
+                      CaptionML=[ENU=Salesperson - Sales &Statistics;
+                                 FRA=Vendeurs : &Statistiques ventes];
+                      RunObject=Report 114;
+                      Image=Report }
+      { 77      ;1   ;Action    ;
+                      CaptionML=[ENU=Price &List;
+                                 FRA=&Liste des prix];
+                      RunObject=Report 715;
+                      Image=Report }
+      { 93      ;1   ;Separator  }
+      { 130     ;1   ;Action    ;
+                      CaptionML=[ENU=Inventory - Sales &Back Orders;
+                                 FRA=Stoc&ks : Commandes Ö livrer];
+                      RunObject=Report 718;
+                      Image=Report }
+      { 129     ;1   ;Separator  }
+      { 32      ;1   ;Action    ;
+                      CaptionML=[ENU=&G/L Trial Balance;
+                                 FRA=Balance comptes &gÇnÇraux];
+                      RunObject=Report 10803;
+                      Image=Report }
+      { 1120002 ;1   ;Action    ;
+                      CaptionML=[ENU=G/L Detail Trial Balance;
+                                 FRA=Grand livre comptes gÇnÇraux];
+                      RunObject=Report 10804;
+                      Image=Report }
+      { 37      ;1   ;Action    ;
+                      CaptionML=[ENU=Trial Balance by &Period;
+                                 FRA=&Balance par pÇriode];
+                      RunObject=Report 38;
+                      Image=Report }
+      { 48      ;1   ;Action    ;
+                      CaptionML=[ENU=Closing T&rial Balance;
+                                 FRA=Bala&nce de clìture];
+                      RunObject=Report 10;
+                      Image=Report }
+      { 49      ;1   ;Separator  }
+      { 50      ;1   ;Action    ;
+                      CaptionML=[ENU=Aged Ac&counts Receivable;
+                                 FRA=&ComptabilitÇ client ÉgÇe];
+                      RunObject=Report 120;
+                      Image=Report }
+      { 51      ;1   ;Action    ;
+                      CaptionML=[ENU=Aged Accounts Pa&yable;
+                                 FRA=ComptabilitÇ fournisseur É&gÇe];
+                      RunObject=Report 322;
+                      Image=Report }
+      { 52      ;1   ;Action    ;
+                      CaptionML=[ENU=Reconcile Cust. and &Vend. Accs;
+                                 FRA=Concordance cptes clt/&fourn.];
+                      RunObject=Report 33;
+                      Image=Report }
+      { 53      ;1   ;Separator  }
+      { 54      ;1   ;Action    ;
+                      CaptionML=[ENU=VAT Registration No. Chec&k;
+                                 FRA=VÇrification n¯ identif. intra&comm.];
+                      RunObject=Report 32;
+                      Image=Report }
+      { 55      ;1   ;Action    ;
+                      CaptionML=[ENU=VAT E&xceptions;
+                                 FRA=E&xceptions TVA];
+                      RunObject=Report 31;
+                      Image=Report }
+      { 56      ;1   ;Action    ;
+                      CaptionML=[ENU=V&AT Statement;
+                                 FRA=DÇclaration de TV&A];
+                      RunObject=Report 12;
+                      Image=Report }
+      { 57      ;1   ;Action    ;
+                      CaptionML=[ENU=VAT-VIES Declaration Tax A&uth;
+                                 FRA=TVA - DÇcl. intracomm&unautaire];
+                      RunObject=Report 19;
+                      Image=Report }
+      { 58      ;1   ;Action    ;
+                      CaptionML=[ENU=VAT - VIES Declaration &Disk;
+                                 FRA=TVA : &Disquette TVA];
+                      RunObject=Report 88;
+                      Image=Report }
+      { 59      ;1   ;Action    ;
+                      CaptionML=[ENU=EC Sal&es List;
+                                 FRA=Liste des ventes U&E];
+                      RunObject=Report 130;
+                      Image=Report }
+      { 1120003 ;1   ;Separator  }
+      { 1120004 ;1   ;Action    ;
+                      CaptionML=[ENU=Journals;
+                                 FRA=Feuilles];
+                      RunObject=Report 10801;
+                      Image=Report }
+      { 1120005 ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Journal;
+                                 FRA=Journal comptes clients];
+                      RunObject=Report 10813;
+                      Image=Report }
+      { 1120006 ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor Journal;
+                                 FRA=Journal comptes fournisseurs];
+                      RunObject=Report 10814;
+                      Image=Report }
+      { 1120007 ;1   ;Action    ;
+                      CaptionML=[ENU=Bank Account Journal;
+                                 FRA=Journal comptes bancaires];
+                      RunObject=Report 10815;
+                      Image=Report }
+      { 1120008 ;1   ;Separator  }
+      { 1120009 ;1   ;Action    ;
+                      CaptionML=[ENU=Payments Lists;
+                                 FRA=Listes de räglements];
+                      RunObject=Report 10860;
+                      Image=Report }
+      { 1120010 ;1   ;Action    ;
+                      CaptionML=[ENU=GL/Cust. Ledger Reconciliation;
+                                 FRA=Rapprochement cpta. gÇn./client];
+                      RunObject=Report 10861;
+                      Image=Report }
+      { 1120011 ;1   ;Action    ;
+                      CaptionML=[ENU=GL/Vend. Ledger Reconciliation;
+                                 FRA=Rapprochement cpta. gÇn./fourn.];
+                      RunObject=Report 10863;
+                      Image=Report }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 107     ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Quotes;
+                                 FRA=Devis];
+                      RunObject=Page 9300;
+                      Image=Quote }
+      { 115     ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Orders;
+                                 FRA=Commandes vente];
+                      RunObject=Page 9305;
+                      Image=Order }
+      { 43      ;1   ;Action    ;
+                      CaptionML=[ENU=Dynamics CRM Sales Orders;
+                                 FRA=Commandes vente Dynamics CRM];
+                      RunObject=Page 5353;
+                      RunPageView=WHERE(StateCode=FILTER(Submitted),
+                                        LastBackofficeSubmit=FILTER('')) }
+      { 112     ;1   ;Action    ;
+                      CaptionML=[ENU=Customers;
+                                 FRA=Clients];
+                      RunObject=Page 22;
+                      Image=Customer }
+      { 113     ;1   ;Action    ;
+                      CaptionML=[ENU=Balance;
+                                 FRA=Solde];
+                      RunObject=Page 22;
+                      RunPageView=WHERE(Balance (LCY)=FILTER(<>0));
+                      Image=Balance }
+      { 105     ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Orders;
+                                 FRA=Commandes achat];
+                      RunObject=Page 9307 }
+      { 102     ;1   ;Action    ;
+                      CaptionML=[ENU=Vendors;
+                                 FRA=Fournisseurs];
+                      RunObject=Page 27;
+                      Image=Vendor }
+      { 103     ;1   ;Action    ;
+                      CaptionML=[ENU=Balance;
+                                 FRA=Solde];
+                      RunObject=Page 27;
+                      RunPageView=WHERE(Balance (LCY)=FILTER(<>0));
+                      Image=Balance }
+      { 1120000 ;1   ;Action    ;
+                      CaptionML=[ENU=Payment Slips;
+                                 FRA=Bordereaux paiement];
+                      RunObject=Page 10870 }
+      { 110     ;1   ;Action    ;
+                      CaptionML=[ENU=Items;
+                                 FRA=Articles];
+                      RunObject=Page 31;
+                      Image=Item }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 109     ;1   ;ActionGroup;
+                      CaptionML=[ENU=Journals;
+                                 FRA=Feuilles];
+                      Image=Journals }
+      { 6       ;2   ;Action    ;
+                      CaptionML=[ENU=Item Journals;
+                                 FRA=Feuilles article];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Item),
+                                        Recurring=CONST(No)) }
+      { 8       ;2   ;Action    ;
+                      CaptionML=[ENU=Physical Inventory Journals;
+                                 FRA=Feuilles d'inventaire];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Phys. Inventory),
+                                        Recurring=CONST(No)) }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Revaluation Journals;
+                                 FRA=Feuilles rÇÇvaluation];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Revaluation),
+                                        Recurring=CONST(No)) }
+      { 33      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Journals;
+                                 FRA=Feuilles ressource];
+                      RunObject=Page 272;
+                      RunPageView=WHERE(Recurring=CONST(No)) }
+      { 34      ;2   ;Action    ;
+                      CaptionML=[ENU=FA Journals;
+                                 FRA=Feuilles immobilisation];
+                      RunObject=Page 5633;
+                      RunPageView=WHERE(Recurring=CONST(No)) }
+      { 36      ;2   ;Action    ;
+                      CaptionML=[ENU=Cash Receipt Journals;
+                                 FRA=Feuilles räglement];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Cash Receipts),
+                                        Recurring=CONST(No));
+                      Image=Journals }
+      { 46      ;2   ;Action    ;
+                      CaptionML=[ENU=Payment Journals;
+                                 FRA=Feuilles paiement];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Payments),
+                                        Recurring=CONST(No));
+                      Image=Journals }
+      { 1120016 ;2   ;Action    ;
+                      CaptionML=[ENU=Payment Slips;
+                                 FRA=Bordereaux paiement];
+                      RunObject=Page 10870 }
+      { 35      ;2   ;Action    ;
+                      CaptionML=[ENU=General Journals;
+                                 FRA=Feuilles comptabilitÇ];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(General),
+                                        Recurring=CONST(No));
+                      Image=Journal }
+      { 47      ;2   ;Action    ;
+                      CaptionML=[ENU=Recurring Journals;
+                                 FRA=Feuilles abonnement];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(General),
+                                        Recurring=CONST(Yes)) }
+      { 117     ;1   ;ActionGroup;
+                      CaptionML=[ENU=Worksheets;
+                                 FRA=Feuilles activitÇ];
+                      Image=Worksheets }
+      { 64      ;2   ;Action    ;
+                      CaptionML=[ENU=Requisition Worksheets;
+                                 FRA=Demandes achat];
+                      RunObject=Page 295;
+                      RunPageView=WHERE(Template Type=CONST(Req.),
+                                        Recurring=CONST(No)) }
+      { 39      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Posted Documents;
+                                 FRA=Documents validÇs];
+                      Image=FiledPosted }
+      { 118     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Shipments;
+                                 FRA=ExpÇditions vente enregistrÇes];
+                      RunObject=Page 142;
+                      Image=PostedShipment }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Invoices;
+                                 FRA=Factures vente enregistrÇes];
+                      RunObject=Page 143;
+                      Image=PostedOrder }
+      { 26      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Credit Memos;
+                                 FRA=Avoirs vente enregistrÇs];
+                      RunObject=Page 144;
+                      Image=PostedOrder }
+      { 119     ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Receipts;
+                                 FRA=RÇceptions achat enregistrÇes];
+                      RunObject=Page 145 }
+      { 27      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Invoices;
+                                 FRA=Factures achat enregistrÇes];
+                      RunObject=Page 146 }
+      { 28      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Credit Memos;
+                                 FRA=Avoirs achat enregistrÇs];
+                      RunObject=Page 147 }
+      { 29      ;2   ;Action    ;
+                      CaptionML=[ENU=Issued Reminders;
+                                 FRA=Relances Çmises];
+                      RunObject=Page 440;
+                      Image=OrderReminder }
+      { 30      ;2   ;Action    ;
+                      CaptionML=[ENU=Issued Fin. Charge Memos;
+                                 FRA=Factures d'intÇràts Çmises];
+                      RunObject=Page 452;
+                      Image=PostedMemo }
+      { 1120001 ;2   ;Action    ;
+                      CaptionML=[ENU=Payment Slip List Archives;
+                                 FRA=Archives liste bordereau paiement];
+                      RunObject=Page 10879 }
+      { 143     ;1   ;ActionGroup;
+                      CaptionML=[ENU=Finance;
+                                 FRA=Finance];
+                      Image=Bank }
+      { 152     ;2   ;Action    ;
+                      CaptionML=[ENU=VAT Statements;
+                                 FRA=DÇclarations de TVA];
+                      RunObject=Page 320 }
+      { 154     ;2   ;Action    ;
+                      CaptionML=[ENU=Chart of Accounts;
+                                 FRA=Plan comptable];
+                      RunObject=Page 16 }
+      { 153     ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Accounts;
+                                 FRA=Comptes bancaires];
+                      RunObject=Page 371;
+                      Image=BankAccount }
+      { 144     ;2   ;Action    ;
+                      CaptionML=[ENU=Currencies;
+                                 FRA=Devises];
+                      RunObject=Page 5;
+                      Image=Currency }
+      { 145     ;2   ;Action    ;
+                      CaptionML=[ENU=Accounting Periods;
+                                 FRA=PÇriodes comptables];
+                      RunObject=Page 100;
+                      Image=AccountingPeriods }
+      { 150     ;2   ;Action    ;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      RunObject=Page 536;
+                      Image=Dimensions }
+      { 151     ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Account Posting Groups;
+                                 FRA=Groupes compta. banque];
+                      RunObject=Page 373 }
+      { 155     ;1   ;ActionGroup;
+                      CaptionML=[ENU=Marketing;
+                                 FRA=Marketing];
+                      Image=Marketing }
+      { 156     ;2   ;Action    ;
+                      CaptionML=[ENU=Contacts;
+                                 FRA=Contacts];
+                      RunObject=Page 5052;
+                      Image=CustomerContact }
+      { 157     ;2   ;Action    ;
+                      CaptionML=[ENU=To-dos;
+                                 FRA=Actions];
+                      RunObject=Page 5096;
+                      Image=TaskList }
+      { 158     ;1   ;ActionGroup;
+                      CaptionML=[ENU=Sales;
+                                 FRA=Ventes];
+                      Image=Sales }
+      { 159     ;2   ;Action    ;
+                      CaptionML=[ENU=Assembly BOM;
+                                 FRA=Nomenclature d'ÇlÇment d'assemblage];
+                      RunObject=Page 36;
+                      Image=AssemblyBOM }
+      { 160     ;2   ;Action    ;
+                      CaptionML=[ENU=Sales Credit Memos;
+                                 FRA=Avoirs vente];
+                      RunObject=Page 9302 }
+      { 161     ;2   ;Action    ;
+                      CaptionML=[ENU=Standard Sales Codes;
+                                 FRA=Codes vente standard];
+                      RunObject=Page 172 }
+      { 162     ;2   ;Action    ;
+                      CaptionML=[ENU=Salespeople/Purchasers;
+                                 FRA=Vendeur/Acheteur];
+                      RunObject=Page 14 }
+      { 163     ;2   ;Action    ;
+                      CaptionML=[ENU=Customer Invoice Discount;
+                                 FRA=Remise facture client];
+                      RunObject=Page 23 }
+      { 92      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Purchase;
+                                 FRA=Achat];
+                      Image=Purchasing }
+      { 122     ;2   ;Action    ;
+                      CaptionML=[ENU=Standard Purchase Codes;
+                                 FRA=Codes achat standard];
+                      RunObject=Page 177 }
+      { 123     ;2   ;Action    ;
+                      CaptionML=[ENU=Vendor Invoice Discounts;
+                                 FRA=Remises facture fournisseur];
+                      RunObject=Page 28 }
+      { 124     ;2   ;Action    ;
+                      CaptionML=[ENU=Item Discount Groups;
+                                 FRA=Groupes remises article];
+                      RunObject=Page 513 }
+      { 125     ;1   ;ActionGroup;
+                      CaptionML=[ENU=Resources;
+                                 FRA=Ressources];
+                      Image=ResourcePlanning }
+      { 126     ;2   ;Action    ;
+                      CaptionML=[ENU=Resources;
+                                 FRA=Ressources];
+                      RunObject=Page 77 }
+      { 131     ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Groups;
+                                 FRA=Groupes ressources];
+                      RunObject=Page 72 }
+      { 136     ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Price Changes;
+                                 FRA=Nouv. prix ressource proposÇs];
+                      RunObject=Page 493;
+                      Image=ResourcePrice }
+      { 137     ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Registers;
+                                 FRA=Historiques des transactions ressource];
+                      RunObject=Page 274;
+                      Image=ResourceRegisters }
+      { 138     ;1   ;ActionGroup;
+                      CaptionML=[ENU=Human Resources;
+                                 FRA=Ressources humaines];
+                      Image=HumanResources }
+      { 139     ;2   ;Action    ;
+                      CaptionML=[ENU=Employees;
+                                 FRA=SalariÇs];
+                      RunObject=Page 5201;
+                      Image=Employee }
+      { 16      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Fixed Assets;
+                                 FRA=Immobilisations];
+                      Image=FixedAssets }
+      { 17      ;2   ;Action    ;
+                      CaptionML=[ENU=Fixed Assets;
+                                 FRA=Immobilisations];
+                      RunObject=Page 5601 }
+      { 140     ;1   ;ActionGroup;
+                      CaptionML=[ENU=Administration;
+                                 FRA=Administration];
+                      Image=Administration }
+      { 141     ;2   ;Action    ;
+                      CaptionML=[ENU=User Setup;
+                                 FRA=Paramätres utilisateur];
+                      RunObject=Page 119;
+                      Image=UserSetup }
+      { 165     ;2   ;Action    ;
+                      CaptionML=[ENU=Data Templates List;
+                                 FRA=Liste modäles donnÇes];
+                      RunObject=Page 8620 }
+      { 166     ;2   ;Action    ;
+                      CaptionML=[ENU=Base Calendar List;
+                                 FRA=Liste des calendriers principaux];
+                      RunObject=Page 7601 }
+      { 167     ;2   ;Action    ;
+                      CaptionML=[ENU=Post Codes;
+                                 FRA=Codes postaux];
+                      RunObject=Page 367 }
+      { 168     ;2   ;Action    ;
+                      CaptionML=[ENU=Reason Codes;
+                                 FRA=Codes motif];
+                      RunObject=Page 259 }
+      { 169     ;2   ;Action    ;
+                      CaptionML=[ENU=Extended Texts;
+                                 FRA=Textes Çtendus];
+                      RunObject=Page 391;
+                      Image=Text }
+      { 1       ;0   ;ActionContainer;
+                      ActionContainerType=NewDocumentItems }
+      { 11      ;1   ;Action    ;
+                      CaptionML=[ENU=C&ustomer;
+                                 FRA=&Client];
+                      RunObject=Page 21;
+                      Promoted=No;
+                      Image=Customer;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 1120043 ;1   ;Action    ;
+                      CaptionML=[ENU=Sales &Order;
+                                 FRA=Commande ve&nte];
+                      RunObject=Page 42;
+                      Promoted=No;
+                      Image=Document;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Credit &Memo;
+                                 FRA=Avoir &vente];
+                      RunObject=Page 44;
+                      Promoted=No;
+                      Image=CreditMemo;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 7       ;1   ;Action    ;
+                      CaptionML=[ENU=&Sales Reminder;
+                                 FRA=&Relance vente];
+                      RunObject=Page 434;
+                      Promoted=No;
+                      Image=Reminder;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 5       ;1   ;Separator  }
+      { 4       ;1   ;Action    ;
+                      CaptionML=[ENU=&Vendor;
+                                 FRA=&Fournisseur];
+                      RunObject=Page 26;
+                      Promoted=No;
+                      Image=Vendor;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 1120112 ;1   ;Action    ;
+                      CaptionML=[ENU=&Purchase Order;
+                                 FRA=&Commande achat];
+                      RunObject=Page 50;
+                      Promoted=No;
+                      Image=Document;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 13      ;1   ;Separator ;
+                      CaptionML=[ENU=Tasks;
+                                 FRA=TÉches];
+                      IsHeader=Yes }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Cash Receipt &Journal;
+                                 FRA=Feuille rä&glement];
+                      RunObject=Page 255;
+                      Image=CashReceiptJournal }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Vendor Pa&yment Journal;
+                                 FRA=Feuille des paiements four&nisseur];
+                      RunObject=Page 256;
+                      Image=VendorPaymentJournal }
+      { 1120012 ;1   ;Action    ;
+                      CaptionML=[ENU=Archive Payment Journals;
+                                 FRA=Archiver les feuilles paiement];
+                      RunObject=Report 10873;
+                      Image=Report }
+      { 1120013 ;1   ;Action    ;
+                      CaptionML=[ENU=Create Payment Slips;
+                                 FRA=CrÇer bordereaux paiement];
+                      RunObject=Codeunit 10860 }
+      { 1120014 ;1   ;Action    ;
+                      CaptionML=[ENU=Look/Edit Payment Line;
+                                 FRA=Consulter/êditer ligne paiement];
+                      RunObject=Page 10862 }
+      { 1120015 ;1   ;Action    ;
+                      CaptionML=[ENU=Payment Report;
+                                 FRA=êtat räglement];
+                      RunObject=Page 10863 }
+      { 44      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Price &Worksheet;
+                                 FRA=Feuille pri&x vente];
+                      RunObject=Page 7023;
+                      Image=PriceWorksheet }
+      { 173     ;1   ;Action    ;
+                      CaptionML=[ENU=Sales P&rices;
+                                 FRA=Prix ven&te];
+                      RunObject=Page 7002;
+                      Image=SalesPrices }
+      { 174     ;1   ;Action    ;
+                      CaptionML=[ENU=Sales &Line Discounts;
+                                 FRA=Remi&ses ligne vente];
+                      RunObject=Page 7004;
+                      Image=SalesLineDisc }
+      { 19      ;1   ;Separator  }
+      { 20      ;1   ;Action    ;
+                      CaptionML=[ENU=&Bank Account Reconciliation;
+                                 FRA=Rapprochement &bancaire];
+                      RunObject=Page 379;
+                      Image=BankAccountRec }
+      { 170     ;1   ;Action    ;
+                      CaptionML=[ENU=Payment Registration;
+                                 FRA=Enregistrement de paiement];
+                      RunObject=Codeunit 980;
+                      Image=Payment }
+      { 21      ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Adjust E&xchange Rates;
+                                 FRA=Ajuste&r taux de change];
+                      RunObject=Report 595;
+                      Image=AdjustExchangeRates }
+      { 45      ;1   ;Action    ;
+                      CaptionML=[ENU=Adjust &Item Costs/Prices;
+                                 FRA=Ajuster coñts et pr&ix article];
+                      RunObject=Report 794;
+                      Image=AdjustItemCost }
+      { 65      ;1   ;Action    ;
+                      CaptionML=[ENU=Adjust &Cost - Item Entries;
+                                 FRA=Ajuster &coñts - êcr. article];
+                      RunObject=Report 795;
+                      Image=AdjustEntries }
+      { 22      ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Post Inve&ntory Cost to G/L;
+                                 FRA=Valider coñts a&justÇs];
+                      RunObject=Report 1002;
+                      Image=PostInventoryToGL }
+      { 23      ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Calc. and Post VAT Settlem&ent;
+                                 FRA=Calcul&er et valider dÇcl. TVA];
+                      RunObject=Report 20;
+                      Image=SettleOpenTransactions }
+      { 31      ;1   ;Separator ;
+                      CaptionML=[ENU=Administration;
+                                 FRA=Administration];
+                      IsHeader=Yes }
+      { 38      ;1   ;Action    ;
+                      CaptionML=[ENU=General Le&dger Setup;
+                                 FRA=Para&mätres comptabilitÇ];
+                      RunObject=Page 118;
+                      Image=Setup }
+      { 40      ;1   ;Action    ;
+                      CaptionML=[ENU=S&ales && Receivables Setup;
+                                 FRA=P&aramätres ventes];
+                      RunObject=Page 459;
+                      Image=Setup }
+      { 41      ;1   ;Separator ;
+                      CaptionML=[ENU=History;
+                                 FRA=Historique];
+                      IsHeader=Yes }
+      { 42      ;1   ;Action    ;
+                      CaptionML=[ENU=Navi&gate;
+                                 FRA=Navi&guer];
+                      RunObject=Page 344;
+                      Image=Navigate }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 78  ;2   ;Part      ;
+                PagePartID=Page9073;
+                PartType=Page }
+
+    { 24  ;2   ;Part      ;
+                PagePartID=Page9175;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 69  ;2   ;Part      ;
+                PagePartID=Page762;
+                PartType=Page }
+
+    { 66  ;2   ;Part      ;
+                PagePartID=Page762;
+                Visible=false;
+                PartType=Page }
+
+    { 70  ;2   ;Part      ;
+                PagePartID=Page770;
+                PartType=Page }
+
+    { 68  ;2   ;Part      ;
+                PagePartID=Page770;
+                Visible=false;
+                PartType=Page }
+
+    { 2   ;2   ;Part      ;
+                PagePartID=Page760;
+                Visible=false;
+                PartType=Page }
+
+    { 12  ;2   ;Part      ;
+                PagePartID=Page681;
+                PartType=Page }
+
+    { 1907692008;2;Part   ;
+                PagePartID=Page9150;
+                Visible=false;
+                PartType=Page }
+
+    { 1902476008;2;Part   ;
+                PagePartID=Page9151;
+                Visible=false;
+                PartType=Page }
+
+    { 99  ;2   ;Part      ;
+                PagePartID=Page675;
+                Visible=false;
+                PartType=Page }
+
+    { 1905989608;2;Part   ;
+                PagePartID=Page9152;
+                Visible=false;
+                PartType=Page }
+
+    { 67  ;2   ;Part      ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

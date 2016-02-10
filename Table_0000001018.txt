@@ -1,0 +1,70 @@
+OBJECT Table 1018 Job WIP Buffer
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Job WIP Buffer;
+               FRA=Tampon TEC projet];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Posting Group       ;Code10        ;CaptionML=[ENU=Posting Group;
+                                                              FRA=Groupe comptabilisation] }
+    { 2   ;   ;Type                ;Option        ;CaptionML=[ENU=Type;
+                                                              FRA=Type];
+                                                   OptionCaptionML=[ENU=Applied Costs,Applied Sales,Recognized Costs,Recognized Sales,Accrued Costs,Accrued Sales;
+                                                                    FRA=Co–ts lettr‚s,Ventes lettr‚es,Co–ts r‚ceptionn‚s,Ventes r‚ceptionn‚es,Co–ts … payer,Ventes … payer];
+                                                   OptionString=Applied Costs,Applied Sales,Recognized Costs,Recognized Sales,Accrued Costs,Accrued Sales }
+    { 3   ;   ;WIP Entry Amount    ;Decimal       ;CaptionML=[ENU=WIP Entry Amount;
+                                                              FRA=Montant ‚criture TEC] }
+    { 4   ;   ;G/L Account No.     ;Code20        ;TableRelation="G/L Account";
+                                                   CaptionML=[ENU=G/L Account No.;
+                                                              FRA=Nø compte g‚n‚ral] }
+    { 5   ;   ;Bal. G/L Account No.;Code20        ;TableRelation="G/L Account";
+                                                   CaptionML=[ENU=Bal. G/L Account No.;
+                                                              FRA=Nø compte g‚n‚ral contrepartie] }
+    { 6   ;   ;WIP Method          ;Code20        ;CaptionML=[ENU=WIP Method;
+                                                              FRA=M‚thode TEC];
+                                                   Editable=No }
+    { 7   ;   ;Job No.             ;Code20        ;TableRelation=Job;
+                                                   CaptionML=[ENU=Job No.;
+                                                              FRA=Nø projet];
+                                                   NotBlank=Yes;
+                                                   Editable=No }
+    { 8   ;   ;Job Complete        ;Boolean       ;CaptionML=[ENU=Job Complete;
+                                                              FRA=Projet termin‚] }
+    { 9   ;   ;Job WIP Total Entry No.;Integer    ;TableRelation="Job WIP Total";
+                                                   CaptionML=[ENU=Job WIP Total Entry No.;
+                                                              FRA=Nø s‚quence total TEC projet] }
+    { 22  ;   ;Reverse             ;Boolean       ;InitValue=Yes;
+                                                   CaptionML=[ENU=Reverse;
+                                                              FRA=Contrepasser] }
+    { 23  ;   ;WIP Posting Method Used;Option     ;CaptionML=[ENU=WIP Posting Method Used;
+                                                              FRA=M‚thode de comptabilisation TEC utilis‚e];
+                                                   OptionCaptionML=[ENU=Per Job,Per Job Ledger Entry;
+                                                                    FRA=Par projet,Par ‚criture comptable projet];
+                                                   OptionString=Per Job,Per Job Ledger Entry }
+    { 71  ;   ;Dim Combination ID  ;Integer       ;CaptionML=[ENU=Dim Combination ID;
+                                                              FRA=ID croisement analytique] }
+  }
+  KEYS
+  {
+    {    ;Job No.,Job WIP Total Entry No.,Type,Posting Group,Dim Combination ID,Reverse,G/L Account No.;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

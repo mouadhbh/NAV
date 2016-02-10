@@ -1,0 +1,55 @@
+OBJECT Table 2000000072 Profile
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Profile;
+               FRA=Profil];
+  }
+  FIELDS
+  {
+    { 3   ;   ;Profile ID          ;Code30        ;CaptionML=[ENU=Profile ID;
+                                                              FRA=ID profil] }
+    { 12  ;   ;Description         ;Text250       ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 15  ;   ;Role Center ID      ;Integer       ;TableRelation=AllObj."Object ID" WHERE (Object Type=CONST(Page));
+                                                   CaptionML=[ENU=Role Center ID;
+                                                              FRA=ID Tableau de bord] }
+    { 18  ;   ;Default Role Center ;Boolean       ;CaptionML=[ENU=Default Role Center;
+                                                              FRA=Tableau de bord par d‚faut] }
+    { 21  ;   ;Use Comments        ;Boolean       ;CaptionML=[ENU=Use Comments;
+                                                              FRA=Utiliser les commentaires] }
+    { 24  ;   ;Use Notes           ;Boolean       ;CaptionML=[ENU=Use Notes;
+                                                              FRA=Utiliser les notes] }
+    { 27  ;   ;Use Record Notes    ;Boolean       ;CaptionML=[ENU=Use Record Notes;
+                                                              FRA=Utiliser notes enregistrement] }
+    { 30  ;   ;Record Notebook     ;Text250       ;CaptionML=[ENU=Record Notebook;
+                                                              FRA=Enregistrer le bloc-notes] }
+    { 33  ;   ;Use Page Notes      ;Boolean       ;CaptionML=[ENU=Use Page Notes;
+                                                              FRA=Utiliser les notes de pages] }
+    { 36  ;   ;Page Notebook       ;Text250       ;CaptionML=[ENU=Page Notebook;
+                                                              FRA=Bloc-notes de page] }
+    { 39  ;   ;Disable Personalization;Boolean    ;CaptionML=[ENU=Disable Personalization;
+                                                              FRA=D‚sactiver la personnalisation] }
+  }
+  KEYS
+  {
+    {    ;Profile ID                              ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

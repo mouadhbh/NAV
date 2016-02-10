@@ -1,0 +1,49 @@
+OBJECT Table 9611 XML Schema Restriction
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=XML Schema Restriction;
+               FRA=Restriction de sch‚ma XML];
+  }
+  FIELDS
+  {
+    { 1   ;   ;XML Schema Code     ;Code20        ;TableRelation="XML Schema Element"."XML Schema Code";
+                                                   CaptionML=[ENU=XML Schema Code;
+                                                              FRA=Code sch‚ma XML] }
+    { 2   ;   ;Element ID          ;Integer       ;TableRelation="XML Schema Element".ID WHERE (XML Schema Code=FIELD(XML Schema Code));
+                                                   CaptionML=[ENU=Element ID;
+                                                              FRA=ID ‚l‚ment] }
+    { 3   ;   ;ID                  ;Integer       ;CaptionML=[ENU=ID;
+                                                              FRA=ID] }
+    { 4   ;   ;Value               ;Text250       ;CaptionML=[ENU=Value;
+                                                              FRA=Valeur] }
+    { 25  ;   ;Simple Data Type    ;Text50        ;CaptionML=[ENU=Simple Data Type;
+                                                              FRA=Type de donn‚es simple];
+                                                   Editable=No }
+    { 26  ;   ;Type                ;Option        ;CaptionML=[ENU=Type;
+                                                              FRA=Type];
+                                                   OptionCaptionML=[ENU=Value,Base;
+                                                                    FRA=Valeur,Base];
+                                                   OptionString=Value,Base }
+  }
+  KEYS
+  {
+    {    ;XML Schema Code,Element ID,ID           ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

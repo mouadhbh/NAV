@@ -1,0 +1,303 @@
+OBJECT Page 10868 Payment Slip
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVFR8.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Payment Slip;
+               FRA=Bordereau paiement];
+    SourceTable=Table10865;
+    PageType=Document;
+    RefreshOnActivate=Yes;
+    OnAfterGetRecord=BEGIN
+                       CurrPage.Lines.PAGE.EDITABLE(TRUE);
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 1120047 ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Header;
+                                 FRA=&Bordereau];
+                      Image=DepositSlip }
+      { 1120049 ;2   ;Action    ;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 ShowDocDim;
+                                 CurrPage.SAVERECORD;
+                               END;
+                                }
+      { 1120050 ;2   ;Action    ;
+                      CaptionML=[ENU=Header RIB;
+                                 FRA=Relev‚ d'identit‚ bancaire];
+                      RunObject=Page 10876;
+                      RunPageLink=No.=FIELD(No.);
+                      Image=Check }
+      { 1120040 ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Navigate;
+                                 FRA=Navi&guer] }
+      { 1120042 ;2   ;Action    ;
+                      CaptionML=[ENU=Header;
+                                 FRA=En-tˆte];
+                      Image=DepositSlip;
+                      OnAction=BEGIN
+                                 Navigate.SetDoc("Posting Date","No.");
+                                 Navigate.RUN;
+                               END;
+                                }
+      { 1120043 ;2   ;Action    ;
+                      CaptionML=[ENU=Line;
+                                 FRA=Ligne];
+                      Image=Line;
+                      OnAction=BEGIN
+                                 CurrPage.Lines.PAGE.NavigateLine("Posting Date");
+                               END;
+                                }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1120031 ;1   ;ActionGroup;
+                      Name=F&unctions;
+                      CaptionML=[ENU=F&unctions;
+                                 FRA=Fonction&s];
+                      Image=Action }
+      { 1120032 ;2   ;Action    ;
+                      Name=SuggestVendorPayments;
+                      CaptionML=[ENU=Suggest &Vendor Payments;
+                                 FRA=Proposer paiements &fournisseur];
+                      Promoted=Yes;
+                      Image=SuggestVendorPayments;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 PaymentClass@1120002 : Record 10860;
+                                 CreateVendorPmtSuggestion@1120001 : Report 10862;
+                               BEGIN
+                                 IF "Status No." <> 0 THEN
+                                   MESSAGE(Text003)
+                                 ELSE
+                                   IF PaymentClass.GET("Payment Class") THEN
+                                     IF PaymentClass.Suggestions = PaymentClass.Suggestions::Vendor THEN BEGIN
+                                       CreateVendorPmtSuggestion.SetGenPayLine(Rec);
+                                       CreateVendorPmtSuggestion.RUNMODAL;
+                                       CLEAR(CreateVendorPmtSuggestion);
+                                     END ELSE
+                                       MESSAGE(Text001);
+                               END;
+                                }
+      { 1120037 ;2   ;Action    ;
+                      Name=SuggestCustomerPayments;
+                      CaptionML=[ENU=Suggest &Customer Payments;
+                                 FRA=Proposer rŠglements &client];
+                      Promoted=Yes;
+                      Image=SuggestCustomerPayments;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 Customer@1120000 : Record 18;
+                                 PaymentClass@1120002 : Record 10860;
+                                 CreateCustomerPmtSuggestion@1120001 : Report 10864;
+                               BEGIN
+                                 IF "Status No." <> 0 THEN
+                                   MESSAGE(Text003)
+                                 ELSE
+                                   IF PaymentClass.GET("Payment Class") THEN
+                                     IF PaymentClass.Suggestions = PaymentClass.Suggestions::Customer THEN BEGIN
+                                       CreateCustomerPmtSuggestion.SetGenPayLine(Rec);
+                                       Customer.SETRANGE("Partner Type","Partner Type");
+                                       CreateCustomerPmtSuggestion.SETTABLEVIEW(Customer);
+                                       CreateCustomerPmtSuggestion.RUNMODAL;
+                                       CLEAR(CreateCustomerPmtSuggestion);
+                                     END ELSE
+                                       MESSAGE(Text002);
+                               END;
+                                }
+      { 1120052 ;2   ;Separator  }
+      { 1120046 ;2   ;Action    ;
+                      Name=Archive;
+                      CaptionML=[ENU=Archive;
+                                 FRA=Archiver];
+                      Image=Archive;
+                      OnAction=BEGIN
+                                 IF "No." = '' THEN
+                                   EXIT;
+                                 IF NOT CONFIRM(Text009) THEN
+                                   EXIT;
+                                 PaymentMgt.ArchiveDocument(Rec);
+                               END;
+                                }
+      { 1120039 ;1   ;ActionGroup;
+                      CaptionML=[ENU=P&osting;
+                                 FRA=&Validation];
+                      Image=Post }
+      { 1120044 ;2   ;Action    ;
+                      Name=GenerateFile;
+                      CaptionML=[ENU=Generate file;
+                                 FRA=G‚n‚rer fichier];
+                      Image=CreateDocument;
+                      OnAction=BEGIN
+                                 PaymentStep.SETRANGE("Action Type",PaymentStep."Action Type"::File);
+                                 PaymentMgt.ProcessPaymentSteps(Rec,PaymentStep);
+                               END;
+                                }
+      { 1120045 ;2   ;Action    ;
+                      Name=Post;
+                      CaptionML=[ENU=Post;
+                                 FRA=Valider];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Post;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 PaymentStep.SETFILTER("Action Type",'%1|%2',PaymentStep."Action Type"::None,PaymentStep."Action Type"::Ledger);
+                                 PaymentMgt.ProcessPaymentSteps(Rec,PaymentStep);
+                               END;
+                                }
+      { 1120002 ;2   ;Action    ;
+                      Name=Print;
+                      CaptionML=[ENU=Print;
+                                 FRA=Imprimer];
+                      Image=Print;
+                      OnAction=BEGIN
+                                 CurrPage.Lines.PAGE.MarkLines(TRUE);
+                                 PaymentStep.SETRANGE("Action Type",PaymentStep."Action Type"::Report);
+                                 PaymentMgt.ProcessPaymentSteps(Rec,PaymentStep);
+                                 CurrPage.Lines.PAGE.MarkLines(FALSE);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1120000;1;Group     ;
+                CaptionML=[ENU=General;
+                           FRA=G‚n‚ral] }
+
+    { 1120001;2;Field     ;
+                AssistEdit=No;
+                SourceExpr="No.";
+                OnAssistEdit=BEGIN
+                               IF AssistEdit(xRec) THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 1120003;2;Field     ;
+                Lookup=No;
+                SourceExpr="Payment Class";
+                Editable=FALSE }
+
+    { 1120005;2;Field     ;
+                DrillDown=No;
+                SourceExpr="Payment Class Name";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 1120007;2;Field     ;
+                DrillDown=No;
+                SourceExpr="Status Name";
+                Importance=Promoted;
+                Editable=FALSE }
+
+    { 1120009;2;Field     ;
+                SourceExpr="Currency Code";
+                OnAssistEdit=BEGIN
+                               ChangeExchangeRate.SetParameter("Currency Code","Currency Factor","Posting Date");
+                               IF ChangeExchangeRate.RUNMODAL = ACTION::OK THEN BEGIN
+                                 VALIDATE("Currency Factor",ChangeExchangeRate.GetParameter);
+                                 CurrPage.UPDATE;
+                               END;
+                               CLEAR(ChangeExchangeRate);
+                             END;
+                              }
+
+    { 1120011;2;Field     ;
+                SourceExpr="Posting Date";
+                Importance=Promoted }
+
+    { 1120013;2;Field     ;
+                SourceExpr="Document Date";
+                OnValidate=BEGIN
+                             DocumentDateOnAfterValidate;
+                           END;
+                            }
+
+    { 1120033;2;Field     ;
+                SourceExpr="Amount (LCY)";
+                Importance=Promoted }
+
+    { 1120004;2;Field     ;
+                SourceExpr="Partner Type" }
+
+    { 1120022;1;Part      ;
+                Name=Lines;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page10869 }
+
+    { 1904784501;1;Group  ;
+                CaptionML=[ENU=Posting;
+                           FRA=Validation] }
+
+    { 1120019;2;Field     ;
+                SourceExpr="Source Code";
+                Importance=Promoted }
+
+    { 1120015;2;Field     ;
+                SourceExpr="Shortcut Dimension 1 Code" }
+
+    { 1120017;2;Field     ;
+                SourceExpr="Shortcut Dimension 2 Code" }
+
+    { 1120023;2;Field     ;
+                SourceExpr="Account Type";
+                Importance=Promoted }
+
+    { 1120026;2;Field     ;
+                SourceExpr="Account No.";
+                Importance=Promoted }
+
+    { 1120006; ;Container ;
+                ContainerType=FactBoxArea }
+
+    { 1120008;1;Part      ;
+                Name=Payment Journal Errors;
+                CaptionML=[ENU=File Export Errors;
+                           FRA=Erreurs exportation fichier];
+                SubPageLink=Document No.=FIELD(No.),
+                            Journal Line No.=FIELD(Line No.),
+                            Journal Template Name=CONST(''),
+                            Journal Batch Name=CONST(10865);
+                PagePartID=Page1228;
+                ProviderID=1120022;
+                PartType=Page }
+
+  }
+  CODE
+  {
+    VAR
+      PaymentStep@1120003 : Record 10862;
+      PaymentMgt@1120000 : Codeunit 10860;
+      ChangeExchangeRate@1120001 : Page 511;
+      Navigate@1120002 : Page 344;
+      Text001@1120004 : TextConst 'ENU=This payment class does not authorize vendor suggestions.;FRA=Ce type de rŠglement n''autorise pas les propositions fournisseur.';
+      Text002@1120005 : TextConst 'ENU=This payment class does not authorize customer suggestions.;FRA=Ce type de rŠglement n''autorise pas les propositions client.';
+      Text003@1120006 : TextConst 'ENU=You cannot suggest payments on a posted header.;FRA=Vous n''ˆtes pas autoris‚ … faire des propositions de paiement sur un bordereau valid‚.';
+      Text009@1120011 : TextConst 'ENU=Do you want to archive this document?;FRA=Souhaitez-vous archiver ce documentÿ?';
+
+    LOCAL PROCEDURE DocumentDateOnAfterValidate@19038487();
+    BEGIN
+      CurrPage.UPDATE;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

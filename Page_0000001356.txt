@@ -1,0 +1,137 @@
+OBJECT Page 1356 Mini Purchase Invoice List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Purchase Invoice List;
+               FRA=Liste factures achat];
+    SourceTable=Table38;
+    SourceTableView=WHERE(Document Type=CONST(Invoice));
+    PageType=List;
+    CardPageID=Mini Purchase Invoice;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Invoice,Posting;
+                                FRA=Nouveau,Traitement,êtat,Facture,Validation];
+    OnOpenPage=BEGIN
+                 SetSecurityFilterOnRespCenter;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1102601017;1 ;ActionGroup;
+                      CaptionML=[ENU=&Invoice;
+                                 FRA=Fa&cture];
+                      Image=Invoice }
+      { 3       ;2   ;Action    ;
+                      Name=Vendor;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Vendor;
+                                 FRA=Fournisseur];
+                      ToolTipML=[ENU=View or edit detailed information about the vendor on the selected purchase document.;
+                                 FRA=Affichez ou modifiez des informations dÇtaillÇes concernant le fournisseur sur le document achat sÇlectionnÇ.];
+                      RunObject=Page 1330;
+                      RunPageLink=No.=FIELD(Buy-from Vendor No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Vendor;
+                      PromotedCategory=Category4;
+                      Scope=Repeater }
+      { 50      ;1   ;ActionGroup;
+                      CaptionML=[ENU=P&osting;
+                                 FRA=&Validation];
+                      Image=Post }
+      { 52      ;2   ;Action    ;
+                      Name=Post;
+                      ShortCutKey=F9;
+                      CaptionML=[ENU=P&ost;
+                                 FRA=&Valider];
+                      ToolTipML=[ENU=Finalize the selected purchase document. Posting updates your books with the document's amounts and quantities.;
+                                 FRA=Finalisez le document achat sÇlectionnÇ. La validation met Ö jour votre comptabilitÇ avec les montants et les quantitÇs du document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostOrder;
+                      PromotedCategory=Category5;
+                      Scope=Repeater;
+                      OnAction=BEGIN
+                                 Post(CODEUNIT::"Purch.-Post (Yes/No)");
+                               END;
+                                }
+      { 4       ;2   ;Action    ;
+                      Name=Preview;
+                      CaptionML=[ENU=Preview Posting;
+                                 FRA=Aperáu compta.];
+                      Image=ViewPostedOrder;
+                      Scope=Repeater;
+                      OnAction=VAR
+                                 PurchPostYesNo@1000 : Codeunit 91;
+                               BEGIN
+                                 PurchPostYesNo.Preview(Rec);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the purchase document. The field is only visible if you have not set up a number series for the type of purchase document, or if the Manual Nos. field is selected for the number series.;
+                           FRA=SpÇcifie le numÇro du document achat. Le champ n'est visible que si vous n'avez dÇfini aucune souche de numÇros pour ce type de document achat, ou si le champ N¯ manuels est sÇlectionnÇ pour la souche de numÇros.];
+                SourceExpr="No." }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the name of the vendor who ships the items.;
+                           FRA=SpÇcifie le nom du fournisseur qui expÇdie les articles.];
+                SourceExpr="Buy-from Vendor Name" }
+
+    { 1102601007;2;Field  ;
+                ToolTipML=[ENU=Specifies when the invoice is due. The program calculates the date using the Payment Terms Code and Document Date fields.;
+                           FRA=SpÇcifie la date d'ÇchÇance de la facture. Le programme calcule la date Ö l'aide des champs Code condition paiement et Date document.];
+                SourceExpr="Due Date";
+                Visible=FALSE }
+
+    { 5   ;2   ;Field     ;
+                ToolTipML=[ENU=Shows the sum of the amounts in the Amount field on the associated purchase lines.;
+                           FRA=Affiche la somme des montants du champ Montant sur les lignes achat associÇes.];
+                SourceExpr=Amount }
+
+  }
+  CODE
+  {
+    VAR
+      MiniLinesInstructionMgt@1000 : Codeunit 1320;
+      OpenPostedPurchaseInvQst@1001 : TextConst 'ENU=The invoice has been posted and moved to the Posted Purchase Invoice list.\\Do you want to open the posted invoice?;FRA=La facture a ÇtÇ validÇe et dÇplacÇe dans la liste des factures achat enregistrÇes.\\Souhaitez-vous ouvrir la facture validÇeˇ?';
+
+    LOCAL PROCEDURE Post@4(PostingCodeunitID@1000 : Integer);
+    BEGIN
+      MiniLinesInstructionMgt.PurchaseCheckAllLinesHaveQuantityAssigned(Rec);
+      SendToPosting(PostingCodeunitID);
+      ShowPostedConfirmationMessage;
+    END;
+
+    LOCAL PROCEDURE ShowPostedConfirmationMessage@7();
+    VAR
+      PurchInvHeader@1000 : Record 122;
+    BEGIN
+      PurchInvHeader.SETFILTER("Pre-Assigned No.","No.");
+      IF PurchInvHeader.FINDFIRST THEN
+        IF DIALOG.CONFIRM(OpenPostedPurchaseInvQst,FALSE) THEN
+          PAGE.RUN(PAGE::"Mini Posted Purchase Invoice",PurchInvHeader);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

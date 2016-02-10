@@ -1,0 +1,453 @@
+OBJECT Table 254 VAT Entry
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00,NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    OnInsert=VAR
+               GenJnlPostPreview@1000 : Codeunit 19;
+             BEGIN
+               GenJnlPostPreview.SaveVATEntry(Rec);
+             END;
+
+    CaptionML=[ENU=VAT Entry;
+               FRA=Ecriture TVA];
+    LookupPageID=Page315;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Entry No.           ;Integer       ;CaptionML=[ENU=Entry No.;
+                                                              FRA=Nø s‚quence];
+                                                   Editable=No }
+    { 2   ;   ;Gen. Bus. Posting Group;Code10     ;TableRelation="Gen. Business Posting Group";
+                                                   CaptionML=[ENU=Gen. Bus. Posting Group;
+                                                              FRA=Groupe compta. march‚];
+                                                   Editable=No }
+    { 3   ;   ;Gen. Prod. Posting Group;Code10    ;TableRelation="Gen. Product Posting Group";
+                                                   CaptionML=[ENU=Gen. Prod. Posting Group;
+                                                              FRA=Groupe compta. produit];
+                                                   Editable=No }
+    { 4   ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              FRA=Date comptabilisation];
+                                                   Editable=No }
+    { 5   ;   ;Document No.        ;Code20        ;CaptionML=[ENU=Document No.;
+                                                              FRA=Nø document];
+                                                   Editable=No }
+    { 6   ;   ;Document Type       ;Option        ;CaptionML=[ENU=Document Type;
+                                                              FRA=Type document];
+                                                   OptionCaptionML=[ENU=" ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund";
+                                                                    FRA=" ,Paiement,Facture,Avoir,Int‚rˆts,Relance,Remboursement"];
+                                                   OptionString=[ ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund];
+                                                   Editable=No }
+    { 7   ;   ;Type                ;Option        ;OnValidate=BEGIN
+                                                                IF Type = Type::Settlement THEN
+                                                                  ERROR(Text000,FIELDCAPTION(Type),Type);
+                                                              END;
+
+                                                   CaptionML=[ENU=Type;
+                                                              FRA=Type];
+                                                   OptionCaptionML=[ENU=" ,Purchase,Sale,Settlement";
+                                                                    FRA=" ,Achat,Vente,RŠglement"];
+                                                   OptionString=[ ,Purchase,Sale,Settlement];
+                                                   Editable=No }
+    { 8   ;   ;Base                ;Decimal       ;CaptionML=[ENU=Base;
+                                                              FRA=Base];
+                                                   Editable=No;
+                                                   AutoFormatType=1 }
+    { 9   ;   ;Amount              ;Decimal       ;CaptionML=[ENU=Amount;
+                                                              FRA=Montant];
+                                                   Editable=No;
+                                                   AutoFormatType=1 }
+    { 10  ;   ;VAT Calculation Type;Option        ;CaptionML=[ENU=VAT Calculation Type;
+                                                              FRA=Mode calcul TVA];
+                                                   OptionCaptionML=[ENU=Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax;
+                                                                    FRA=Normal,Intracomm.,Correctif,Sales Tax];
+                                                   OptionString=Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax;
+                                                   Editable=No }
+    { 12  ;   ;Bill-to/Pay-to No.  ;Code20        ;TableRelation=IF (Type=CONST(Purchase)) Vendor
+                                                                 ELSE IF (Type=CONST(Sale)) Customer;
+                                                   OnValidate=BEGIN
+                                                                VALIDATE(Type);
+                                                                IF "Bill-to/Pay-to No." = '' THEN BEGIN
+                                                                  "Country/Region Code" := '';
+                                                                  "VAT Registration No." := '';
+                                                                END ELSE
+                                                                  CASE Type OF
+                                                                    Type::Purchase:
+                                                                      BEGIN
+                                                                        Vend.GET("Bill-to/Pay-to No.");
+                                                                        "Country/Region Code" := Vend."Country/Region Code";
+                                                                        "VAT Registration No." := Vend."VAT Registration No.";
+                                                                      END;
+                                                                    Type::Sale:
+                                                                      BEGIN
+                                                                        Cust.GET("Bill-to/Pay-to No.");
+                                                                        "Country/Region Code" := Cust."Country/Region Code";
+                                                                        "VAT Registration No." := Cust."VAT Registration No.";
+                                                                      END;
+                                                                  END;
+                                                              END;
+
+                                                   CaptionML=[ENU=Bill-to/Pay-to No.;
+                                                              FRA=Nødonneur/preneur d'ordre] }
+    { 13  ;   ;EU 3-Party Trade    ;Boolean       ;OnValidate=BEGIN
+                                                                VALIDATE(Type);
+                                                              END;
+
+                                                   CaptionML=[ENU=EU 3-Party Trade;
+                                                              FRA=Trans. tripartite UE] }
+    { 14  ;   ;User ID             ;Code50        ;TableRelation=User."User Name";
+                                                   OnLookup=VAR
+                                                              UserMgt@1000 : Codeunit 418;
+                                                            BEGIN
+                                                              UserMgt.LookupUserID("User ID");
+                                                            END;
+
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=User ID;
+                                                              FRA=Code utilisateur];
+                                                   Editable=No }
+    { 15  ;   ;Source Code         ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Source Code;
+                                                              FRA=Code journal];
+                                                   Editable=No }
+    { 16  ;   ;Reason Code         ;Code10        ;TableRelation="Reason Code";
+                                                   CaptionML=[ENU=Reason Code;
+                                                              FRA=Code motif];
+                                                   Editable=No }
+    { 17  ;   ;Closed by Entry No. ;Integer       ;TableRelation="VAT Entry";
+                                                   CaptionML=[ENU=Closed by Entry No.;
+                                                              FRA=Nø s‚quence lettrage final];
+                                                   Editable=No }
+    { 18  ;   ;Closed              ;Boolean       ;CaptionML=[ENU=Closed;
+                                                              FRA=Cl“tur‚];
+                                                   Editable=No }
+    { 19  ;   ;Country/Region Code ;Code10        ;TableRelation=Country/Region;
+                                                   OnValidate=BEGIN
+                                                                VALIDATE(Type);
+                                                                VALIDATE("VAT Registration No.");
+                                                              END;
+
+                                                   CaptionML=[ENU=Country/Region Code;
+                                                              FRA=Code pays/r‚gion] }
+    { 20  ;   ;Internal Ref. No.   ;Text30        ;CaptionML=[ENU=Internal Ref. No.;
+                                                              FRA=Nø r‚f‚rence interne];
+                                                   Editable=No }
+    { 21  ;   ;Transaction No.     ;Integer       ;CaptionML=[ENU=Transaction No.;
+                                                              FRA=Nø transaction];
+                                                   Editable=No }
+    { 22  ;   ;Unrealized Amount   ;Decimal       ;CaptionML=[ENU=Unrealized Amount;
+                                                              FRA=Taxe encaissement];
+                                                   Editable=No;
+                                                   AutoFormatType=1 }
+    { 23  ;   ;Unrealized Base     ;Decimal       ;CaptionML=[ENU=Unrealized Base;
+                                                              FRA=Base encaissement];
+                                                   Editable=No;
+                                                   AutoFormatType=1 }
+    { 24  ;   ;Remaining Unrealized Amount;Decimal;CaptionML=[ENU=Remaining Unrealized Amount;
+                                                              FRA=Taxe encaissement restante];
+                                                   Editable=No;
+                                                   AutoFormatType=1 }
+    { 25  ;   ;Remaining Unrealized Base;Decimal  ;CaptionML=[ENU=Remaining Unrealized Base;
+                                                              FRA=Base encaissement restante];
+                                                   Editable=No;
+                                                   AutoFormatType=1 }
+    { 26  ;   ;External Document No.;Code35       ;CaptionML=[ENU=External Document No.;
+                                                              FRA=Nø doc. externe];
+                                                   Editable=No }
+    { 28  ;   ;No. Series          ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=No. Series;
+                                                              FRA=Souches de nø];
+                                                   Editable=No }
+    { 29  ;   ;Tax Area Code       ;Code20        ;TableRelation="Tax Area";
+                                                   CaptionML=[ENU=Tax Area Code;
+                                                              FRA=Code zone recouvrement];
+                                                   Editable=No }
+    { 30  ;   ;Tax Liable          ;Boolean       ;CaptionML=[ENU=Tax Liable;
+                                                              FRA=Soumis … recouvrement];
+                                                   Editable=No }
+    { 31  ;   ;Tax Group Code      ;Code10        ;TableRelation="Tax Group";
+                                                   CaptionML=[ENU=Tax Group Code;
+                                                              FRA=Code groupe taxes];
+                                                   Editable=No }
+    { 32  ;   ;Use Tax             ;Boolean       ;CaptionML=[ENU=Use Tax;
+                                                              FRA=Use Tax];
+                                                   Editable=No }
+    { 33  ;   ;Tax Jurisdiction Code;Code10       ;TableRelation="Tax Jurisdiction";
+                                                   CaptionML=[ENU=Tax Jurisdiction Code;
+                                                              FRA=USA code autorit‚s recouvrem.];
+                                                   Editable=No }
+    { 34  ;   ;Tax Group Used      ;Code10        ;TableRelation="Tax Group";
+                                                   CaptionML=[ENU=Tax Group Used;
+                                                              FRA=Groupe taxes utilis‚];
+                                                   Editable=No }
+    { 35  ;   ;Tax Type            ;Option        ;CaptionML=[ENU=Tax Type;
+                                                              FRA=Type taxe];
+                                                   OptionCaptionML=[ENU=Sales Tax,Excise Tax;
+                                                                    FRA=Sales Tax,Excise Tax];
+                                                   OptionString=Sales Tax,Excise Tax;
+                                                   Editable=No }
+    { 36  ;   ;Tax on Tax          ;Boolean       ;CaptionML=[ENU=Tax on Tax;
+                                                              FRA=Taxe sur taxe];
+                                                   Editable=No }
+    { 37  ;   ;Sales Tax Connection No.;Integer   ;CaptionML=[ENU=Sales Tax Connection No.;
+                                                              FRA=Nø lien Sales Tax];
+                                                   Editable=No }
+    { 38  ;   ;Unrealized VAT Entry No.;Integer   ;TableRelation="VAT Entry";
+                                                   CaptionML=[ENU=Unrealized VAT Entry No.;
+                                                              FRA=Nø s‚q. TVA sur encaissement];
+                                                   Editable=No }
+    { 39  ;   ;VAT Bus. Posting Group;Code10      ;TableRelation="VAT Business Posting Group";
+                                                   CaptionML=[ENU=VAT Bus. Posting Group;
+                                                              FRA=Groupe compta. march‚ TVA];
+                                                   Editable=No }
+    { 40  ;   ;VAT Prod. Posting Group;Code10     ;TableRelation="VAT Product Posting Group";
+                                                   CaptionML=[ENU=VAT Prod. Posting Group;
+                                                              FRA=Groupe compta. produit TVA];
+                                                   Editable=No }
+    { 43  ;   ;Additional-Currency Amount;Decimal ;AccessByPermission=TableData 4=R;
+                                                   CaptionML=[ENU=Additional-Currency Amount;
+                                                              FRA=Montant DR];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 44  ;   ;Additional-Currency Base;Decimal   ;AccessByPermission=TableData 4=R;
+                                                   CaptionML=[ENU=Additional-Currency Base;
+                                                              FRA=Base DR];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 45  ;   ;Add.-Currency Unrealized Amt.;Decimal;
+                                                   CaptionML=[ENU=Add.-Currency Unrealized Amt.;
+                                                              FRA=Montant pr‚vu DR];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 46  ;   ;Add.-Currency Unrealized Base;Decimal;
+                                                   CaptionML=[ENU=Add.-Currency Unrealized Base;
+                                                              FRA=Base pr‚vue DR];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 48  ;   ;VAT Base Discount % ;Decimal       ;CaptionML=[ENU=VAT Base Discount %;
+                                                              FRA=% remise base TVA];
+                                                   DecimalPlaces=0:5;
+                                                   MinValue=0;
+                                                   MaxValue=100;
+                                                   Editable=No }
+    { 49  ;   ;Add.-Curr. Rem. Unreal. Amount;Decimal;
+                                                   CaptionML=[ENU=Add.-Curr. Rem. Unreal. Amount;
+                                                              FRA=Taxe encaiss. rest. DR];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 50  ;   ;Add.-Curr. Rem. Unreal. Base;Decimal;
+                                                   CaptionML=[ENU=Add.-Curr. Rem. Unreal. Base;
+                                                              FRA=Base encaiss. rest. DR];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 51  ;   ;VAT Difference      ;Decimal       ;CaptionML=[ENU=VAT Difference;
+                                                              FRA=Diff‚rence TVA];
+                                                   Editable=No;
+                                                   AutoFormatType=1 }
+    { 52  ;   ;Add.-Curr. VAT Difference;Decimal  ;AccessByPermission=TableData 4=R;
+                                                   CaptionML=[ENU=Add.-Curr. VAT Difference;
+                                                              FRA=Diff‚rence TVA DR];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 53  ;   ;Ship-to/Order Address Code;Code10  ;TableRelation=IF (Type=CONST(Purchase)) "Order Address".Code WHERE (Vendor No.=FIELD(Bill-to/Pay-to No.))
+                                                                 ELSE IF (Type=CONST(Sale)) "Ship-to Address".Code WHERE (Customer No.=FIELD(Bill-to/Pay-to No.));
+                                                   CaptionML=[ENU=Ship-to/Order Address Code;
+                                                              FRA=Code adresse destinataire/adresse de commande] }
+    { 54  ;   ;Document Date       ;Date          ;CaptionML=[ENU=Document Date;
+                                                              FRA=Date document];
+                                                   Editable=No }
+    { 55  ;   ;VAT Registration No.;Text20        ;OnValidate=VAR
+                                                                VATRegNoFormat@1000 : Record 381;
+                                                              BEGIN
+                                                                VATRegNoFormat.Test("VAT Registration No.","Country/Region Code",'',0);
+                                                              END;
+
+                                                   CaptionML=[ENU=VAT Registration No.;
+                                                              FRA=Nø identif. intracomm.] }
+    { 56  ;   ;Reversed            ;Boolean       ;CaptionML=[ENU=Reversed;
+                                                              FRA=Contre-pass‚] }
+    { 57  ;   ;Reversed by Entry No.;Integer      ;TableRelation="VAT Entry";
+                                                   CaptionML=[ENU=Reversed by Entry No.;
+                                                              FRA=Contre-pass‚ par nø ‚criture];
+                                                   BlankZero=Yes }
+    { 58  ;   ;Reversed Entry No.  ;Integer       ;TableRelation="VAT Entry";
+                                                   CaptionML=[ENU=Reversed Entry No.;
+                                                              FRA=Nø ‚criture contre-pass‚e];
+                                                   BlankZero=Yes }
+    { 59  ;   ;EU Service          ;Boolean       ;CaptionML=[ENU=EU Service;
+                                                              FRA=Service UE];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Entry No.                               ;Clustered=Yes }
+    {    ;Type,Closed,VAT Bus. Posting Group,VAT Prod. Posting Group,Posting Date;
+                                                   SumIndexFields=Base,Amount,Additional-Currency Base,Additional-Currency Amount,Remaining Unrealized Amount,Remaining Unrealized Base,Add.-Curr. Rem. Unreal. Amount,Add.-Curr. Rem. Unreal. Base }
+    {    ;Type,Closed,Tax Jurisdiction Code,Use Tax,Posting Date;
+                                                   SumIndexFields=Base,Amount,Unrealized Amount,Unrealized Base,Remaining Unrealized Amount }
+    {    ;Type,Country/Region Code,VAT Registration No.,VAT Bus. Posting Group,VAT Prod. Posting Group,Posting Date;
+                                                   SumIndexFields=Base,Additional-Currency Base }
+    {    ;Document No.,Posting Date                }
+    {    ;Transaction No.                          }
+    {    ;Tax Jurisdiction Code,Tax Group Used,Tax Type,Use Tax,Posting Date }
+    {    ;Type,Bill-to/Pay-to No.,Transaction No. ;MaintainSQLIndex=No }
+  }
+  FIELDGROUPS
+  {
+    { 1   ;DropDown            ;Entry No.,Posting Date,Document Type,Document No.,Posting Date }
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=You cannot change the contents of this field when %1 is %2.;FRA=Vous ne pouvez pas modifier le contenu de ce champ quand %1 est %2.';
+      Cust@1001 : Record 18;
+      Vend@1002 : Record 23;
+      GLSetup@1003 : Record 98;
+      GLSetupRead@1004 : Boolean;
+
+    LOCAL PROCEDURE GetCurrencyCode@1() : Code[10];
+    BEGIN
+      IF NOT GLSetupRead THEN BEGIN
+        GLSetup.GET;
+        GLSetupRead := TRUE;
+      END;
+      EXIT(GLSetup."Additional Reporting Currency");
+    END;
+
+    PROCEDURE GetUnRealizedVATPart@2(SettledAmount@1003 : Decimal;Paid@1005 : Decimal;Full@1001 : Decimal;TotalUnrealVATAmountFirst@1006 : Decimal;TotalUnrealVATAmountLast@1007 : Decimal;DelayedUnrealizedVAT@1120000 : Boolean;RealizeVAT@1120001 : Boolean) : Decimal;
+    VAR
+      UnrealizedVatType@1000 : ' ,Percentage,First,Last,First (Fully Paid),Last (Fully Paid)';
+    BEGIN
+      IF DelayedUnrealizedVAT AND RealizeVAT THEN
+        CheckDelayedUnrealVatType;
+      IF (Type <> 0) AND
+         (Amount = 0) AND
+         (Base = 0)
+      THEN BEGIN
+        UnrealizedVatType := GetUnrealizedVatType;
+        IF (UnrealizedVatType = UnrealizedVatType::" ") OR
+           (("Remaining Unrealized Amount" = 0) AND
+            ("Remaining Unrealized Base" = 0))
+        THEN
+          EXIT(0);
+
+        IF ABS(Paid) = ABS(Full) THEN
+          EXIT(1);
+
+        CASE UnrealizedVatType OF
+          UnrealizedVatType::Percentage:
+            BEGIN
+              IF ABS(Full) = ABS(Paid) - ABS(SettledAmount) THEN
+                EXIT(1);
+              EXIT(ABS(SettledAmount) / (ABS(Full) - (ABS(Paid) - ABS(SettledAmount))));
+            END;
+          UnrealizedVatType::First:
+            BEGIN
+              IF "VAT Calculation Type" = "VAT Calculation Type"::"Reverse Charge VAT" THEN
+                EXIT(1);
+              IF ABS(Paid) < ABS(TotalUnrealVATAmountFirst) THEN
+                EXIT(ABS(SettledAmount) / ABS(TotalUnrealVATAmountFirst));
+              EXIT(1);
+            END;
+          UnrealizedVatType::"First (Fully Paid)":
+            BEGIN
+              IF "VAT Calculation Type" = "VAT Calculation Type"::"Reverse Charge VAT" THEN
+                EXIT(1);
+              IF ABS(Paid) < ABS(TotalUnrealVATAmountFirst) THEN
+                EXIT(0);
+              EXIT(1);
+            END;
+          UnrealizedVatType::"Last (Fully Paid)":
+            EXIT(0);
+          UnrealizedVatType::Last:
+            BEGIN
+              IF "VAT Calculation Type" = "VAT Calculation Type"::"Reverse Charge VAT" THEN
+                EXIT(0);
+              IF ABS(Paid) > ABS(Full) - ABS(TotalUnrealVATAmountLast) THEN
+                EXIT((ABS(Paid) - (ABS(Full) - ABS(TotalUnrealVATAmountLast))) / ABS(TotalUnrealVATAmountLast));
+              EXIT(0);
+            END;
+        END;
+      END ELSE
+        EXIT(0);
+    END;
+
+    LOCAL PROCEDURE GetUnrealizedVatType@3() UnrealizedVatType : Integer;
+    VAR
+      VatPostingSetup@1001 : Record 325;
+      TaxJurisdiction@1000 : Record 320;
+    BEGIN
+      IF "VAT Calculation Type" = "VAT Calculation Type"::"Sales Tax" THEN BEGIN
+        TaxJurisdiction.GET("Tax Jurisdiction Code");
+        UnrealizedVatType := TaxJurisdiction."Unrealized VAT Type";
+      END ELSE BEGIN
+        VatPostingSetup.GET("VAT Bus. Posting Group","VAT Prod. Posting Group");
+        UnrealizedVatType := VatPostingSetup."Unrealized VAT Type";
+      END;
+    END;
+
+    PROCEDURE CheckDelayedUnrealVatType@1120000();
+    VAR
+      VatPostingSetup@1120001 : Record 325;
+      TaxJurisdiction@1120000 : Record 320;
+    BEGIN
+      IF "VAT Calculation Type" = "VAT Calculation Type"::"Sales Tax" THEN BEGIN
+        TaxJurisdiction.GET("Tax Jurisdiction Code");
+        TaxJurisdiction.TESTFIELD("Unrealized VAT Type",TaxJurisdiction."Unrealized VAT Type"::Percentage);
+      END ELSE BEGIN
+        VatPostingSetup.GET("VAT Bus. Posting Group","VAT Prod. Posting Group");
+        VatPostingSetup.TESTFIELD("Unrealized VAT Type",VatPostingSetup."Unrealized VAT Type"::Percentage);
+      END;
+    END;
+
+    PROCEDURE CopyFromGenJnlLine@5(GenJnlLine@1000 : Record 81);
+    BEGIN
+      CopyPostingGroupsFromGenJnlLine(GenJnlLine);
+      "Posting Date" := GenJnlLine."Posting Date";
+      "Document Date" := GenJnlLine."Document Date";
+      "Document No." := GenJnlLine."Document No.";
+      "External Document No." := GenJnlLine."External Document No.";
+      "Document Type" := GenJnlLine."Document Type";
+      Type := GenJnlLine."Gen. Posting Type";
+      "VAT Calculation Type" := GenJnlLine."VAT Calculation Type";
+      "Source Code" := GenJnlLine."Source Code";
+      "Reason Code" := GenJnlLine."Reason Code";
+      "Ship-to/Order Address Code" := GenJnlLine."Ship-to/Order Address Code";
+      "EU 3-Party Trade" := GenJnlLine."EU 3-Party Trade";
+      "User ID" := USERID;
+      "No. Series" := GenJnlLine."Posting No. Series";
+      "VAT Base Discount %" := GenJnlLine."VAT Base Discount %";
+      "Bill-to/Pay-to No." := GenJnlLine."Bill-to/Pay-to No.";
+      "Country/Region Code" := GenJnlLine."Country/Region Code";
+      "VAT Registration No." := GenJnlLine."VAT Registration No.";
+    END;
+
+    LOCAL PROCEDURE CopyPostingGroupsFromGenJnlLine@4(GenJnlLine@1000 : Record 81);
+    BEGIN
+      "Gen. Bus. Posting Group" := GenJnlLine."Gen. Bus. Posting Group";
+      "Gen. Prod. Posting Group" := GenJnlLine."Gen. Prod. Posting Group";
+      "VAT Bus. Posting Group" := GenJnlLine."VAT Bus. Posting Group";
+      "VAT Prod. Posting Group" := GenJnlLine."VAT Prod. Posting Group";
+      "Tax Area Code" := GenJnlLine."Tax Area Code";
+      "Tax Liable" := GenJnlLine."Tax Liable";
+      "Tax Group Code" := GenJnlLine."Tax Group Code";
+      "Use Tax" := GenJnlLine."Use Tax";
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

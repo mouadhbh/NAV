@@ -1,0 +1,80 @@
+OBJECT Page 90005 My Test Page 1
+{
+  OBJECT-PROPERTIES
+  {
+    Date=28/01/16;
+    Time=17:11:48;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    ActionList=ACTIONS
+    {
+      { 1000000007;  ;ActionContainer;
+                      Name=<Action8>;
+                      CaptionML=ENU=<Action8>;
+                      ActionContainerType=ActionItems }
+      { 1000000008;1 ;Action    ;
+                      Name=<Action9>;
+                      CaptionML=ENU=Execute;
+                      OnAction=BEGIN
+                                 Result:=Value1>Value2;
+                               END;
+                                }
+      { 1000000010;1 ;Action    ;
+                      CaptionML=ENU=somme;
+                      OnAction=BEGIN
+                                 Result2:=Value1+Value2;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1000000000;;Container;
+                CaptionML=ENU=My Test Page1;
+                ContainerType=ContentArea }
+
+    { 1000000001;1;Group  ;
+                CaptionML=ENU=General;
+                GroupType=Group }
+
+    { 1000000002;2;Group  ;
+                CaptionML=ENU=Input;
+                GroupType=Group }
+
+    { 1000000003;3;Field  ;
+                CaptionML=ENU=Value 1;
+                SourceExpr=Value1 }
+
+    { 1000000004;3;Field  ;
+                CaptionML=ENU=Value 2;
+                SourceExpr=Value2 }
+
+    { 1000000005;2;Group  ;
+                CaptionML=ENU=Output;
+                GroupType=Group }
+
+    { 1000000006;3;Field  ;
+                CaptionML=ENU=Result;
+                SourceExpr=Result }
+
+    { 1000000009;3;Field  ;
+                CaptionML=ENU=Result2;
+                SourceExpr=Result2 }
+
+  }
+  CODE
+  {
+    VAR
+      Value1@1000000000 : Integer;
+      Value2@1000000001 : Integer;
+      Result@1000000002 : Boolean;
+      Result2@1000000003 : Integer;
+
+    BEGIN
+    END.
+  }
+}
+

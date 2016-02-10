@@ -1,0 +1,48 @@
+OBJECT Table 1526 Workflow Record Change Archive
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Workflow Record Change Archive;
+               FRA=Flux de travail - Archive de modification d'enregistrement];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Entry No.           ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=Entry No.;
+                                                              FRA=Nø s‚quence] }
+    { 2   ;   ;Table No.           ;Integer       ;CaptionML=[ENU=Table No.;
+                                                              FRA=Nø table] }
+    { 3   ;   ;Field No.           ;Integer       ;CaptionML=[ENU=Field No.;
+                                                              FRA=Nø champ] }
+    { 4   ;   ;Old Value           ;Text250       ;CaptionML=[ENU=Old Value;
+                                                              FRA=Ancienne valeur] }
+    { 5   ;   ;New Value           ;Text250       ;CaptionML=[ENU=New Value;
+                                                              FRA=Nouvelle valeur] }
+    { 6   ;   ;Record ID           ;RecordID      ;CaptionML=[ENU=Record ID;
+                                                              FRA=ID d'enregistrement] }
+    { 7   ;   ;Workflow Step Instance ID;GUID     ;CaptionML=[ENU=Workflow Step Instance ID;
+                                                              FRA=ID instance d'‚tape de flux de travail] }
+    { 9   ;   ;Inactive            ;Boolean       ;CaptionML=[ENU=Inactive;
+                                                              FRA=Inactif] }
+  }
+  KEYS
+  {
+    {    ;Entry No.                               ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

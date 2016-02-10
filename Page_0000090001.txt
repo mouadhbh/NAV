@@ -1,0 +1,121 @@
+OBJECT Page 90001 Custom Page
+{
+  OBJECT-PROPERTIES
+  {
+    Date=26/01/16;
+    Time=14:24:59;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    SourceTable=Table27;
+    ActionList=ACTIONS
+    {
+      { 1000000021;  ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1000000022;1 ;Action    ;
+                      CaptionML=ENU=Inventory - List;
+                      RunObject=Report 701;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1000000023;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1000000024;1 ;Action    ;
+                      CaptionML=ENU=Item Turnover;
+                      RunObject=Page 158;
+                      RunPageLink=No.=FIELD(No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=ItemAvailability;
+                      PromotedCategory=Process }
+    }
+  }
+  CONTROLS
+  {
+    { 1000000000;;Container;
+                Name=Custom Page;
+                ContainerType=ContentArea }
+
+    { 1000000001;1;Group  ;
+                Name=General;
+                GroupType=Group }
+
+    { 1000000002;2;Field  ;
+                SourceExpr="No." }
+
+    { 1000000004;2;Field  ;
+                ExtendedDatatype=Ratio;
+                SourceExpr="Profit %" }
+
+    { 1000000003;2;Field  ;
+                SourceExpr=Description }
+
+    { 1000000005;2;Field  ;
+                SourceExpr="Costing Method" }
+
+    { 1000000006;2;Field  ;
+                SourceExpr=Picture }
+
+    { 1000000007;1;Group  ;
+                CaptionML=ENU=Details;
+                GroupType=Group }
+
+    { 1000000008;2;Group  ;
+                GroupType=FixedLayout }
+
+    { 1000000009;3;Group  ;
+                CaptionML=ENU=Inventory;
+                GroupType=Group }
+
+    { 1000000010;4;Field  ;
+                CaptionML=[ENU=Quantity on;
+                           FRA=Stocks];
+                SourceExpr=Inventory }
+
+    { 1000000011;3;Group  ;
+                CaptionML=ENU=Purch. Order;
+                GroupType=Group }
+
+    { 1000000013;4;Field  ;
+                SourceExpr="Qty. on Purch. Order" }
+
+    { 1000000012;3;Group  ;
+                CaptionML=ENU=Prod. Order;
+                GroupType=Group }
+
+    { 1000000014;4;Field  ;
+                SourceExpr="Qty. on Prod. Order" }
+
+    { 1000000015;3;Group  ;
+                CaptionML=ENU=Component Lines;
+                GroupType=Group }
+
+    { 1000000016;4;Field  ;
+                SourceExpr="Qty. on Component Lines" }
+
+    { 1000000017;3;Group  ;
+                CaptionML=ENU=Sales Order;
+                GroupType=Group }
+
+    { 1000000018;4;Field  ;
+                SourceExpr="Qty. on Sales Order" }
+
+    { 1000000020;3;Group  ;
+                CaptionML=ENU=Service Order;
+                GroupType=Group }
+
+    { 1000000019;4;Field  ;
+                SourceExpr="Qty. on Service Order" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

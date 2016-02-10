@@ -1,0 +1,106 @@
+OBJECT Page 1312 Mini Std Sales Code Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Lines;
+               FRA=Lignes];
+    MultipleNewLines=Yes;
+    LinksAllowed=No;
+    SourceTable=Table171;
+    DelayedInsert=Yes;
+    PageType=ListPart;
+    AutoSplitKey=Yes;
+    OnNewRecord=BEGIN
+                  Type := Type::Item;
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1907935204;1 ;ActionGroup;
+                      CaptionML=[ENU=&Line;
+                                 FRA=&Ligne];
+                      Image=Line }
+      { 1900206304;2 ;Action    ;
+                      AccessByPermission=TableData 348=R;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      ToolTipML=[ENU=Set up default dimensions for the item, such as a department or project code. You can assign dimension codes to transactions to distribute costs and analyze historical information.;
+                                 FRA=Configurez des axes analytiques par d‚faut pour l'article, comme un code projet ou d‚partement. Vous pouvez affecter des codes axe aux transactions dans le but de r‚partir les co–ts et d'analyser les informations d'historique.];
+                      Image=Dimensions;
+                      Scope=Repeater;
+                      OnAction=BEGIN
+                                 ShowDimensions;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of a general ledger account, an item, a resource, an additional cost or a fixed asset, depending on the contents of the Type field.;
+                           FRA=Indique le num‚ro d'un compte g‚n‚ral, d'un article, d'une ressource, d'un co–t suppl‚mentaire ou d'une immobilisation selon ce que vous avez s‚lectionn‚ dans le champ Type.];
+                SourceExpr="No.";
+                LookupPageID=Mini Item List;
+                OnValidate=BEGIN
+                             IF "No." = xRec."No." THEN
+                               EXIT;
+
+                             IF "No." <> '' THEN
+                               Type := Type::Item;
+                           END;
+                            }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Contains a description of the entry. The description depends on what you chose in the Type and No. fields. If the Type field is not blank, the program will fill in the field when you enter something in the No. field. You can change the contents of the field.;
+                           FRA=Indique la d‚signation de l'‚criture. La d‚signation d‚pend de ce que vous choisissez dans les champs Type et Nø. Si le champ Type n'est pas vide, le programme renseigne le champ lorsque vous saisissez quelque chose dans le champ Nø. Vous pouvez modifier le contenu de ce champ.];
+                SourceExpr=Description;
+                OnValidate=BEGIN
+                             IF Description = xRec.Description THEN
+                               EXIT;
+
+                             IF "No." = '' THEN
+                               Type := Type::" ";
+                           END;
+                            }
+
+    { 8   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of units of the item on the line. The field can be blank if the quantity will vary. Then you can enter a quantity when you insert the line on a document.;
+                           FRA=Indique le nombre d'unit‚s de l'article sur la ligne. Le champ peut ˆtre vide si la quantit‚ est susceptible de varier. Vous saisissez alors une quantit‚ lorsque vous ins‚rez la ligne dans un document.];
+                SourceExpr=Quantity }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit of measure code to use to determine the unit price. If the line type is Item, the value is automatically copied from the Sales Unit of Measure field on the Item Card.;
+                           FRA=Indique le code unit‚ … utiliser pour d‚terminer le prix unitaire. Si le type de ligne est Article, la valeur est copi‚e automatiquement … partir du champ Unit‚ de vente dans la fiche article.];
+                SourceExpr="Unit of Measure Code";
+                Visible=FALSE }
+
+    { 10  ;2   ;Field     ;
+                ToolTipML=[ENU=Applies only to lines with the type G/L Account or Charge (Item). You cannot enter an amount on lines with types other than G/L Account or Charge (Item).;
+                           FRA=Ne s'applique qu'aux lignes de type Compte g‚n‚ral ou Frais annexes. Vous ne pouvez pas entrer de montant dans des lignes dont le type est autre que Compte g‚n‚ral ou Frais annexes.];
+                SourceExpr="Amount Excl. VAT";
+                Visible=FALSE }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

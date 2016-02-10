@@ -1,0 +1,39 @@
+OBJECT Table 90001 Sales Transaction
+{
+  OBJECT-PROPERTIES
+  {
+    Date=21/01/16;
+    Time=15:46:13;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+  }
+  FIELDS
+  {
+    { 10  ;   ;Line No.            ;Integer        }
+    { 20  ;   ;Salesperson Code    ;Code10        ;TableRelation=Salesperson/Purchaser WHERE (Commission %=FILTER(>0)) }
+    { 30  ;   ;Type                ;Option        ;OptionString=G/L Account,Item,resource }
+    { 40  ;   ;No.                 ;Code20        ;TableRelation=IF (Type=CONST(G/L Account)) "G/L Account"
+                                                                 ELSE IF (Type=CONST(Item)) Item
+                                                                 ELSE IF (Type=CONST(resource)) Resource
+                                                                 ELSE "Standard Text" }
+    { 50  ;   ;Amount              ;Decimal        }
+  }
+  KEYS
+  {
+    {    ;Line No.                                ;Clustered=Yes }
+    {    ;Salesperson Code,Type                   ;SumIndexFields=Amount }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

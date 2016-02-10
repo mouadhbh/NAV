@@ -1,0 +1,338 @@
+OBJECT Page 9015 Job Project Manager RC
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               FRA=Tableau de bord];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 25      ;1   ;Action    ;
+                      CaptionML=[ENU=Job &Analysis;
+                                 FRA=Ana&lyse projet];
+                      RunObject=Report 1008;
+                      Image=Report }
+      { 48      ;1   ;Action    ;
+                      CaptionML=[ENU=Job Actual To &Budget;
+                                 FRA=Projet Comp. rÇal./&Budget];
+                      RunObject=Report 1009;
+                      Image=Report }
+      { 26      ;1   ;Action    ;
+                      CaptionML=[ENU=Job - Pla&nning Line;
+                                 FRA=Projet - Ligne pla&nning];
+                      RunObject=Report 1006;
+                      Image=Report }
+      { 29      ;1   ;Separator  }
+      { 49      ;1   ;Action    ;
+                      CaptionML=[ENU=Job Su&ggested Billing;
+                                 FRA=&Prop. de facturation projet];
+                      RunObject=Report 1011;
+                      Image=Report }
+      { 50      ;1   ;Action    ;
+                      CaptionML=[ENU=Jobs per &Customer;
+                                 FRA=Projets par &client];
+                      RunObject=Report 1012;
+                      Image=Report }
+      { 51      ;1   ;Action    ;
+                      CaptionML=[ENU=Items per &Job;
+                                 FRA=Articles par pro&jet];
+                      RunObject=Report 1013;
+                      Image=Report }
+      { 52      ;1   ;Action    ;
+                      CaptionML=[ENU=Jobs per &Item;
+                                 FRA=P&rojets par article];
+                      RunObject=Report 1014;
+                      Image=Report }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Jobs;
+                                 FRA=Projets];
+                      RunObject=Page 89;
+                      Image=Job }
+      { 53      ;1   ;Action    ;
+                      CaptionML=[ENU=On Order;
+                                 FRA=En commande];
+                      RunObject=Page 89;
+                      RunPageView=WHERE(Status=FILTER(Order)) }
+      { 54      ;1   ;Action    ;
+                      CaptionML=[ENU=Planned and Quoted;
+                                 FRA=PlanifiÇ et en devis];
+                      RunObject=Page 89;
+                      RunPageView=WHERE(Status=FILTER(Quote|Planning)) }
+      { 35      ;1   ;Action    ;
+                      CaptionML=[ENU=Completed;
+                                 FRA=TerminÇ];
+                      RunObject=Page 89;
+                      RunPageView=WHERE(Status=FILTER(Completed)) }
+      { 55      ;1   ;Action    ;
+                      CaptionML=[ENU=Unassigned;
+                                 FRA=Non affectÇ];
+                      RunObject=Page 89;
+                      RunPageView=WHERE(Person Responsible=FILTER('')) }
+      { 36      ;1   ;Action    ;
+                      CaptionML=[ENU=Job Tasks;
+                                 FRA=TÉches projet];
+                      RunObject=Page 1004 }
+      { 37      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Invoices;
+                                 FRA=Factures vente];
+                      RunObject=Page 9301;
+                      Image=Invoice }
+      { 38      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Credit Memos;
+                                 FRA=Avoirs vente];
+                      RunObject=Page 9302 }
+      { 39      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Orders;
+                                 FRA=Commandes achat];
+                      RunObject=Page 9307 }
+      { 40      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Invoices;
+                                 FRA=Factures achat];
+                      RunObject=Page 9308 }
+      { 41      ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Credit Memos;
+                                 FRA=Avoirs achat];
+                      RunObject=Page 9309 }
+      { 42      ;1   ;Action    ;
+                      CaptionML=[ENU=Resources;
+                                 FRA=Ressources];
+                      RunObject=Page 77 }
+      { 43      ;1   ;Action    ;
+                      CaptionML=[ENU=Resource Groups;
+                                 FRA=Groupes ressources];
+                      RunObject=Page 72 }
+      { 44      ;1   ;Action    ;
+                      CaptionML=[ENU=Items;
+                                 FRA=Articles];
+                      RunObject=Page 31;
+                      Image=Item }
+      { 45      ;1   ;Action    ;
+                      CaptionML=[ENU=Customers;
+                                 FRA=Clients];
+                      RunObject=Page 22;
+                      Image=Customer }
+      { 4       ;1   ;Action    ;
+                      CaptionML=[ENU=Time Sheets;
+                                 FRA=Feuilles de temps];
+                      RunObject=Page 951 }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 13      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Journals;
+                                 FRA=Feuilles];
+                      Image=Journals }
+      { 18      ;2   ;Action    ;
+                      CaptionML=[ENU=Job Journals;
+                                 FRA=Feuilles activitÇ projet];
+                      RunObject=Page 276;
+                      RunPageView=WHERE(Recurring=CONST(No)) }
+      { 19      ;2   ;Action    ;
+                      CaptionML=[ENU=Job G/L Journals;
+                                 FRA=Feuilles compta. projet];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Jobs),
+                                        Recurring=CONST(No)) }
+      { 20      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Journals;
+                                 FRA=Feuilles ressource];
+                      RunObject=Page 272;
+                      RunPageView=WHERE(Recurring=CONST(No)) }
+      { 22      ;2   ;Action    ;
+                      CaptionML=[ENU=Item Journals;
+                                 FRA=Feuilles article];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Item),
+                                        Recurring=CONST(No)) }
+      { 23      ;2   ;Action    ;
+                      CaptionML=[ENU=Recurring Job Journals;
+                                 FRA=Feuilles abonnement projet];
+                      RunObject=Page 276;
+                      RunPageView=WHERE(Recurring=CONST(Yes)) }
+      { 46      ;2   ;Action    ;
+                      CaptionML=[ENU=Recurring Resource Journals;
+                                 FRA=Feuilles abonnement ressource];
+                      RunObject=Page 272;
+                      RunPageView=WHERE(Recurring=CONST(Yes)) }
+      { 47      ;2   ;Action    ;
+                      CaptionML=[ENU=Recurring Item Journals;
+                                 FRA=Feuilles abonnement article];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Item),
+                                        Recurring=CONST(Yes)) }
+      { 62      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Posted Documents;
+                                 FRA=Documents validÇs];
+                      Image=FiledPosted }
+      { 67      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Shipments;
+                                 FRA=ExpÇditions enregistrÇes];
+                      RunObject=Page 142 }
+      { 68      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Invoices;
+                                 FRA=Factures vente enregistrÇes];
+                      RunObject=Page 143;
+                      Image=PostedOrder }
+      { 69      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Credit Memos;
+                                 FRA=Avoirs vente enregistrÇs];
+                      RunObject=Page 144;
+                      Image=PostedOrder }
+      { 70      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Receipts;
+                                 FRA=RÇceptions achat enregistrÇes];
+                      RunObject=Page 145 }
+      { 71      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Invoices;
+                                 FRA=Factures achat enregistrÇes];
+                      RunObject=Page 146 }
+      { 72      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Credit Memos;
+                                 FRA=Avoirs achat enregistrÇs];
+                      RunObject=Page 147 }
+      { 73      ;2   ;Action    ;
+                      CaptionML=[ENU=G/L Registers;
+                                 FRA=Historiques des transactions comptabilitÇ];
+                      RunObject=Page 116;
+                      Image=GLRegisters }
+      { 74      ;2   ;Action    ;
+                      CaptionML=[ENU=Job Registers;
+                                 FRA=Historiques des transactions projet];
+                      RunObject=Page 278;
+                      Image=JobRegisters }
+      { 75      ;2   ;Action    ;
+                      CaptionML=[ENU=Item Registers;
+                                 FRA=Historiques des transactions article];
+                      RunObject=Page 117;
+                      Image=ItemRegisters }
+      { 76      ;2   ;Action    ;
+                      CaptionML=[ENU=Resource Registers;
+                                 FRA=Historiques des transactions ressource];
+                      RunObject=Page 274;
+                      Image=ResourceRegisters }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 17      ;1   ;Separator ;
+                      CaptionML=[ENU=Tasks;
+                                 FRA=TÉches];
+                      IsHeader=Yes }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Job J&ournal;
+                                 FRA=Feuille pr&ojet];
+                      RunObject=Page 201;
+                      Image=JobJournal }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Job G/L &Journal;
+                                 FRA=Feuille compta. pro&jet];
+                      RunObject=Page 1020;
+                      Image=GLJournal }
+      { 16      ;1   ;Action    ;
+                      CaptionML=[ENU=R&esource Journal;
+                                 FRA=Feuille r&essource];
+                      RunObject=Page 207;
+                      Image=ResourceJournal }
+      { 2       ;1   ;Action    ;
+                      CaptionML=[ENU=C&hange Job Planning Line Date;
+                                 FRA=Mo&difier date ligne planning projet];
+                      RunObject=Report 1087;
+                      Image=Report }
+      { 3       ;1   ;Action    ;
+                      CaptionML=[ENU=Split Pla&nning Lines;
+                                 FRA=êclater lignes pla&nning];
+                      RunObject=Report 1088;
+                      Image=Splitlines }
+      { 1       ;1   ;Action    ;
+                      CaptionML=[ENU=Manager Time Sheet by Job;
+                                 FRA=Feuille de temps administrateur par projet];
+                      RunObject=Page 954;
+                      Image=JobTimeSheet }
+      { 5       ;1   ;Separator  }
+      { 6       ;1   ;Action    ;
+                      CaptionML=[ENU=Job &Create Sales Invoice;
+                                 FRA=Projet &CrÇer facture vente];
+                      RunObject=Report 1093;
+                      Image=CreateJobSalesInvoice }
+      { 7       ;1   ;Separator  }
+      { 8       ;1   ;Action    ;
+                      CaptionML=[ENU=Update Job I&tem Cost;
+                                 FRA=&Mettre Ö jour coñt article projet];
+                      RunObject=Report 1095;
+                      Image=Report }
+      { 27      ;1   ;Action    ;
+                      CaptionML=[ENU=Job WIP Cockpit;
+                                 FRA=Cockpit TEC projet];
+                      RunObject=Page 1027;
+                      Image=WIP }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=Job Calculate &WIP;
+                                 FRA=&Projet Calculer TEC];
+                      RunObject=Report 1086;
+                      Image=Report }
+      { 10      ;1   ;Action    ;
+                      CaptionML=[ENU=Jo&b Post WIP to G/L;
+                                 FRA=Projet Valider TEC en compta&bilitÇ];
+                      RunObject=Report 1085;
+                      Image=Report }
+      { 11      ;1   ;Separator ;
+                      CaptionML=[ENU=History;
+                                 FRA=Historique];
+                      IsHeader=Yes }
+      { 24      ;1   ;Action    ;
+                      CaptionML=[ENU=Navi&gate;
+                                 FRA=Navi&guer];
+                      RunObject=Page 344;
+                      Image=Navigate }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 1904661108;2;Part   ;
+                PagePartID=Page9068;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 1907692008;2;Part   ;
+                PagePartID=Page9150;
+                PartType=Page }
+
+    { 28  ;2   ;Part      ;
+                PagePartID=Page681;
+                PartType=Page }
+
+    { 21  ;2   ;Part      ;
+                PagePartID=Page675;
+                Visible=false;
+                PartType=Page }
+
+    { 1903012608;2;Part   ;
+                PagePartID=Page9175;
+                PartType=Page }
+
+    { 1901377608;2;Part   ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

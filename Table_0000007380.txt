@@ -1,0 +1,80 @@
+OBJECT Table 7380 Phys. Invt. Item Selection
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Phys. Invt. Item Selection;
+               FRA=S‚lection article inventaire];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Item No.            ;Code20        ;TableRelation=Item;
+                                                   CaptionML=[ENU=Item No.;
+                                                              FRA=Nø article];
+                                                   NotBlank=Yes;
+                                                   Editable=No }
+    { 2   ;   ;Variant Code        ;Code10        ;TableRelation="Item Variant".Code WHERE (Item No.=FIELD(Item No.));
+                                                   CaptionML=[ENU=Variant Code;
+                                                              FRA=Code variante];
+                                                   Editable=No }
+    { 3   ;   ;Location Code       ;Code10        ;TableRelation=Location WHERE (Use As In-Transit=CONST(No));
+                                                   CaptionML=[ENU=Location Code;
+                                                              FRA=Code magasin];
+                                                   Editable=No }
+    { 4   ;   ;Description         ;Text50        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(Item.Description WHERE (No.=FIELD(Item No.)));
+                                                   CaptionML=[ENU=Description;
+                                                              FRA=D‚signation];
+                                                   Editable=No }
+    { 5   ;   ;Shelf No.           ;Code10        ;CaptionML=[ENU=Shelf No.;
+                                                              FRA=Nø emplacement];
+                                                   Editable=No }
+    { 6   ;   ;Phys Invt Counting Period Code;Code10;
+                                                   TableRelation="Phys. Invt. Counting Period";
+                                                   CaptionML=[ENU=Phys Invt Counting Period Code;
+                                                              FRA=Code p‚riode inventaire stock];
+                                                   Editable=No }
+    { 7   ;   ;Last Counting Date  ;Date          ;CaptionML=[ENU=Last Counting Date;
+                                                              FRA=Date dern. inventaire];
+                                                   Editable=No }
+    { 9   ;   ;Count Frequency per Year;Integer   ;CaptionML=[ENU=Count Frequency per Year;
+                                                              FRA=Fr‚quence inventaire par an];
+                                                   MinValue=0;
+                                                   BlankZero=Yes;
+                                                   Editable=No }
+    { 10  ;   ;Selected            ;Boolean       ;CaptionML=[ENU=Selected;
+                                                              FRA=S‚lectionn‚] }
+    { 11  ;   ;Phys Invt Counting Period Type;Option;
+                                                   CaptionML=[ENU=Phys Invt Counting Period Type;
+                                                              FRA=Type p‚riode inventaire];
+                                                   OptionCaptionML=[ENU=" ,Item,SKU";
+                                                                    FRA=" ,Article,Point de stock"];
+                                                   OptionString=[ ,Item,SKU] }
+    { 12  ;   ;Next Counting Start Date;Date      ;CaptionML=[ENU=Next Counting Start Date;
+                                                              FRA=Proch. date d‚but d'inventaire];
+                                                   Editable=No }
+    { 13  ;   ;Next Counting End Date;Date        ;CaptionML=[ENU=Next Counting End Date;
+                                                              FRA=Proch. date fin d'inventaire];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Item No.,Variant Code,Location Code,Phys Invt Counting Period Code;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

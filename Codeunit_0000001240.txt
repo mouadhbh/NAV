@@ -1,0 +1,34 @@
+OBJECT Codeunit 1240 Read Data Exch. from File
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    TableNo=1220;
+    OnRun=VAR
+            TempBlob@1000 : Record 99008535;
+            FileMgt@1001 : Codeunit 419;
+          BEGIN
+            INIT;
+            "File Name" := COPYSTR(FileMgt.BLOBImportWithFilter(TempBlob,ImportBankStmtTxt,'',FileFilterTxt,FileFilterExtensionTxt),1,250);
+            IF "File Name" <> '' THEN
+              "File Content" := TempBlob.Blob;
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      ImportBankStmtTxt@1007 : TextConst 'ENU=Select a file to import;FRA=Choisir un fichier … importer';
+      FileFilterTxt@1006 : TextConst 'ENU="All Files(*.*)|*.*|XML Files(*.xml)|*.xml|Text Files(*.txt;*.csv;*.asc)|*.txt;*.csv;*.asc,*.nda";FRA="Tous les fichiers(*.*)|*.*|Fichiers XML(*.xml)|*.xml|Fichiers texte(*.txt;*.csv;*.asc)|*.txt;*.csv;*.asc,*.nda"';
+      FileFilterExtensionTxt@1005 : TextConst '@@@={Locked};ENU=txt,csv,asc,xml,nda;FRA=txt,csv,asc,xml,nda';
+
+    BEGIN
+    END.
+  }
+}
+

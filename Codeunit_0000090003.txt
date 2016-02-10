@@ -1,0 +1,42 @@
+OBJECT Codeunit 90003 My Codeunit 4
+{
+  OBJECT-PROPERTIES
+  {
+    Date=02/02/16;
+    Time=10:49:09;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+            "When Was It":=TODAY;
+            CASE DATE2DMY("When Was It",2) OF
+              1:Description:='January';
+              2:Description:='February';
+              3:Description:='March';
+              4:Description:='April';
+              5:Description:='May';
+              6:Description:='June';
+              7:Description:='July';
+              8:Description:='August';
+              9:Description:='September';
+              10:Description:='October';
+              11:Description:='November';
+              12:Description:='December';
+            END;
+            MESSAGE('%1 is in %2',"When Was It",Description);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      "When Was It"@1000000000 : Date;
+      Description@1000000001 : Text[30];
+
+    BEGIN
+    END.
+  }
+}
+

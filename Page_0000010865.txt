@@ -1,0 +1,68 @@
+OBJECT Page 10865 Payment Status
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=NAVFR9.00.00.43402;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Payment Status;
+               FRA=Statut räglement];
+    SourceTable=Table10861;
+    DelayedInsert=Yes;
+    PageType=List;
+    AutoSplitKey=Yes;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=RIB }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Look }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr=ReportMenu }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr=Amount }
+
+    { 1120000;2;Field     ;
+                SourceExpr=Debit }
+
+    { 1120003;2;Field     ;
+                SourceExpr=Credit }
+
+    { 1120001;2;Field     ;
+                SourceExpr="Bank Account" }
+
+    { 1120002;2;Field     ;
+                SourceExpr="Payment in Progress" }
+
+    { 1120004;2;Field     ;
+                SourceExpr="Archiving Authorized" }
+
+    { 1120005;2;Field     ;
+                Name=AcceptationCode;
+                SourceExpr="Acceptation Code" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

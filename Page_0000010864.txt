@@ -1,0 +1,143 @@
+OBJECT Page 10864 Payment Class
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVFR8.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Payment Class;
+               FRA=Types de räglement];
+    SourceTable=Table10860;
+    DelayedInsert=Yes;
+    PageType=List;
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1120006 ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 FRA=Fonction&s];
+                      Image=Action }
+      { 1120007 ;2   ;Action    ;
+                      Name=DuplicateParameter;
+                      CaptionML=[ENU=Duplicate Parameter;
+                                 FRA=Dupliquer le paramÇtrage];
+                      Image=CopySerialNo;
+                      OnAction=VAR
+                                 PaymentClass@1120002 : Record 10860;
+                                 DuplicateParameter@1120000 : Report 10872;
+                               BEGIN
+                                 IF Code <> '' THEN BEGIN
+                                   PaymentClass.SETRANGE(Code,Code);
+                                   DuplicateParameter.SETTABLEVIEW(PaymentClass);
+                                   DuplicateParameter.InitParameter(Code);
+                                   DuplicateParameter.RUNMODAL;
+                                 END;
+                               END;
+                                }
+      { 1120008 ;2   ;Action    ;
+                      CaptionML=[ENU=Import Parameters;
+                                 FRA=Importer paramätres];
+                      Image=Import;
+                      OnAction=VAR
+                                 Instream@1120000 : InStream;
+                                 ImportFile@1120002 : File;
+                                 ToFile@1120001 : Text[1024];
+                               BEGIN
+                                 UPLOAD('','','','',ToFile);
+                                 ImportFile.OPEN(ToFile);
+                                 ImportFile.CREATEINSTREAM(Instream);
+                                 XMLPORT.IMPORT(XMLPORT::"Import/Export Parameters",Instream);
+                                 ImportFile.CLOSE;
+                               END;
+                                }
+      { 1120013 ;2   ;Action    ;
+                      CaptionML=[ENU=Export Parameters;
+                                 FRA=Exporter paramätres];
+                      Image=Export;
+                      OnAction=VAR
+                                 RBAutoMgt@1120002 : Codeunit 419;
+                                 ServerFile@1120001 : File;
+                                 Fileoutstream@1120000 : OutStream;
+                                 ToFile@1120004 : Text[1024];
+                                 ServerFileName@1120005 : Text[1024];
+                               BEGIN
+                                 ServerFileName := RBAutoMgt.ServerTempFileName(Text002);
+
+                                 ServerFile.CREATE(ServerFileName);
+                                 ServerFile.CREATEOUTSTREAM(Fileoutstream);
+                                 XMLPORT.EXPORT(XMLPORT::"Import/Export Parameters",Fileoutstream);
+                                 ServerFile.CLOSE;
+
+                                 ToFile := Text003;
+                                 DOWNLOAD(ServerFileName,'','','',ToFile);
+                                 ERASE(ServerFileName);
+                               END;
+                                }
+      { 1120001 ;1   ;Action    ;
+                      Name=Status;
+                      CaptionML=[ENU=St&atus;
+                                 FRA=Sta&tut];
+                      RunObject=Page 10865;
+                      RunPageLink=Payment Class=FIELD(Code);
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Process }
+      { 1120000 ;1   ;Action    ;
+                      Name=Steps;
+                      CaptionML=[ENU=Ste&ps;
+                                 FRA=Eta&pes];
+                      RunObject=Page 10866;
+                      RunPageLink=Payment Class=FIELD(Code);
+                      Promoted=Yes;
+                      Image=MoveToNextPeriod;
+                      PromotedCategory=Process }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 1120002;2;Field     ;
+                SourceExpr=Enable }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Code }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Header No. Series" }
+
+    { 1120004;2;Field     ;
+                SourceExpr="Line No. Series" }
+
+    { 1120009;2;Field     ;
+                SourceExpr=Suggestions }
+
+    { 1120011;2;Field     ;
+                SourceExpr="Unrealized VAT Reversal" }
+
+    { 1120003;2;Field     ;
+                SourceExpr="SEPA Transfer Type" }
+
+  }
+  CODE
+  {
+    VAR
+      Text002@1120001 : TextConst 'ENU=''txt'';FRA=''txt''';
+      Text003@1120000 : TextConst 'ENU=Import_Export Parameters.txt;FRA=Import_Export parametres.txt';
+
+    BEGIN
+    END.
+  }
+}
+

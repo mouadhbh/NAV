@@ -1,0 +1,699 @@
+OBJECT Table 10866 Payment Line
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=NAVFR9.00.00.43402;
+  }
+  PROPERTIES
+  {
+    OnInsert=VAR
+               Statement@1120000 : Record 10865;
+             BEGIN
+               Statement.GET("No.");
+               Statement.TESTFIELD("File Export Completed",FALSE);
+               "Payment Class" := Statement."Payment Class";
+               IF (Statement."Currency Code" <> "Currency Code") AND IsCopy THEN
+                 ERROR(Text000);
+               "Currency Code" := Statement."Currency Code";
+               "Currency Factor" := Statement."Currency Factor";
+               "Posting Date" := Statement."Posting Date";
+               VALIDATE(Amount);
+               VALIDATE("Status No.");
+               PaymentClass.GET(Statement."Payment Class");
+               IF PaymentClass."Line No. Series" = '' THEN
+                 "Document No." := Statement."No."
+               ELSE
+                 IF "Document No." = '' THEN
+                   "Document No." := NoSeriesMgt.GetNextNo(PaymentClass."Line No. Series","Posting Date",FALSE);
+               UpdateEntry(TRUE);
+             END;
+
+    OnModify=BEGIN
+               ModifyCheck;
+             END;
+
+    OnDelete=VAR
+               PaymentApply@1120000 : Codeunit 10861;
+             BEGIN
+               IF "Copied To No." <> '' THEN
+                 ERROR(Text001);
+               PaymentApply.DeleteApply(Rec);
+               DeletePaymentFileErrors;
+             END;
+
+    CaptionML=[ENU=Payment Line;
+               FRA=Ligne bordereau];
+    LookupPageID=Page10872;
+    DrillDownPageID=Page10872;
+  }
+  FIELDS
+  {
+    { 1   ;   ;No.                 ;Code20        ;TableRelation="Payment Header";
+                                                   CaptionML=[ENU=No.;
+                                                              FRA=Nø] }
+    { 2   ;   ;Line No.            ;Integer       ;CaptionML=[ENU=Line No.;
+                                                              FRA=Nø ligne] }
+    { 3   ;   ;Amount              ;Decimal       ;OnValidate=VAR
+                                                                CurrExchRate@1120000 : Record 330;
+                                                              BEGIN
+                                                                IF ((Amount > 0) AND (NOT Correction)) OR
+                                                                   ((Amount < 0) AND Correction)
+                                                                THEN BEGIN
+                                                                  "Debit Amount" := Amount;
+                                                                  "Credit Amount" := 0
+                                                                END ELSE BEGIN
+                                                                  "Debit Amount" := 0;
+                                                                  "Credit Amount" := -Amount;
+                                                                END;
+                                                                IF "Currency Code" = '' THEN
+                                                                  "Amount (LCY)" := Amount
+                                                                ELSE
+                                                                  "Amount (LCY)" := ROUND(
+                                                                      CurrExchRate.ExchangeAmtFCYToLCY(
+                                                                        "Posting Date","Currency Code",
+                                                                        Amount,"Currency Factor"));
+                                                                IF Amount <> xRec.Amount THEN
+                                                                  PaymentToleranceMgt.PmtTolPaymentLine(Rec);
+                                                              END;
+
+                                                   CaptionML=[ENU=Amount;
+                                                              FRA=Montant] }
+    { 4   ;   ;Account Type        ;Option        ;OnValidate=BEGIN
+                                                                UpdateEntry(FALSE);
+                                                              END;
+
+                                                   CaptionML=[ENU=Account Type;
+                                                              FRA=Type compte];
+                                                   OptionCaptionML=[ENU=G/L Account,Customer,Vendor,Bank Account,Fixed Asset;
+                                                                    FRA=G‚n‚ral,Client,Fournisseur,Banque,Immobilisation];
+                                                   OptionString=G/L Account,Customer,Vendor,Bank Account,Fixed Asset }
+    { 5   ;   ;Account No.         ;Code20        ;TableRelation=IF (Account Type=CONST(G/L Account)) "G/L Account"
+                                                                 ELSE IF (Account Type=CONST(Customer)) Customer
+                                                                 ELSE IF (Account Type=CONST(Vendor)) Vendor
+                                                                 ELSE IF (Account Type=CONST(Bank Account)) "Bank Account"
+                                                                 ELSE IF (Account Type=CONST(Fixed Asset)) "Fixed Asset";
+                                                   OnValidate=BEGIN
+                                                                UpdateEntry(FALSE);
+                                                              END;
+
+                                                   CaptionML=[ENU=Account No.;
+                                                              FRA=Nø compte] }
+    { 6   ;   ;Posting Group       ;Code10        ;TableRelation=IF (Account Type=CONST(Customer)) "Customer Posting Group"
+                                                                 ELSE IF (Account Type=CONST(Vendor)) "Vendor Posting Group"
+                                                                 ELSE IF (Account Type=CONST(Fixed Asset)) "FA Posting Group";
+                                                   CaptionML=[ENU=Posting Group;
+                                                              FRA=Groupe comptabilisation];
+                                                   Editable=No }
+    { 7   ;   ;Copied To No.       ;Code20        ;CaptionML=[ENU=Copied To No.;
+                                                              FRA=Nø destination] }
+    { 8   ;   ;Copied To Line      ;Integer       ;CaptionML=[ENU=Copied To Line;
+                                                              FRA=Ligne destination] }
+    { 9   ;   ;Due Date            ;Date          ;CaptionML=[ENU=Due Date;
+                                                              FRA=Date d'‚ch‚ance] }
+    { 10  ;   ;Acc. Type Last Entry Debit;Option  ;CaptionML=[ENU=Acc. Type Last Entry Debit;
+                                                              FRA=Type compte ‚cr. pr‚c. d‚bit];
+                                                   OptionCaptionML=[ENU=G/L Account,Customer,Vendor,Bank Account,Fixed Asset;
+                                                                    FRA=G‚n‚ral,Client,Fournisseur,Banque,Immobilisation];
+                                                   OptionString=G/L Account,Customer,Vendor,Bank Account,Fixed Asset;
+                                                   Editable=No }
+    { 11  ;   ;Acc. No. Last Entry Debit;Code20   ;TableRelation=IF (Acc. Type Last Entry Debit=CONST(G/L Account)) "G/L Account"
+                                                                 ELSE IF (Acc. Type Last Entry Debit=CONST(Customer)) Customer
+                                                                 ELSE IF (Acc. Type Last Entry Debit=CONST(Vendor)) Vendor
+                                                                 ELSE IF (Acc. Type Last Entry Debit=CONST(Bank Account)) "Bank Account"
+                                                                 ELSE IF (Acc. Type Last Entry Debit=CONST(Fixed Asset)) "Fixed Asset";
+                                                   CaptionML=[ENU=Acc. No. Last Entry Debit;
+                                                              FRA=Nø cpte ‚cr. pr‚c. d‚bit];
+                                                   Editable=No }
+    { 12  ;   ;Acc. Type Last Entry Credit;Option ;CaptionML=[ENU=Acc. Type Last Entry Credit;
+                                                              FRA=Type compte ‚cr. pr‚c. cr‚dit];
+                                                   OptionCaptionML=[ENU=G/L Account,Customer,Vendor,Bank Account,Fixed Asset;
+                                                                    FRA=G‚n‚ral,Client,Fournisseur,Banque,Immobilisation];
+                                                   OptionString=G/L Account,Customer,Vendor,Bank Account,Fixed Asset;
+                                                   Editable=No }
+    { 13  ;   ;Acc. No. Last Entry Credit;Code20  ;TableRelation=IF (Acc. Type Last Entry Credit=CONST(G/L Account)) "G/L Account"
+                                                                 ELSE IF (Acc. Type Last Entry Credit=CONST(Customer)) Customer
+                                                                 ELSE IF (Acc. Type Last Entry Credit=CONST(Vendor)) Vendor
+                                                                 ELSE IF (Acc. Type Last Entry Credit=CONST(Bank Account)) "Bank Account"
+                                                                 ELSE IF (Acc. Type Last Entry Credit=CONST(Fixed Asset)) "Fixed Asset";
+                                                   CaptionML=[ENU=Acc. No. Last Entry Credit;
+                                                              FRA=Nø compte ‚cr. pr‚c. cr‚dit];
+                                                   Editable=No }
+    { 14  ;   ;P. Group Last Entry Debit;Code10   ;CaptionML=[ENU=P. Group Last Entry Debit;
+                                                              FRA=Groupe compta. ‚cr. pr‚c. d‚bit];
+                                                   Editable=No }
+    { 15  ;   ;P. Group Last Entry Credit;Code10  ;CaptionML=[ENU=P. Group Last Entry Credit;
+                                                              FRA=Groupe compta. ‚cr. pr‚c. cr‚dit];
+                                                   Editable=No }
+    { 16  ;   ;Payment Class       ;Text30        ;TableRelation="Payment Class";
+                                                   CaptionML=[ENU=Payment Class;
+                                                              FRA=Type de rŠglement] }
+    { 17  ;   ;Status No.          ;Integer       ;TableRelation="Payment Status".Line WHERE (Payment Class=FIELD(Payment Class));
+                                                   OnValidate=VAR
+                                                                PaymentStatus@1120000 : Record 10861;
+                                                              BEGIN
+                                                                PaymentStatus.GET("Payment Class","Status No.");
+                                                                "Payment in Progress" := PaymentStatus."Payment in Progress";
+                                                              END;
+
+                                                   CaptionML=[ENU=Status No.;
+                                                              FRA=Nø statut];
+                                                   Editable=No }
+    { 18  ;   ;Status Name         ;Text50        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup("Payment Status".Name WHERE (Payment Class=FIELD(Payment Class),
+                                                                                                   Line=FIELD(Status No.)));
+                                                   CaptionML=[ENU=Status Name;
+                                                              FRA=Nom statut];
+                                                   Editable=No }
+    { 19  ;   ;IsCopy              ;Boolean       ;CaptionML=[ENU=IsCopy;
+                                                              FRA=Copie] }
+    { 20  ;   ;Currency Code       ;Code10        ;TableRelation=Currency;
+                                                   CaptionML=[ENU=Currency Code;
+                                                              FRA=Code devise] }
+    { 21  ;   ;Entry No. Debit     ;Integer       ;CaptionML=[ENU=Entry No. Debit;
+                                                              FRA=Nø ‚criture d‚bit];
+                                                   Editable=No }
+    { 22  ;   ;Entry No. Credit    ;Integer       ;CaptionML=[ENU=Entry No. Credit;
+                                                              FRA=Nø ‚criture cr‚dit];
+                                                   Editable=No }
+    { 23  ;   ;Entry No. Debit Memo;Integer       ;CaptionML=[ENU=Entry No. Debit Memo;
+                                                              FRA=Nø ‚criture avoir d‚bit];
+                                                   Editable=No }
+    { 24  ;   ;Entry No. Credit Memo;Integer      ;CaptionML=[ENU=Entry No. Credit Memo;
+                                                              FRA=Nø ‚criture avoir cr‚dit];
+                                                   Editable=No }
+    { 25  ;   ;Bank Account Code   ;Code10        ;TableRelation=IF (Account Type=CONST(Customer)) "Customer Bank Account".Code WHERE (Customer No.=FIELD(Account No.))
+                                                                 ELSE IF (Account Type=CONST(Vendor)) "Vendor Bank Account".Code WHERE (Vendor No.=FIELD(Account No.));
+                                                   OnValidate=VAR
+                                                                SEPADirectDebitMandate@1120000 : Record 1230;
+                                                              BEGIN
+                                                                IF "Bank Account Code" <> '' THEN BEGIN
+                                                                  IF "Account Type" = "Account Type"::Customer THEN BEGIN
+                                                                    IF SEPADirectDebitMandate.GET("Direct Debit Mandate ID") THEN
+                                                                      IF "Bank Account Code" <> SEPADirectDebitMandate."Customer Bank Account Code" THEN
+                                                                        ERROR(BankAccErr,SEPADirectDebitMandate."Customer Bank Account Code");
+                                                                    CustomerBank.GET("Account No.","Bank Account Code");
+                                                                    "Bank Branch No." := CustomerBank."Bank Branch No.";
+                                                                    "Bank Account No." := CustomerBank."Bank Account No.";
+                                                                    IBAN := CustomerBank.IBAN;
+                                                                    "SWIFT Code" := CustomerBank."SWIFT Code";
+                                                                    "Agency Code" := CustomerBank."Agency Code";
+                                                                    "Bank Account Name" := CustomerBank.Name;
+                                                                    "RIB Key" := CustomerBank."RIB Key";
+                                                                    "RIB Checked" := RibKey.Check("Bank Branch No.","Agency Code","Bank Account No.","RIB Key");
+                                                                    "Bank City" := CustomerBank.City;
+                                                                  END ELSE
+                                                                    IF "Account Type" = "Account Type"::Vendor THEN BEGIN
+                                                                      VendorBank.GET("Account No.","Bank Account Code");
+                                                                      "Bank Branch No." := VendorBank."Bank Branch No.";
+                                                                      "Bank Account No." := VendorBank."Bank Account No.";
+                                                                      IBAN := VendorBank.IBAN;
+                                                                      "SWIFT Code" := VendorBank."SWIFT Code";
+                                                                      "Agency Code" := VendorBank."Agency Code";
+                                                                      "Bank Account Name" := VendorBank.Name;
+                                                                      "RIB Key" := VendorBank."RIB Key";
+                                                                      "RIB Checked" := RibKey.Check("Bank Branch No.","Agency Code","Bank Account No.","RIB Key");
+                                                                      "Bank City" := VendorBank.City;
+                                                                    END;
+                                                                END ELSE
+                                                                  InitBankAccount;
+                                                              END;
+
+                                                   CaptionML=[ENU=Bank Account Code;
+                                                              FRA=Code compte bancaire] }
+    { 26  ;   ;Bank Branch No.     ;Text20        ;OnValidate=BEGIN
+                                                                "RIB Checked" := RibKey.Check("Bank Branch No.","Agency Code","Bank Account No.","RIB Key");
+                                                              END;
+
+                                                   CaptionML=[ENU=Bank Branch No.;
+                                                              FRA=Code ‚tablissement] }
+    { 27  ;   ;Bank Account No.    ;Text30        ;OnValidate=BEGIN
+                                                                "RIB Checked" := RibKey.Check("Bank Branch No.","Agency Code","Bank Account No.","RIB Key");
+                                                              END;
+
+                                                   CaptionML=[ENU=Bank Account No.;
+                                                              FRA=Nø compte bancaire] }
+    { 28  ;   ;Agency Code         ;Text5         ;OnValidate=BEGIN
+                                                                "RIB Checked" := RibKey.Check("Bank Branch No.","Agency Code","Bank Account No.","RIB Key");
+                                                              END;
+
+                                                   CaptionML=[ENU=Agency Code;
+                                                              FRA=Code agence] }
+    { 29  ;   ;RIB Key             ;Integer       ;OnValidate=BEGIN
+                                                                "RIB Checked" := RibKey.Check("Bank Branch No.","Agency Code","Bank Account No.","RIB Key");
+                                                              END;
+
+                                                   CaptionML=[ENU=RIB Key;
+                                                              FRA=Cl‚ RIB] }
+    { 30  ;   ;RIB Checked         ;Boolean       ;CaptionML=[ENU=RIB Checked;
+                                                              FRA=V‚rification RIB];
+                                                   Editable=No }
+    { 31  ;   ;Acceptation Code    ;Option        ;InitValue=No;
+                                                   CaptionML=[ENU=Acceptation Code;
+                                                              FRA=Code acceptation];
+                                                   OptionCaptionML=[ENU=LCR,No,BOR,LCR NA;
+                                                                    FRA=LCR,Non,BOR,LCR NA];
+                                                   OptionString=LCR,No,BOR,LCR NA }
+    { 32  ;   ;Document No.        ;Code20        ;CaptionML=[ENU=Document No.;
+                                                              FRA=Nø document] }
+    { 33  ;   ;Debit Amount        ;Decimal       ;OnValidate=BEGIN
+                                                                GetCurrency;
+                                                                "Debit Amount" := ROUND("Debit Amount",Currency."Amount Rounding Precision");
+                                                                Correction := "Debit Amount" < 0;
+                                                                VALIDATE(Amount,"Debit Amount");
+                                                              END;
+
+                                                   CaptionML=[ENU=Debit Amount;
+                                                              FRA=Montant d‚bit];
+                                                   BlankZero=Yes;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 34  ;   ;Credit Amount       ;Decimal       ;OnValidate=BEGIN
+                                                                GetCurrency;
+                                                                "Credit Amount" := ROUND("Credit Amount",Currency."Amount Rounding Precision");
+                                                                Correction := "Credit Amount" < 0;
+                                                                VALIDATE(Amount,-"Credit Amount");
+                                                              END;
+
+                                                   CaptionML=[ENU=Credit Amount;
+                                                              FRA=Montant cr‚dit];
+                                                   BlankZero=Yes;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 35  ;   ;Applies-to ID       ;Code50        ;CaptionML=[ENU=Applies-to ID;
+                                                              FRA=ID lettrage] }
+    { 36  ;   ;Currency Factor     ;Decimal       ;CaptionML=[ENU=Currency Factor;
+                                                              FRA=Facteur devise];
+                                                   DecimalPlaces=0:15 }
+    { 37  ;   ;Posted              ;Boolean       ;CaptionML=[ENU=Posted;
+                                                              FRA=Valid‚] }
+    { 38  ;   ;Correction          ;Boolean       ;OnValidate=BEGIN
+                                                                VALIDATE(Amount);
+                                                              END;
+
+                                                   CaptionML=[ENU=Correction;
+                                                              FRA=Correction] }
+    { 39  ;   ;Bank Account Name   ;Text50        ;CaptionML=[ENU=Bank Account Name;
+                                                              FRA=Nom compte bancaire] }
+    { 40  ;   ;Payment Address Code;Code10        ;TableRelation="Payment Address".Code WHERE (Account Type=FIELD(Account Type),
+                                                                                               Account No.=FIELD(Account No.));
+                                                   CaptionML=[ENU=Payment Address Code;
+                                                              FRA=Code adresse de rŠglement] }
+    { 41  ;   ;Applies-to Doc. Type;Option        ;CaptionML=[ENU=Applies-to Doc. Type;
+                                                              FRA=Type doc. lettrage];
+                                                   OptionCaptionML=[ENU=" ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder";
+                                                                    FRA=" ,Paiement,Facture,Avoir,Int‚rˆts,Relance"];
+                                                   OptionString=[ ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder];
+                                                   Editable=No }
+    { 42  ;   ;Applies-to Doc. No. ;Code20        ;CaptionML=[ENU=Applies-to Doc. No.;
+                                                              FRA=Nø doc. lettrage];
+                                                   Editable=No }
+    { 43  ;   ;External Document No.;Code35       ;CaptionML=[ENU=External Document No.;
+                                                              FRA=Nø doc. externe] }
+    { 44  ;   ;Amount (LCY)        ;Decimal       ;CaptionML=[ENU=Amount (LCY);
+                                                              FRA=Montant DS];
+                                                   Editable=No }
+    { 45  ;   ;Drawee Reference    ;Text10        ;CaptionML=[ENU=Drawee Reference;
+                                                              FRA=R‚f‚rence tir‚] }
+    { 46  ;   ;Bank City           ;Text30        ;CaptionML=[ENU=Bank City;
+                                                              FRA=Ville banque] }
+    { 47  ;   ;Marked              ;Boolean       ;CaptionML=[ENU=Marked;
+                                                              FRA=Marqu‚];
+                                                   Editable=No }
+    { 48  ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              FRA=Date comptabilisation];
+                                                   Editable=No }
+    { 50  ;   ;Payment in Progress ;Boolean       ;CaptionML=[ENU=Payment in Progress;
+                                                              FRA=Paiement en cours];
+                                                   Editable=No }
+    { 51  ;   ;Created from No.    ;Code20        ;CaptionML=[ENU=Created from No.;
+                                                              FRA=Cr‚‚ … partir du nø] }
+    { 55  ;   ;IBAN                ;Code50        ;OnValidate=VAR
+                                                                CompanyInfo@1120000 : Record 79;
+                                                              BEGIN
+                                                                CompanyInfo.CheckIBAN(IBAN);
+                                                              END;
+
+                                                   CaptionML=[@@@="{Locked} ";
+                                                              ENU=IBAN;
+                                                              FRA=IBAN] }
+    { 56  ;   ;SWIFT Code          ;Code20        ;CaptionML=[ENU=SWIFT Code;
+                                                              FRA=Code SWIFT] }
+    { 291 ;   ;Has Payment Export Error;Boolean   ;FieldClass=FlowField;
+                                                   CalcFormula=Exist("Payment Jnl. Export Error Text" WHERE (Document No.=FIELD(No.),
+                                                                                                             Journal Line No.=FIELD(Line No.)));
+                                                   CaptionML=[ENU=Has Payment Export Error;
+                                                              FRA=Pr‚sente erreur exportation paiement];
+                                                   Editable=No }
+    { 480 ;   ;Dimension Set ID    ;Integer       ;TableRelation="Dimension Set Entry";
+                                                   OnLookup=BEGIN
+                                                              ShowDimensions;
+                                                            END;
+
+                                                   CaptionML=[ENU=Dimension Set ID;
+                                                              FRA=ID ensemble de dimensions];
+                                                   Editable=No }
+    { 1230;   ;Direct Debit Mandate ID;Code35     ;TableRelation=IF (Account Type=CONST(Customer)) "SEPA Direct Debit Mandate" WHERE (Customer No.=FIELD(Account No.));
+                                                   OnValidate=VAR
+                                                                SEPADirectDebitMandate@1120000 : Record 1230;
+                                                              BEGIN
+                                                                IF SEPADirectDebitMandate.GET("Direct Debit Mandate ID") THEN
+                                                                  VALIDATE("Bank Account Code",SEPADirectDebitMandate."Customer Bank Account Code");
+                                                              END;
+
+                                                   CaptionML=[ENU=Direct Debit Mandate ID;
+                                                              FRA=ID mandat de pr‚lŠvement] }
+  }
+  KEYS
+  {
+    {    ;No.,Line No.                            ;SumIndexFields=Amount;
+                                                   Clustered=Yes }
+    {    ;Copied To No.,Copied To Line             }
+    {    ;Account Type,Account No.,Copied To Line,Payment in Progress;
+                                                   SumIndexFields=Amount (LCY) }
+    {    ;No.,Account No.,Bank Branch No.,Agency Code,Bank Account No.,Payment Address Code }
+    {    ;Posting Date,Document No.                }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      Text000@1120000 : TextConst 'ENU=You cannot use different currencies on the same payment header.;FRA=Vous ne pouvez pas utiliser diff‚rentes devises sur le mˆme bordereau.';
+      Text001@1120001 : TextConst 'ENU=You cannot delete this payment line.;FRA=Vous ne pouvez pas supprimer cette ligne de paiement.';
+      Currency@1120003 : Record 4;
+      CustomerBank@1120004 : Record 287;
+      VendorBank@1120005 : Record 288;
+      PaymentClass@1120007 : Record 10860;
+      Customer@1120008 : Record 18;
+      Vendor@1120009 : Record 23;
+      DefaultDimension@1120010 : Record 352;
+      RibKey@1120006 : Codeunit 10801;
+      NoSeriesMgt@1120002 : Codeunit 396;
+      PaymentToleranceMgt@1120011 : Codeunit 426;
+      Text002@1120012 : TextConst 'ENU=You cannot modify this payment line.;FRA=Vous ne pouvez pas modifier cette ligne de paiement.';
+      DimMgt@1120013 : Codeunit 408;
+      BankAccErr@1120014 : TextConst 'ENU=You must use customer bank account, %1, which you specified in the selected direct debit mandate.;FRA=Vous devez utiliser le compte bancaire du client, %1, que vous avez sp‚cifi‚ dans le mandat de pr‚lŠvement s‚lectionn‚.';
+
+    LOCAL PROCEDURE AddDocumentNoToList@1120012(VAR List@1120002 : Text;DocumentNo@1120004 : Code[20];LenToCut@1120005 : Integer);
+    VAR
+      Delimiter@1120001 : Text[2];
+      PrevLen@1120000 : Integer;
+    BEGIN
+      PrevLen := STRLEN(List);
+      IF PrevLen <> 0 THEN
+        Delimiter := ', ';
+      List += Delimiter + DocumentNo;
+      IF (PrevLen <= LenToCut) AND (STRLEN(List) > LenToCut) THEN
+        List := COPYSTR(List,1,PrevLen) + PADSTR('',LenToCut - PrevLen) + COPYSTR(List,PrevLen + STRLEN(Delimiter) + 1);
+    END;
+
+    PROCEDURE SetUpNewLine@1120007(LastGenJnlLine@1120002 : Record 10866;BottomLine@1120000 : Boolean);
+    VAR
+      Statement@1120001 : Record 10865;
+    BEGIN
+      "Account Type" := LastGenJnlLine."Account Type";
+      IF "No." <> '' THEN BEGIN
+        Statement.GET("No.");
+        PaymentClass.GET(Statement."Payment Class");
+        IF PaymentClass."Line No. Series" = '' THEN
+          "Document No." := Statement."No."
+        ELSE
+          IF "Document No." = '' THEN
+            IF BottomLine THEN
+              "Document No." := INCSTR(LastGenJnlLine."Document No.")
+            ELSE
+              "Document No." := NoSeriesMgt.GetNextNo(PaymentClass."Line No. Series","Posting Date",FALSE);
+      END;
+      "Due Date" := Statement."Posting Date";
+    END;
+
+    PROCEDURE ShowDimensions@1120004();
+    BEGIN
+      "Dimension Set ID" :=
+        DimMgt.EditDimensionSet("Dimension Set ID",STRSUBSTNO('%1 %2 %3',TABLECAPTION,"No.","Line No."));
+    END;
+
+    PROCEDURE GetAppliedDocNoList@1120009(LenToCut@1120000 : Integer) List : Text;
+    VAR
+      CustLedgEntry@1120001 : Record 21;
+      VendLedgEntry@1120002 : Record 25;
+      DocumentNo@1120003 : Code[20];
+    BEGIN
+      IF ("Applies-to Doc. No." = '') AND ("Applies-to ID" = '') THEN
+        EXIT('');
+      CASE "Account Type" OF
+        "Account Type"::Customer:
+          BEGIN
+            CustLedgEntry.SETRANGE("Customer No.","Account No.");
+            IF "Applies-to Doc. No." <> '' THEN BEGIN
+              CustLedgEntry.SETRANGE("Document Type","Applies-to Doc. Type");
+              CustLedgEntry.SETRANGE("Document No.","Applies-to Doc. No.");
+            END ELSE
+              CustLedgEntry.SETRANGE("Applies-to ID","Applies-to ID");
+            IF CustLedgEntry.FINDSET THEN
+              REPEAT
+                AddDocumentNoToList(List,CustLedgEntry."Document No.",LenToCut);
+              UNTIL CustLedgEntry.NEXT = 0;
+          END;
+        "Account Type"::Vendor:
+          BEGIN
+            VendLedgEntry.SETRANGE("Vendor No.","Account No.");
+            IF "Applies-to Doc. No." <> '' THEN BEGIN
+              VendLedgEntry.SETRANGE("Document Type","Applies-to Doc. Type");
+              VendLedgEntry.SETRANGE("Document No.","Applies-to Doc. No.");
+            END ELSE
+              VendLedgEntry.SETRANGE("Applies-to ID","Applies-to ID");
+            IF VendLedgEntry.FINDSET THEN
+              REPEAT
+                IF VendLedgEntry."External Document No." = '' THEN
+                  DocumentNo := VendLedgEntry."Document No."
+                ELSE
+                  DocumentNo := VendLedgEntry."External Document No.";
+                AddDocumentNoToList(List,DocumentNo,LenToCut);
+              UNTIL VendLedgEntry.NEXT = 0;
+          END;
+        ELSE
+          EXIT('');
+      END;
+      EXIT(List);
+    END;
+
+    PROCEDURE GetAppliesToDocCustLedgEntry@60(VAR CustLedgEntry@1000 : Record 21);
+    BEGIN
+      IF "Account Type" <> "Account Type"::Customer THEN
+        EXIT;
+
+      CustLedgEntry.SETRANGE("Customer No.","Account No.");
+      CustLedgEntry.SETRANGE(Open,TRUE);
+      IF "Applies-to Doc. No." <> '' THEN BEGIN
+        CustLedgEntry.SETRANGE("Document Type","Applies-to Doc. Type");
+        CustLedgEntry.SETRANGE("Document No.","Applies-to Doc. No.");
+        IF CustLedgEntry.FINDFIRST THEN;
+      END ELSE
+        IF "Applies-to ID" <> '' THEN BEGIN
+          CustLedgEntry.SETRANGE("Applies-to ID","Applies-to ID");
+          IF CustLedgEntry.FINDSET THEN;
+        END;
+    END;
+
+    PROCEDURE GetCurrency@1120003();
+    VAR
+      Header@1120000 : Record 10865;
+    BEGIN
+      Header.GET("No.");
+      IF Header."Currency Code" = '' THEN BEGIN
+        CLEAR(Currency);
+        Currency.InitRoundingPrecision;
+      END ELSE
+        Currency.GET(Header."Currency Code");
+    END;
+
+    PROCEDURE InitBankAccount@1120002();
+    BEGIN
+      "Bank Account Code" := '';
+      "Bank Branch No." := '';
+      "Bank Account No." := '';
+      "Agency Code" := '';
+      "RIB Key" := 0;
+      "RIB Checked" := FALSE;
+      "Bank Account Name" := '';
+      "Bank City" := '';
+      IBAN := '';
+      "SWIFT Code" := '';
+    END;
+
+    PROCEDURE DimensionSetup@1120000();
+    VAR
+      DimManagt@1120000 : Codeunit 408;
+    BEGIN
+      IF "Line No." <> 0 THEN BEGIN
+        CLEAR(DefaultDimension);
+        DefaultDimension.SETRANGE("Table ID",DimManagt.TypeToTableID1("Account Type"));
+        DimensionCreate;
+      END;
+    END;
+
+    PROCEDURE DimensionCreate@1120001();
+    VAR
+      TempDimSetEntry@1120000 : TEMPORARY Record 480;
+      DimSetEntry@1120002 : Record 480;
+      DimValue@1120001 : Record 349;
+      PaymentHeader@1120003 : Record 10865;
+    BEGIN
+      DefaultDimension.SETRANGE("No.","Account No.");
+      IF DefaultDimension.FIND('-') THEN
+        REPEAT
+          DimValue.GET(DefaultDimension."Dimension Code",DefaultDimension."Dimension Value Code");
+          TempDimSetEntry."Dimension Code" := DimValue."Dimension Code";
+          TempDimSetEntry."Dimension Value Code" := DimValue.Code;
+          TempDimSetEntry."Dimension Value ID" := DimValue."Dimension Value ID";
+          TempDimSetEntry.INSERT;
+        UNTIL DefaultDimension.NEXT = 0;
+
+      PaymentHeader.SETRANGE("No.","No.");
+      PaymentHeader.FINDFIRST;
+
+      DimSetEntry.SETRANGE("Dimension Set ID",PaymentHeader."Dimension Set ID");
+      IF DimSetEntry.FINDSET THEN
+        REPEAT
+          TempDimSetEntry := DimSetEntry;
+          TempDimSetEntry."Dimension Set ID" := 0;
+          IF NOT TempDimSetEntry.MODIFY THEN
+            TempDimSetEntry.INSERT;
+        UNTIL DimSetEntry.NEXT = 0;
+
+      "Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
+    END;
+
+    PROCEDURE DeletePaymentFileErrors@1120010();
+    VAR
+      GenJnlLine@1120001 : Record 81;
+    BEGIN
+      GenJnlLine."Journal Template Name" := '';
+      GenJnlLine."Journal Batch Name" := FORMAT(DATABASE::"Payment Header");
+      GenJnlLine."Document No." := "No.";
+      GenJnlLine."Line No." := "Line No.";
+      GenJnlLine.DeletePaymentFileErrors;
+    END;
+
+    PROCEDURE UpdateDueDate@1120024(DocumentDate@1120002 : Date);
+    VAR
+      PaymentTerms@1120001 : Record 3;
+      PaymentHeader@1120000 : Record 10865;
+    BEGIN
+      IF "Status No." > 0 THEN
+        EXIT;
+      IF DocumentDate = 0D THEN BEGIN
+        PaymentHeader.GET("No.");
+        DocumentDate := PaymentHeader."Posting Date";
+        IF DocumentDate = 0D THEN
+          EXIT;
+      END;
+      CLEAR(PaymentTerms);
+      IF "Account Type" = "Account Type"::Customer THEN BEGIN
+        IF "Account No." <> '' THEN BEGIN
+          Customer.GET("Account No.");
+          IF NOT PaymentTerms.GET(Customer."Payment Terms Code") THEN
+            "Due Date" := PaymentHeader."Posting Date";
+        END
+      END ELSE
+        IF "Account Type" = "Account Type"::Vendor THEN
+          IF "Account No." <> '' THEN BEGIN
+            Vendor.GET("Account No.");
+            IF NOT PaymentTerms.GET(Vendor."Payment Terms Code") THEN
+              "Due Date" := PaymentHeader."Posting Date";
+          END;
+      IF PaymentTerms.Code <> '' THEN
+        "Due Date" := CALCDATE(PaymentTerms."Due Date Calculation",DocumentDate);
+    END;
+
+    PROCEDURE UpdateEntry@1120006(InsertRecord@1120004 : Boolean);
+    VAR
+      PaymentAddress@1120003 : Record 10870;
+      GLAccount@1120002 : Record 15;
+      BankAccount@1120001 : Record 270;
+      FixedAsset@1120000 : Record 5600;
+    BEGIN
+      IF (xRec."Line No." <> 0) AND ("Account Type" <> xRec."Account Type") THEN BEGIN
+        IF NOT InsertRecord THEN BEGIN
+          "Account No." := '';
+          InitBankAccount;
+          "Due Date" := 0D;
+        END;
+        "Dimension Set ID" := 0;
+      END;
+      IF "Account No." = '' THEN BEGIN
+        InitBankAccount;
+        "Due Date" := 0D;
+        "Dimension Set ID" := 0;
+        EXIT;
+      END;
+      IF (xRec."Line No." = "Line No.") AND (xRec."Account No." <> '') AND ("Account No." <> xRec."Account No.") THEN BEGIN
+        InitBankAccount;
+        "Dimension Set ID" := 0;
+      END;
+      IF (xRec."Line No." = "Line No.") AND (xRec."Account Type" = "Account Type") AND (xRec."Account No." = "Account No.") THEN
+        EXIT;
+      CASE "Account Type" OF
+        "Account Type"::"G/L Account":
+          BEGIN
+            GLAccount.GET("Account No.");
+            GLAccount.TESTFIELD("Account Type",GLAccount."Account Type"::Posting);
+            GLAccount.TESTFIELD(Blocked,FALSE);
+          END;
+        "Account Type"::Customer:
+          BEGIN
+            Customer.GET("Account No.");
+            IF Customer.Blocked = Customer.Blocked::All THEN
+              Customer.FIELDERROR(Blocked);
+            IF "Bank Account Code" = '' THEN
+              IF Customer."Preferred Bank Account" <> '' THEN
+                VALIDATE("Bank Account Code",Customer."Preferred Bank Account");
+            IF NOT InsertRecord THEN
+              UpdateDueDate(0D);
+          END;
+        "Account Type"::Vendor:
+          BEGIN
+            Vendor.GET("Account No.");
+            Vendor.TESTFIELD(Blocked,Vendor.Blocked::" ");
+            IF "Bank Account Code" = '' THEN
+              IF Vendor."Preferred Bank Account" <> '' THEN
+                VALIDATE("Bank Account Code",Vendor."Preferred Bank Account");
+            IF NOT InsertRecord THEN
+              UpdateDueDate(0D);
+          END;
+        "Account Type"::"Bank Account":
+          BEGIN
+            BankAccount.GET("Account No.");
+            BankAccount.TESTFIELD(Blocked,FALSE);
+          END;
+        "Account Type"::"Fixed Asset":
+          BEGIN
+            FixedAsset.GET("Account No.");
+            FixedAsset.TESTFIELD(Blocked,FALSE);
+          END;
+      END;
+      DimensionSetup;
+      PaymentAddress.SETRANGE("Account Type","Account Type");
+      PaymentAddress.SETRANGE("Account No.","Account No.");
+      PaymentAddress.SETRANGE("Default Value",TRUE);
+      IF PaymentAddress.FINDFIRST THEN
+        "Payment Address Code" := PaymentAddress.Code
+      ELSE
+        "Payment Address Code" := '';
+    END;
+
+    PROCEDURE ModifyCheck@1120008();
+    BEGIN
+      IF Posted THEN
+        ERROR(Text002);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

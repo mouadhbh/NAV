@@ -1,0 +1,69 @@
+OBJECT Page 5371 CRM Synch. Job Status Part
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Microsoft Dynamics CRM Synch. Job Status;
+               FRA=Statut projets synch. Microsoft Dynamics CRM];
+    SourceTable=Table5370;
+    PageType=CardPart;
+    OnOpenPage=BEGIN
+                 CRMSynchJobManagement.SetInitialState(Rec);
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 2       ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 5       ;1   ;Action    ;
+                      CaptionML=[ENU=Edit Job Queue Entries;
+                                 FRA=Modifier Çcritures file d'attente des travaux];
+                      RunObject=Page 672;
+                      RunPageView=WHERE(Object ID to Run=CONST(5339));
+                      Image=ViewDetails }
+      { 4       ;1   ;Action    ;
+                      Name=<Page CRM Connection Setup>;
+                      CaptionML=[ENU=Microsoft Dynamics CRM Connection Setup;
+                                 FRA=Paramätres de la connexion Ö Microsoft Dynamics CRM];
+                      RunObject=Page 5330;
+                      Image=Setup }
+      { 3       ;1   ;Action    ;
+                      Name=Reset;
+                      CaptionML=[ENU=Reset;
+                                 FRA=RÇinitialiser];
+                      Image=Cancel;
+                      OnAction=BEGIN
+                                 CRMSynchJobManagement.OnReset(Rec);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=CueGroup }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Failed Synch. Jobs";
+                DrillDownPageID=CRM Synch. Job Queue;
+                Image=Checklist }
+
+  }
+  CODE
+  {
+    VAR
+      CRMSynchJobManagement@1000 : Codeunit 5371;
+
+    BEGIN
+    END.
+  }
+}
+

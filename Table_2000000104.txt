@@ -1,0 +1,38 @@
+OBJECT Table 2000000104 Debugger Watch
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Debugger Watch;
+               FRA=Espion du d‚bogueur];
+  }
+  FIELDS
+  {
+    { 1   ;   ;ID                  ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=ID;
+                                                              FRA=ID] }
+    { 7   ;   ;Path                ;Text124       ;CaptionML=[ENU=Path;
+                                                              FRA=Chemin] }
+  }
+  KEYS
+  {
+    {    ;ID                                      ;Clustered=Yes }
+    {    ;Path                                     }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

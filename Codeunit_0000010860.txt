@@ -1,0 +1,1068 @@
+OBJECT Codeunit 10860 Payment Management
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    Permissions=TableData 21=rm,
+                TableData 25=rm;
+    OnRun=BEGIN
+            CreatePaymentHeaders;
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Text001@1120000 : TextConst 'ENU=Number %1 cannot be extended to more than 20 characters.;FRA=Le num‚ro %1 ne peut pas ˆtre ‚tendu … plus de 20 caractŠres.';
+      Text002@1120037 : TextConst 'ENU=One or more acceptation codes are No.;FRA=La valeur d''un ou plusieurs codes acceptation est Non';
+      Text003@1120036 : TextConst 'ENU=One or more lines have an incorrect RIB code.;FRA=Une ou plusieurs lignes indiquent un code RIB incorrect';
+      Text004@1120033 : TextConst 'ENU=There is no Payment Header to create.;FRA=Il n''y a pas de bordereau … cr‚er.';
+      Text005@1120002 : TextConst 'ENU=Ledger Posting;FRA=Validation en comptabilit‚';
+      Text006@1120042 : TextConst 'ENU=One or more due dates are not specified.;FRA=Une ou plusieurs dates d''‚ch‚ance ne sont pas sp‚cifi‚es.';
+      Text007@1120039 : TextConst 'ENU=The action has been canceled.;FRA=L''action a ‚t‚ annul‚e.';
+      Text008@1120038 : TextConst 'ENU=The header RIB is not correct.;FRA=Le RIB de l''en-tˆte est incorrect.';
+      Text009@1120041 : TextConst '@@@=%1 - payment header no, %2 - dimension error;ENU=The combination of dimensions used in Payment Header %1 is blocked. %2.;FRA=La combinaison d''axes analytiques utilis‚e dans le bordereau %1 est bloqu‚e. %2.';
+      Text010@1120040 : TextConst '@@@=%1 - payment header no, %2 - payment line no, %3 - dimension error;ENU=The combination of dimensions used in Payment Header %1, line no. %2 is blocked. %3.;FRA=La combinaison d''axes analytiques utilis‚e dans le bordereau %1, ligne nø %2, est bloqu‚e. %3.';
+      InvPostingBuffer@1120004 : ARRAY [2] OF TEMPORARY Record 10864;
+      CustomerPostingGroup@1120010 : Record 92;
+      VendorPostingGroup@1120011 : Record 93;
+      Customer@1120012 : Record 18;
+      Vendor@1120013 : Record 23;
+      CustLedgerEntry@1120027 : Record 21;
+      VendorLedgerEntry@1120025 : Record 25;
+      GenJnlLine@1120018 : Record 81;
+      PaymentLine@1120017 : Record 10866;
+      OldPaymentLine@1120009 : Record 10866;
+      StepLedger@1120008 : Record 10863;
+      Step@1120007 : Record 10862;
+      PaymentHeader@1120006 : Record 10865;
+      PaymentClass@1120005 : Record 10860;
+      GenJnlPostLine@1120028 : Codeunit 12;
+      DimMgt@1120026 : Codeunit 408;
+      N@1120014 : Integer;
+      Suffix@1120015 : Text;
+      EntryTypeDebit@1120019 : Option;
+      EntryNoAccountDebit@1120020 : Code[20];
+      EntryPostGroupDebit@1120021 : Code[10];
+      EntryTypeCredit@1120022 : Option;
+      EntryNoAccountCredit@1120023 : Code[20];
+      EntryPostGroupCredit@1120024 : Code[10];
+      GLEntryNoTmp@1120032 : Integer;
+      Text011@1120001 : TextConst 'ENU=XX;FRA=XX';
+      Text012@1120003 : TextConst 'ENU=Customer Posting Group %1 does not exist.;FRA=Le groupe compta. client %1 n''existe pas.';
+      Text014@1120044 : TextConst 'ENU=You must enter a G/L account for customer posting group %1.;FRA=Vous devez entrer un compte g‚n‚ral pour le groupe compta. client %1.';
+      Text016@1120016 : TextConst 'ENU=A posted line cannot be deleted.;FRA=Une ligne valid‚e ne peut pas ˆtre supprim‚e.';
+      Text017@1120046 : TextConst 'ENU=Source Code %1 does not exist.;FRA=Le code source %1 n''existe pas.';
+      HeaderAccountUsedGlobally@1120047 : Boolean;
+      Text018@1120048 : TextConst 'ENU=You must specify a debit account number for step %1 of payment type %2.;FRA=Vous devez sp‚cifier un num‚ro de compte de d‚bit … l''‚tape %1 du type de rŠglement %2.';
+      Text019@1120049 : TextConst 'ENU=You must specify a credit account number for step %1 of payment type %2.;FRA=Vous devez sp‚cifier un num‚ro de compte de cr‚dit … l''‚tape %1 du type de rŠglement %2.';
+      Text020@1120050 : TextConst 'ENU=You must specify an account number in the payment header.;FRA=Vous devez sp‚cifier un nø de compte dans le bordereau.';
+      Text021@1120051 : TextConst 'ENU=Code %1 does not contain a number.;FRA=Le code %1 ne contient pas de nombre.';
+      Text022@1120052 : TextConst 'ENU=The status of document %1 does not authorize archiving.;FRA=Le statut du document %1 n''autorise pas l''archivage.';
+      Text100@1120029 : TextConst 'ENU=Rounding on %1;FRA=Arrondi sur %1';
+
+    LOCAL PROCEDURE ProcessPaymentStep@1120023(PaymentHeaderNo@1120000 : Code[20];PaymentStep@1120001 : Record 10862);
+    VAR
+      Window@1120002 : Dialog;
+      ActionValidated@1120003 : Boolean;
+    BEGIN
+      PaymentHeader.GET(PaymentHeaderNo);
+      PaymentHeader.SETRANGE("No.",PaymentHeader."No.");
+
+      IF PaymentStep."Verify Header RIB" AND NOT PaymentHeader."RIB Checked" THEN
+        ERROR(Text008);
+
+      PaymentLine.SETRANGE("No.",PaymentHeader."No.");
+      PaymentLine.SETRANGE("Copied To No.",'');
+
+      IF PaymentStep."Acceptation Code<>No" THEN BEGIN
+        PaymentLine.SETRANGE("Acceptation Code",PaymentLine."Acceptation Code"::No);
+        IF PaymentLine.FIND('-') THEN
+          ERROR(Text002);
+        PaymentLine.SETRANGE("Acceptation Code");
+      END;
+
+      IF PaymentStep."Verify Lines RIB" THEN BEGIN
+        PaymentLine.SETRANGE("RIB Checked",FALSE);
+        IF PaymentLine.FIND('-') THEN
+          ERROR(Text003);
+        PaymentLine.SETRANGE("RIB Checked");
+      END;
+
+      IF PaymentStep."Verify Due Date" THEN BEGIN
+        PaymentLine.SETRANGE("Due Date",0D);
+        IF PaymentLine.FIND('-') THEN
+          ERROR(Text006);
+        PaymentLine.SETRANGE("Due Date");
+      END;
+
+      Step.GET(PaymentStep."Payment Class",PaymentStep.Line);
+
+      CASE Step."Action Type" OF
+        Step."Action Type"::None:
+          ActionValidated := TRUE;
+        Step."Action Type"::File:
+          BEGIN
+            PaymentHeader."File Export Completed" := FALSE;
+            PaymentHeader.MODIFY;
+            COMMIT;
+
+            CASE Step."Export Type" OF
+              Step."Export Type"::Report:
+                REPORT.RUNMODAL(Step."Export No.",TRUE,FALSE,PaymentHeader);
+              Step."Export Type"::XMLport:
+                RunXmlPortExport(Step."Export No.",PaymentHeader);
+            END;
+
+            PaymentHeader.FIND;
+            ActionValidated := PaymentHeader."File Export Completed";
+          END;
+        Step."Action Type"::Report:
+          BEGIN
+            REPORT.RUNMODAL(Step."Report No.",TRUE,TRUE,PaymentLine);
+            ActionValidated := TRUE;
+          END;
+        Step."Action Type"::Ledger:
+          BEGIN
+            InvPostingBuffer[1].DELETEALL;
+            CheckDim;
+            Window.OPEN(
+              '#1#################################\\' +
+              Text005);
+            IF PaymentLine.FIND('-') THEN
+              REPEAT
+                Window.UPDATE(1,Text005 + ' ' + PaymentLine."No." + ' ' + FORMAT(PaymentLine."Line No."));
+                OldPaymentLine := PaymentLine;
+                HeaderAccountUsedGlobally := FALSE;
+                GenerInvPostingBuffer;
+                PaymentLine."Acc. Type Last Entry Debit" := EntryTypeDebit;
+                PaymentLine."Acc. No. Last Entry Debit" := EntryNoAccountDebit;
+                PaymentLine."P. Group Last Entry Debit" := EntryPostGroupDebit;
+                PaymentLine."Acc. Type Last Entry Credit" := EntryTypeCredit;
+                PaymentLine."Acc. No. Last Entry Credit" := EntryNoAccountCredit;
+                PaymentLine."P. Group Last Entry Credit" := EntryPostGroupCredit;
+                PaymentLine.VALIDATE("Status No.",Step."Next Status");
+                PaymentLine.Posted := TRUE;
+                PaymentLine.MODIFY;
+              UNTIL PaymentLine.NEXT = 0;
+            Window.CLOSE;
+            GenerEntries;
+            ActionValidated := TRUE;
+          END;
+      END;
+
+      IF ActionValidated THEN BEGIN
+        PaymentHeader.VALIDATE("Status No.",Step."Next Status");
+        PaymentHeader.MODIFY;
+        PaymentLine.SETRANGE("No.",PaymentHeader."No.");
+        PaymentLine.MODIFYALL("Status No.",Step."Next Status");
+      END ELSE
+        MESSAGE(Text007);
+    END;
+
+    PROCEDURE UpdtBuffer@1120022();
+    VAR
+      CurrExchRate@1120002 : Record 330;
+    BEGIN
+      InvPostingBuffer[2] := InvPostingBuffer[1];
+      IF InvPostingBuffer[2].FIND THEN BEGIN
+        InvPostingBuffer[2].VALIDATE(Amount,InvPostingBuffer[2].Amount + InvPostingBuffer[1].Amount);
+        InvPostingBuffer[2]."Amount (LCY)" := ROUND(CurrExchRate.ExchangeAmtFCYToLCY(PaymentHeader."Posting Date",
+              PaymentHeader."Currency Code",InvPostingBuffer[2].Amount,PaymentHeader."Currency Factor"));
+        InvPostingBuffer[2]."VAT Amount" :=
+          InvPostingBuffer[2]."VAT Amount" + InvPostingBuffer[1]."VAT Amount";
+        InvPostingBuffer[2]."Line Discount Amount" :=
+          InvPostingBuffer[2]."Line Discount Amount" + InvPostingBuffer[1]."Line Discount Amount";
+        IF InvPostingBuffer[1]."Line Discount Account" <> '' THEN
+          InvPostingBuffer[2]."Line Discount Account" := InvPostingBuffer[1]."Line Discount Account";
+        InvPostingBuffer[2]."Inv. Discount Amount" :=
+          InvPostingBuffer[2]."Inv. Discount Amount" + InvPostingBuffer[1]."Inv. Discount Amount";
+        IF InvPostingBuffer[1]."Inv. Discount Account" <> '' THEN
+          InvPostingBuffer[2]."Inv. Discount Account" := InvPostingBuffer[1]."Inv. Discount Account";
+        InvPostingBuffer[2]."VAT Base Amount" :=
+          InvPostingBuffer[2]."VAT Base Amount" + InvPostingBuffer[1]."VAT Base Amount";
+        InvPostingBuffer[2]."Amount (ACY)" :=
+          InvPostingBuffer[2]."Amount (ACY)" + InvPostingBuffer[1]."Amount (ACY)";
+        InvPostingBuffer[2]."VAT Amount (ACY)" :=
+          InvPostingBuffer[2]."VAT Amount (ACY)" + InvPostingBuffer[1]."VAT Amount (ACY)";
+        InvPostingBuffer[2]."VAT Difference" :=
+          InvPostingBuffer[2]."VAT Difference" + InvPostingBuffer[1]."VAT Difference";
+        InvPostingBuffer[2]."Line Discount Amt. (ACY)" :=
+          InvPostingBuffer[2]."Line Discount Amt. (ACY)" +
+          InvPostingBuffer[1]."Line Discount Amt. (ACY)";
+        InvPostingBuffer[2]."Inv. Discount Amt. (ACY)" :=
+          InvPostingBuffer[2]."Inv. Discount Amt. (ACY)" +
+          InvPostingBuffer[1]."Inv. Discount Amt. (ACY)";
+        InvPostingBuffer[2]."VAT Base Amount (ACY)" :=
+          InvPostingBuffer[2]."VAT Base Amount (ACY)" +
+          InvPostingBuffer[1]."VAT Base Amount (ACY)";
+        InvPostingBuffer[2].Quantity :=
+          InvPostingBuffer[2].Quantity + InvPostingBuffer[1].Quantity;
+        IF NOT InvPostingBuffer[1]."System-Created Entry" THEN
+          InvPostingBuffer[2]."System-Created Entry" := FALSE;
+        InvPostingBuffer[2].MODIFY;
+      END ELSE BEGIN
+        GLEntryNoTmp += 1;
+        InvPostingBuffer[1]."GL Entry No." := GLEntryNoTmp;
+        InvPostingBuffer[1].INSERT;
+      END;
+    END;
+
+    PROCEDURE CopyLigBor@1120021(VAR FromPaymentLine@1120000 : Record 10866;NewStep@1120001 : Integer;VAR PayNum@1120002 : Code[20]);
+    VAR
+      ToBord@1120004 : Record 10865;
+      ToPaymentLine@1120005 : Record 10866;
+      Step@1120006 : Record 10862;
+      Process@1120009 : Record 10860;
+      PaymentStatus@1120003 : Record 10861;
+      NoSeriesMgt@1120008 : Codeunit 396;
+      i@1120007 : Integer;
+    BEGIN
+      IF FromPaymentLine.FIND('-') THEN BEGIN
+        Step.GET(FromPaymentLine."Payment Class",NewStep);
+        Process.GET(FromPaymentLine."Payment Class");
+        IF PayNum = '' THEN
+          WITH ToBord DO BEGIN
+            i := 10000;
+            NoSeriesMgt.InitSeries(Step."Header Nos. Series","No. Series",0D,"No.","No. Series");
+            "Payment Class" := FromPaymentLine."Payment Class";
+            "Status No." := Step."Next Status";
+            PaymentStatus.GET("Payment Class","Status No.");
+            "Archiving Authorized" := PaymentStatus."Archiving Authorized";
+            "Currency Code" := FromPaymentLine."Currency Code";
+            "Currency Factor" := FromPaymentLine."Currency Factor";
+            InitHeader;
+            INSERT;
+          END ELSE BEGIN
+          ToBord.GET(PayNum);
+          ToPaymentLine.SETRANGE("No.",PayNum);
+          IF ToPaymentLine.FINDLAST THEN
+            i := ToPaymentLine."Line No." + 10000
+          ELSE
+            i := 10000;
+        END;
+        REPEAT
+          ToPaymentLine.COPY(FromPaymentLine);
+          ToPaymentLine."No." := ToBord."No.";
+          ToPaymentLine."Line No." := i;
+          ToPaymentLine.IsCopy := TRUE;
+          ToPaymentLine."Status No." := Step."Next Status";
+          ToPaymentLine."Copied To No." := '';
+          ToPaymentLine."Copied To Line" := 0;
+          ToPaymentLine.Posted := FALSE;
+          ToPaymentLine."Created from No." := FromPaymentLine."No.";
+          ToPaymentLine."Dimension Set ID" := FromPaymentLine."Dimension Set ID";
+          ToPaymentLine.INSERT(TRUE);
+          FromPaymentLine."Copied To No." := ToPaymentLine."No.";
+          FromPaymentLine."Copied To Line" := ToPaymentLine."Line No.";
+          FromPaymentLine.MODIFY;
+          i += 10000;
+        UNTIL FromPaymentLine.NEXT = 0;
+        PayNum := ToBord."No.";
+      END;
+    END;
+
+    PROCEDURE DeleteLigBorCopy@1120020(VAR FromPaymentLine@1120000 : Record 10866);
+    VAR
+      ToPaymentLine@1120001 : Record 10866;
+    BEGIN
+      ToPaymentLine.SETCURRENTKEY("Copied To No.","Copied To Line");
+
+      IF FromPaymentLine.FIND('-') THEN
+        IF FromPaymentLine.Posted THEN
+          MESSAGE(Text016)
+        ELSE
+          REPEAT
+            ToPaymentLine.SETRANGE("Copied To No.",FromPaymentLine."No.");
+            ToPaymentLine.SETRANGE("Copied To Line",FromPaymentLine."Line No.");
+            ToPaymentLine.FINDFIRST;
+            ToPaymentLine."Copied To No." := '';
+            ToPaymentLine."Copied To Line" := 0;
+            ToPaymentLine.MODIFY;
+            FromPaymentLine.DELETE(TRUE);
+          UNTIL FromPaymentLine.NEXT = 0;
+    END;
+
+    PROCEDURE GenerInvPostingBuffer@1120019();
+    VAR
+      PaymentClass@1120001 : Record 10860;
+      NoSeriesMgt@1120000 : Codeunit 396;
+      Description@1120002 : Text[98];
+    BEGIN
+      StepLedger.SETRANGE("Payment Class",Step."Payment Class");
+      StepLedger.SETRANGE(Line,Step.Line);
+
+      IF StepLedger.FIND('-') THEN BEGIN
+        REPEAT
+          CLEAR(InvPostingBuffer[1]);
+          SetPostingGroup;
+          SetAccountNo;
+          InvPostingBuffer[1]."System-Created Entry" := TRUE;
+          IF StepLedger.Sign = StepLedger.Sign::Debit THEN BEGIN
+            InvPostingBuffer[1].VALIDATE(Amount,ABS(PaymentLine.Amount));
+            InvPostingBuffer[1].VALIDATE("Amount (LCY)",ABS(PaymentLine."Amount (LCY)"));
+          END ELSE BEGIN
+            InvPostingBuffer[1].VALIDATE(Amount,ABS(PaymentLine.Amount) * -1);
+            InvPostingBuffer[1].VALIDATE("Amount (LCY)",ABS(PaymentLine."Amount (LCY)") * -1);
+          END;
+          InvPostingBuffer[1]."Currency Code" := PaymentLine."Currency Code";
+          InvPostingBuffer[1]."Currency Factor" := PaymentLine."Currency Factor";
+          InvPostingBuffer[1].Correction := PaymentLine.Correction XOR Step.Correction;
+          IF StepLedger."Detail Level" = StepLedger."Detail Level"::Line THEN
+            InvPostingBuffer[1]."Payment Line No." := PaymentLine."Line No."
+          ELSE
+            IF StepLedger."Detail Level" = StepLedger."Detail Level"::"Due Date" THEN
+              InvPostingBuffer[1]."Due Date" := PaymentLine."Due Date";
+
+          InvPostingBuffer[1]."Document Type" := StepLedger."Document Type";
+          IF StepLedger."Document No." = StepLedger."Document No."::"Header No." THEN
+            InvPostingBuffer[1]."Document No." := PaymentHeader."No."
+          ELSE BEGIN
+            IF (InvPostingBuffer[1].Sign = InvPostingBuffer[1].Sign::Positive) AND
+               (PaymentLine."Entry No. Debit" = 0) AND (PaymentLine."Entry No. Credit" = 0)
+            THEN BEGIN
+              PaymentClass.GET(PaymentHeader."Payment Class");
+              IF PaymentClass."Line No. Series" = '' THEN
+                PaymentLine.TESTFIELD("Document No.",NoSeriesMgt.GetNextNo(PaymentHeader."No. Series",PaymentLine."Posting Date",FALSE))
+              ELSE
+                PaymentLine.TESTFIELD("Document No.",NoSeriesMgt.GetNextNo(PaymentClass."Line No. Series",PaymentLine."Posting Date",
+                    FALSE));
+            END;
+            InvPostingBuffer[1]."Document No." := PaymentLine."Document No.";
+          END;
+          InvPostingBuffer[1]."Header Document No." := PaymentHeader."No.";
+          IF StepLedger.Sign = StepLedger.Sign::Debit THEN BEGIN
+            EntryTypeDebit := InvPostingBuffer[1]."Account Type";
+            EntryNoAccountDebit := InvPostingBuffer[1]."Account No.";
+            EntryPostGroupDebit := InvPostingBuffer[1]."Posting Group";
+          END ELSE BEGIN
+            EntryTypeCredit := InvPostingBuffer[1]."Account Type";
+            EntryNoAccountCredit := InvPostingBuffer[1]."Account No.";
+            EntryPostGroupCredit := InvPostingBuffer[1]."Posting Group";
+          END;
+          InvPostingBuffer[1]."System-Created Entry" := TRUE;
+          Application;
+          PaymentClass.GET(PaymentHeader."Payment Class");
+          IF (PaymentClass."Unrealized VAT Reversal" = PaymentClass."Unrealized VAT Reversal"::Delayed) AND
+             Step."Realize VAT"
+          THEN BEGIN
+            InvPostingBuffer[1]."Applies-to Doc. Type" := PaymentLine."Applies-to Doc. Type";
+            InvPostingBuffer[1]."Applies-to Doc. No." := PaymentLine."Applies-to Doc. No.";
+            InvPostingBuffer[1]."Applies-to ID" := PaymentLine."Applies-to ID";
+            InvPostingBuffer[1]."Created from No." := PaymentLine."Created from No.";
+          END;
+          Description :=
+            STRSUBSTNO(StepLedger.Description,PaymentLine."Due Date",PaymentLine."Account No.",PaymentLine."Document No.");
+          InvPostingBuffer[1].Description := COPYSTR(Description,1,50);
+          InvPostingBuffer[1]."Source Type" := PaymentLine."Account Type";
+          InvPostingBuffer[1]."Source No." := PaymentLine."Account No.";
+          InvPostingBuffer[1]."External Document No." := PaymentLine."External Document No.";
+          InvPostingBuffer[1]."Dimension Set ID" := PaymentLine."Dimension Set ID";
+          UpdtBuffer;
+          IF (InvPostingBuffer[1].Amount >= 0) XOR InvPostingBuffer[1].Correction THEN
+            PaymentLine."Entry No. Debit" := InvPostingBuffer[1]."GL Entry No."
+          ELSE
+            PaymentLine."Entry No. Credit" := InvPostingBuffer[1]."GL Entry No.";
+        UNTIL StepLedger.NEXT = 0;
+        NoSeriesMgt.SaveNoSeries;
+      END;
+    END;
+
+    PROCEDURE SetPostingGroup@1120018();
+    VAR
+      PostingGroup@1120000 : Code[10];
+    BEGIN
+      IF PaymentLine."Account Type" = PaymentLine."Account Type"::Customer THEN
+        IF ((StepLedger."Accounting Type" = StepLedger."Accounting Type"::"Payment Line Account") OR
+            (StepLedger."Accounting Type" = StepLedger."Accounting Type"::"Associated G/L Account") OR
+            (StepLedger."Accounting Type" = StepLedger."Accounting Type"::"Header Payment Account") OR
+            ((StepLedger."Accounting Type" = StepLedger."Accounting Type"::"Setup Account") AND
+             (StepLedger."Account Type" = StepLedger."Account Type"::Customer)))
+        THEN BEGIN
+          IF PaymentLine."Posting Group" <> '' THEN
+            PostingGroup := PaymentLine."Posting Group"
+          ELSE
+            IF StepLedger."Customer Posting Group" <> '' THEN
+              PostingGroup := StepLedger."Customer Posting Group"
+            ELSE BEGIN
+              Customer.GET(PaymentLine."Account No.");
+              PostingGroup := Customer."Customer Posting Group";
+            END;
+          IF NOT CustomerPostingGroup.GET(PostingGroup) THEN
+            ERROR(Text012,PostingGroup);
+          IF CustomerPostingGroup."Receivables Account" = '' THEN
+            ERROR(Text014,PostingGroup);
+        END;
+
+      IF PaymentLine."Account Type" = PaymentLine."Account Type"::Vendor THEN
+        IF ((StepLedger."Accounting Type" = StepLedger."Accounting Type"::"Payment Line Account") OR
+            (StepLedger."Accounting Type" = StepLedger."Accounting Type"::"Associated G/L Account") OR
+            (StepLedger."Accounting Type" = StepLedger."Accounting Type"::"Header Payment Account") OR
+            ((StepLedger."Accounting Type" = StepLedger."Accounting Type"::"Setup Account") AND
+             (StepLedger."Account Type" = StepLedger."Account Type"::Vendor)))
+        THEN BEGIN
+          IF PaymentLine."Posting Group" <> '' THEN
+            PostingGroup := PaymentLine."Posting Group"
+          ELSE
+            IF StepLedger."Vendor Posting Group" <> '' THEN
+              PostingGroup := StepLedger."Vendor Posting Group"
+            ELSE BEGIN
+              Vendor.GET(PaymentLine."Account No.");
+              PostingGroup := Vendor."Vendor Posting Group";
+            END;
+          IF NOT VendorPostingGroup.GET(PostingGroup) THEN
+            ERROR(Text012,PostingGroup);
+          IF VendorPostingGroup."Payables Account" = '' THEN
+            ERROR(Text014,PostingGroup);
+        END;
+    END;
+
+    PROCEDURE SetAccountNo@1120017();
+    BEGIN
+      CASE StepLedger."Accounting Type" OF
+        StepLedger."Accounting Type"::"Payment Line Account":
+          BEGIN
+            InvPostingBuffer[1]."Account Type" := PaymentLine."Account Type";
+            InvPostingBuffer[1]."Account No." := PaymentLine."Account No.";
+            IF PaymentLine."Account Type" = PaymentLine."Account Type"::Customer THEN
+              InvPostingBuffer[1]."Posting Group" := CustomerPostingGroup.Code;
+            IF PaymentLine."Account Type" = PaymentLine."Account Type"::Vendor THEN
+              InvPostingBuffer[1]."Posting Group" := VendorPostingGroup.Code;
+            InvPostingBuffer[1]."Line No." := PaymentLine."Line No.";
+            DimMgt.UpdateGlobalDimFromDimSetID(PaymentLine."Dimension Set ID",
+              InvPostingBuffer[1]."Global Dimension 1 Code",InvPostingBuffer[1]."Global Dimension 2 Code");
+          END;
+        StepLedger."Accounting Type"::"Associated G/L Account":
+          BEGIN
+            InvPostingBuffer[1]."Account Type" := InvPostingBuffer[1]."Account Type"::"G/L Account";
+            IF PaymentLine."Account Type" = PaymentLine."Account Type"::Customer THEN
+              InvPostingBuffer[1]."Account No." := CustomerPostingGroup."Receivables Account"
+            ELSE
+              InvPostingBuffer[1]."Account No." := VendorPostingGroup."Payables Account";
+            InvPostingBuffer[1]."Line No." := PaymentLine."Line No.";
+          END;
+        StepLedger."Accounting Type"::"Setup Account":
+          BEGIN
+            InvPostingBuffer[1]."Account Type" := StepLedger."Account Type";
+            InvPostingBuffer[1]."Account No." := StepLedger."Account No.";
+            IF StepLedger."Account No." = '' THEN BEGIN
+              PaymentHeader.CALCFIELDS("Payment Class Name");
+              IF StepLedger.Sign = StepLedger.Sign::Debit THEN
+                ERROR(Text018,Step.Name,PaymentHeader."Payment Class Name");
+
+              ERROR(Text019,Step.Name,PaymentHeader."Payment Class Name");
+            END;
+            IF StepLedger."Account Type" = StepLedger."Account Type"::Customer THEN
+              InvPostingBuffer[1]."Posting Group" := StepLedger."Customer Posting Group"
+            ELSE
+              InvPostingBuffer[1]."Posting Group" := StepLedger."Vendor Posting Group";
+            InvPostingBuffer[1]."Line No." := PaymentLine."Line No.";
+          END;
+        StepLedger."Accounting Type"::"G/L Account / Month":
+          BEGIN
+            InvPostingBuffer[1]."Account Type" := InvPostingBuffer[1]."Account Type"::"G/L Account";
+            N := DATE2DMY(PaymentLine."Due Date",2);
+            IF N < 10 THEN
+              Suffix := '0' + FORMAT(N)
+            ELSE
+              Suffix := FORMAT(N);
+            InvPostingBuffer[1]."Account No." := COPYSTR(StepLedger.Root + Suffix,1,MAXSTRLEN(InvPostingBuffer[1]."Account No."));
+            InvPostingBuffer[1]."Line No." := PaymentLine."Line No.";
+          END;
+        StepLedger."Accounting Type"::"G/L Account / Week":
+          BEGIN
+            InvPostingBuffer[1]."Account Type" := InvPostingBuffer[1]."Account Type"::"G/L Account";
+            N := DATE2DWY(PaymentLine."Due Date",2);
+            IF N < 10 THEN
+              Suffix := '0' + FORMAT(N)
+            ELSE
+              Suffix := FORMAT(N);
+            InvPostingBuffer[1]."Account No." := COPYSTR(StepLedger.Root + Suffix,1,MAXSTRLEN(InvPostingBuffer[1]."Account No."));
+            InvPostingBuffer[1]."Line No." := PaymentLine."Line No.";
+          END;
+        StepLedger."Accounting Type"::"Bal. Account Previous Entry":
+          BEGIN
+            IF (StepLedger.Sign = StepLedger.Sign::Debit) AND NOT (PaymentLine.Correction XOR Step.Correction) THEN BEGIN
+              InvPostingBuffer[1]."Account Type" := PaymentLine."Acc. Type Last Entry Credit";
+              InvPostingBuffer[1]."Account No." := PaymentLine."Acc. No. Last Entry Credit";
+              InvPostingBuffer[1]."Posting Group" := PaymentLine."P. Group Last Entry Credit";
+            END ELSE BEGIN
+              InvPostingBuffer[1]."Account Type" := PaymentLine."Acc. Type Last Entry Debit";
+              InvPostingBuffer[1]."Account No." := PaymentLine."Acc. No. Last Entry Debit";
+              InvPostingBuffer[1]."Posting Group" := PaymentLine."P. Group Last Entry Debit";
+            END;
+            InvPostingBuffer[1]."Line No." := PaymentLine."Line No.";
+          END;
+        StepLedger."Accounting Type"::"Header Payment Account":
+          BEGIN
+            InvPostingBuffer[1]."Account Type" := PaymentHeader."Account Type";
+            InvPostingBuffer[1]."Account No." := PaymentHeader."Account No.";
+            IF PaymentHeader."Account No." = '' THEN
+              ERROR(Text020);
+            IF StepLedger."Detail Level" = StepLedger."Detail Level"::Account THEN
+              HeaderAccountUsedGlobally := TRUE;
+            InvPostingBuffer[1]."Line No." := 0;
+            DimMgt.UpdateGlobalDimFromDimSetID(PaymentHeader."Dimension Set ID",
+              InvPostingBuffer[1]."Global Dimension 1 Code",InvPostingBuffer[1]."Global Dimension 2 Code");
+          END;
+      END;
+    END;
+
+    PROCEDURE Application@1120016();
+    BEGIN
+      IF StepLedger.Application <> StepLedger.Application::None THEN
+        IF StepLedger.Application = StepLedger.Application::"Applied Entry" THEN BEGIN
+          InvPostingBuffer[1]."Applies-to Doc. Type" := PaymentLine."Applies-to Doc. Type";
+          InvPostingBuffer[1]."Applies-to Doc. No." := PaymentLine."Applies-to Doc. No.";
+          InvPostingBuffer[1]."Applies-to ID" := PaymentLine."Applies-to ID";
+        END ELSE
+          IF StepLedger.Application = StepLedger.Application::"Entry Previous Step" THEN BEGIN
+            InvPostingBuffer[1]."Applies-to ID" := PaymentLine."No." + '/' + FORMAT(PaymentLine."Line No.") + Text011;
+            IF InvPostingBuffer[1]."Account Type" = InvPostingBuffer[1]."Account Type"::Customer THEN BEGIN
+              IF (InvPostingBuffer[1].Amount < 0) XOR InvPostingBuffer[1].Correction THEN
+                CustLedgerEntry.SETRANGE("Entry No.",OldPaymentLine."Entry No. Debit")
+              ELSE
+                CustLedgerEntry.SETRANGE("Entry No.",OldPaymentLine."Entry No. Credit");
+              IF CustLedgerEntry.FINDFIRST THEN BEGIN
+                CustLedgerEntry."Applies-to ID" := InvPostingBuffer[1]."Applies-to ID";
+                CustLedgerEntry.CALCFIELDS("Remaining Amount");
+                CustLedgerEntry.VALIDATE("Amount to Apply",CustLedgerEntry."Remaining Amount");
+                CustLedgerEntry.MODIFY;
+              END;
+            END ELSE
+              IF InvPostingBuffer[1]."Account Type" = InvPostingBuffer[1]."Account Type"::Vendor THEN BEGIN
+                IF (InvPostingBuffer[1].Amount < 0) XOR InvPostingBuffer[1].Correction THEN
+                  VendorLedgerEntry.SETRANGE("Entry No.",OldPaymentLine."Entry No. Debit")
+                ELSE
+                  VendorLedgerEntry.SETRANGE("Entry No.",OldPaymentLine."Entry No. Credit");
+                IF VendorLedgerEntry.FINDFIRST THEN BEGIN
+                  VendorLedgerEntry."Applies-to ID" := InvPostingBuffer[1]."Applies-to ID";
+                  VendorLedgerEntry.CALCFIELDS("Remaining Amount");
+                  VendorLedgerEntry.VALIDATE("Amount to Apply",VendorLedgerEntry."Remaining Amount");
+                  VendorLedgerEntry.MODIFY;
+                END;
+              END;
+          END ELSE
+            IF StepLedger.Application = StepLedger.Application::"Memorized Entry" THEN BEGIN
+              InvPostingBuffer[1]."Applies-to ID" := PaymentLine."No." + '/' + FORMAT(PaymentLine."Line No.") + Text011;
+              IF InvPostingBuffer[1]."Account Type" = InvPostingBuffer[1]."Account Type"::Customer THEN BEGIN
+                CustLedgerEntry.RESET;
+                IF (InvPostingBuffer[1].Amount < 0) XOR InvPostingBuffer[1].Correction THEN
+                  CustLedgerEntry.SETRANGE("Entry No.",OldPaymentLine."Entry No. Debit Memo")
+                ELSE
+                  CustLedgerEntry.SETRANGE("Entry No.",OldPaymentLine."Entry No. Credit Memo");
+                IF CustLedgerEntry.FINDFIRST THEN BEGIN
+                  CustLedgerEntry."Applies-to ID" := InvPostingBuffer[1]."Applies-to ID";
+                  CustLedgerEntry.CALCFIELDS("Remaining Amount");
+                  CustLedgerEntry.VALIDATE("Amount to Apply",CustLedgerEntry."Remaining Amount");
+                  CustLedgerEntry.MODIFY;
+                END;
+              END ELSE
+                IF InvPostingBuffer[1]."Account Type" = InvPostingBuffer[1]."Account Type"::Vendor THEN BEGIN
+                  IF (InvPostingBuffer[1].Amount < 0) XOR InvPostingBuffer[1].Correction THEN
+                    VendorLedgerEntry.SETRANGE("Entry No.",OldPaymentLine."Entry No. Debit Memo")
+                  ELSE
+                    VendorLedgerEntry.SETRANGE("Entry No.",OldPaymentLine."Entry No. Credit Memo");
+                  IF VendorLedgerEntry.FINDFIRST THEN BEGIN
+                    VendorLedgerEntry."Applies-to ID" := InvPostingBuffer[1]."Applies-to ID";
+                    VendorLedgerEntry.CALCFIELDS("Remaining Amount");
+                    VendorLedgerEntry.VALIDATE("Amount to Apply",VendorLedgerEntry."Remaining Amount");
+                    VendorLedgerEntry.MODIFY;
+                  END;
+                END;
+            END;
+      IF StepLedger."Detail Level" = StepLedger."Detail Level"::Account THEN BEGIN
+        IF (InvPostingBuffer[1]."Account Type" = InvPostingBuffer[1]."Account Type"::Vendor) OR
+           (InvPostingBuffer[1]."Account Type" = InvPostingBuffer[1]."Account Type"::Customer)
+        THEN
+          InvPostingBuffer[1]."Due Date" := PaymentLine."Due Date" // FR Payment due date
+      END ELSE
+        InvPostingBuffer[1]."Due Date" := PaymentLine."Due Date"; // FR Payment due date
+    END;
+
+    PROCEDURE GenerEntries@1120015();
+    VAR
+      Currency@1120000 : Record 4;
+      Difference@1120001 : Decimal;
+      TotalDebit@1120005 : Decimal;
+      TotalCredit@1120006 : Decimal;
+      LastGLEntryNo@1120002 : Integer;
+    BEGIN
+      IF InvPostingBuffer[1].FIND('+') THEN
+        WITH PaymentHeader DO
+          REPEAT
+            LastGLEntryNo := PostInvPostingBuffer;
+            PaymentLine.RESET;
+            PaymentLine.SETRANGE("No.","No.");
+            PaymentLine.SETRANGE("Line No.");
+            IF GenJnlLine.Amount >= 0 THEN BEGIN
+              TotalDebit := TotalDebit + GenJnlLine."Amount (LCY)";
+              StepLedger.GET(Step."Payment Class",Step.Line,StepLedger.Sign::Debit);
+              PaymentLine.SETRANGE("Entry No. Debit",InvPostingBuffer[1]."GL Entry No.");
+              IF StepLedger."Memorize Entry" THEN
+                PaymentLine.MODIFYALL(PaymentLine."Entry No. Debit Memo",LastGLEntryNo);
+              PaymentLine.MODIFYALL("Entry No. Debit",LastGLEntryNo);
+              PaymentLine.SETRANGE("Entry No. Debit");
+            END ELSE BEGIN
+              TotalCredit := TotalCredit + ABS(GenJnlLine."Amount (LCY)");
+              StepLedger.GET(Step."Payment Class",Step.Line,StepLedger.Sign::Credit);
+              PaymentLine.SETRANGE("Entry No. Credit",InvPostingBuffer[1]."GL Entry No.");
+              IF StepLedger."Memorize Entry" THEN
+                PaymentLine.MODIFYALL(PaymentLine."Entry No. Credit Memo",LastGLEntryNo);
+              PaymentLine.MODIFYALL("Entry No. Credit",LastGLEntryNo);
+              PaymentLine.SETRANGE("Entry No. Credit");
+            END;
+          UNTIL InvPostingBuffer[1].NEXT(-1) = 0;
+
+      IF HeaderAccountUsedGlobally THEN BEGIN
+        Difference := TotalDebit - TotalCredit;
+        IF Difference <> 0 THEN BEGIN
+          GenJnlLine.INIT;
+          GenJnlLine."Account Type" := GenJnlLine."Account Type"::"G/L Account";
+          Currency.GET(PaymentHeader."Currency Code");
+          IF Difference < 0 THEN BEGIN
+            GenJnlLine."Account No." := Currency."Unrealized Losses Acc.";
+            StepLedger.GET(Step."Payment Class",Step.Line,StepLedger.Sign::Debit);
+            GenJnlLine.VALIDATE("Debit Amount",-Difference);
+          END ELSE BEGIN
+            GenJnlLine."Account No." := Currency."Unrealized Gains Acc.";
+            StepLedger.GET(Step."Payment Class",Step.Line,StepLedger.Sign::Credit);
+            GenJnlLine.VALIDATE("Credit Amount",Difference);
+          END;
+          GenJnlLine."Posting Date" := PaymentHeader."Posting Date";
+          GenJnlLine."Document No." := PaymentHeader."No.";
+          GenJnlLine.Description := STRSUBSTNO(
+            Text100,STRSUBSTNO(StepLedger.Description,PaymentHeader."Document Date",'',PaymentHeader."No."));
+          GenJnlLine."Shortcut Dimension 1 Code" := PaymentHeader."Shortcut Dimension 1 Code";
+          GenJnlLine."Shortcut Dimension 2 Code" := PaymentHeader."Shortcut Dimension 2 Code";
+          GenJnlLine."Dimension Set ID" := PaymentHeader."Dimension Set ID";
+          GenJnlLine."Source Code" := PaymentHeader."Source Code";
+          GenJnlLine."Reason Code" := Step."Reason Code";
+          GenJnlLine."Document Date" := PaymentHeader."Document Date";
+          GenJnlPostLine.RunWithCheck(GenJnlLine);
+        END;
+      END;
+
+      InvPostingBuffer[1].DELETEALL;
+    END;
+
+    LOCAL PROCEDURE GetIntegerPos@1120014(No@1120000 : Code[20];VAR StartPos@1120001 : Integer;VAR EndPos@1120002 : Integer);
+    VAR
+      IsDigit@1120003 : Boolean;
+      i@1120004 : Integer;
+    BEGIN
+      StartPos := 0;
+      EndPos := 0;
+      IF No <> '' THEN BEGIN
+        i := STRLEN(No);
+        REPEAT
+          IsDigit := No[i] IN ['0'..'9'];
+          IF IsDigit THEN BEGIN
+            IF EndPos = 0 THEN
+              EndPos := i;
+            StartPos := i;
+          END;
+          i := i - 1;
+        UNTIL (i = 0) OR (StartPos <> 0) AND NOT IsDigit;
+      END;
+      IF (StartPos = 0) AND (EndPos = 0) THEN
+        ERROR(Text021,No);
+    END;
+
+    PROCEDURE IncrementNoText@1120013(VAR No@1120000 : Code[20];IncrementByNo@1120001 : Decimal);
+    VAR
+      DecimalNo@1120002 : Decimal;
+      StartPos@1120003 : Integer;
+      EndPos@1120004 : Integer;
+      NewNo@1120005 : Text[30];
+    BEGIN
+      GetIntegerPos(No,StartPos,EndPos);
+      EVALUATE(DecimalNo,COPYSTR(No,StartPos,EndPos - StartPos + 1));
+      NewNo := FORMAT(DecimalNo + IncrementByNo,0,1);
+      ReplaceNoText(No,NewNo,0,StartPos,EndPos);
+    END;
+
+    LOCAL PROCEDURE ReplaceNoText@1120012(VAR No@1120000 : Code[20];NewNo@1120001 : Code[30];FixedLength@1120002 : Integer;StartPos@1120003 : Integer;EndPos@1120004 : Integer);
+    VAR
+      StartNo@1120005 : Code[20];
+      EndNo@1120006 : Code[20];
+      ZeroNo@1120007 : Code[20];
+      NewLength@1120008 : Integer;
+      OldLength@1120009 : Integer;
+    BEGIN
+      IF StartPos > 1 THEN
+        StartNo := COPYSTR(No,1,StartPos - 1);
+      IF EndPos < STRLEN(No) THEN
+        EndNo := COPYSTR(No,EndPos + 1);
+      NewLength := STRLEN(NewNo);
+      OldLength := EndPos - StartPos + 1;
+      IF FixedLength > OldLength THEN
+        OldLength := FixedLength;
+      IF OldLength > NewLength THEN
+        ZeroNo := PADSTR('',OldLength - NewLength,'0');
+      IF STRLEN(StartNo) + STRLEN(ZeroNo) + STRLEN(NewNo) + STRLEN(EndNo) > 20 THEN
+        ERROR(Text001,No);
+
+      No := COPYSTR(StartNo + ZeroNo + NewNo + EndNo,1,MAXSTRLEN(No));
+    END;
+
+    PROCEDURE CreatePaymentHeaders@1120011();
+    BEGIN
+      Step.SETRANGE("Action Type",Step."Action Type"::"Create New Document");
+
+      IF StepSelect('',-1,Step,TRUE) THEN
+        ExecuteCreatePaymtHead(Step);
+    END;
+
+    PROCEDURE ExecuteCreatePaymtHead@1120000(PaymtStep@1120000 : Record 10862) : Code[20];
+    VAR
+      Bor@1120004 : Record 10865;
+      StatementForm@1120003 : Page 10868;
+      InserForm@1120001 : Page 10872;
+      PayNum@1120002 : Code[20];
+    BEGIN
+      PaymentLine.SETRANGE("Payment Class",PaymtStep."Payment Class");
+      PaymentLine.SETRANGE("Status No.",PaymtStep."Previous Status");
+      PaymentLine.SETRANGE("Copied To No.",'');
+      PaymentLine.FILTERGROUP(2);
+      InserForm.SetSteps(PaymtStep.Line);
+      InserForm.SETTABLEVIEW(PaymentLine);
+      InserForm.LOOKUPMODE(TRUE);
+      InserForm.RUNMODAL;
+      PayNum := InserForm.GetNumBor;
+      IF Bor.GET(PayNum) THEN BEGIN
+        StatementForm.SETRECORD(Bor);
+        StatementForm.RUN;
+      END ELSE
+        ERROR(Text004);
+      EXIT(PayNum);
+    END;
+
+    PROCEDURE LinesInsert@1120010(HeaderNumber@1120000 : Code[20]);
+    VAR
+      Header@1120001 : Record 10865;
+      PaymentLine@1120002 : Record 10866;
+      Step@1120004 : Record 10862;
+      InserForm@1120003 : Page 10872;
+    BEGIN
+      Header.GET(HeaderNumber);
+      IF StepSelect(Header."Payment Class",Header."Status No.",Step,FALSE) THEN BEGIN
+        PaymentLine.SETRANGE("Payment Class",Header."Payment Class");
+        PaymentLine.SETRANGE("Copied To No.",'');
+        PaymentLine.SETFILTER("Status No.",FORMAT(Step."Previous Status"));
+        PaymentLine.SETRANGE("Currency Code",Header."Currency Code");
+        PaymentLine.FILTERGROUP(2);
+        InserForm.SetSteps(Step.Line);
+        InserForm.SetNumBor(Header."No.");
+        InserForm.SETTABLEVIEW(PaymentLine);
+        InserForm.LOOKUPMODE(TRUE);
+        InserForm.RUNMODAL;
+      END;
+    END;
+
+    PROCEDURE StepSelect@1120009(Process@1120001 : Text[30];NextStatus@1120002 : Integer;VAR Step@1120003 : Record 10862;CreateDocumentFilter@1120008 : Boolean) OK@1120000 : Boolean;
+    VAR
+      PaymentClass@1120005 : Record 10860;
+      Options@1120004 : Text[250];
+      Choice@1120006 : Integer;
+      i@1120007 : Integer;
+    BEGIN
+      OK := FALSE;
+      i := 0;
+      IF Process = '' THEN BEGIN
+        PaymentClass.SETRANGE(Enable,TRUE);
+        IF CreateDocumentFilter THEN
+          PaymentClass.SETRANGE("Is Create Document",TRUE);
+        IF PaymentClass.FIND('-') THEN
+          REPEAT
+            i += 1;
+            IF Options = '' THEN
+              Options := PaymentClass.Code
+            ELSE
+              Options := Options + ',' + PaymentClass.Code;
+          UNTIL PaymentClass.NEXT = 0;
+        IF i > 0 THEN
+          Choice := STRMENU(Options,1);
+        i := 1;
+        IF Choice > 0 THEN BEGIN
+          PaymentClass.FIND('-');
+          WHILE Choice > i DO BEGIN
+            i += 1;
+            PaymentClass.NEXT;
+          END;
+        END;
+      END ELSE BEGIN
+        PaymentClass.GET(Process);
+        Choice := 1;
+      END;
+      IF Choice > 0 THEN BEGIN
+        Options := '';
+        Step.SETRANGE("Payment Class",PaymentClass.Code);
+        Step.SETRANGE("Action Type",Step."Action Type"::"Create New Document");
+        IF NextStatus > -1 THEN
+          Step.SETRANGE("Next Status",NextStatus);
+        i := 0;
+        IF Step.FIND('-') THEN BEGIN
+          i += 1;
+          REPEAT
+            IF Options = '' THEN
+              Options := Step.Name
+            ELSE
+              Options := Options + ',' + Step.Name;
+          UNTIL Step.NEXT = 0;
+          IF i > 0 THEN BEGIN
+            Choice := STRMENU(Options,1);
+            i := 1;
+            IF Choice > 0 THEN BEGIN
+              Step.FIND('-');
+              WHILE Choice > i DO BEGIN
+                i += 1;
+                Step.NEXT;
+              END;
+              OK := TRUE;
+            END;
+          END;
+        END;
+      END;
+    END;
+
+    LOCAL PROCEDURE CheckDimComb@1120008(PaymentLine2@1120000 : Record 10866);
+    BEGIN
+      IF PaymentLine."Line No." = 0 THEN
+        IF NOT DimMgt.CheckDimIDComb(PaymentHeader."Dimension Set ID") THEN
+          ERROR(
+            Text009,
+            PaymentHeader."No.",DimMgt.GetDimCombErr);
+
+      IF PaymentLine."Line No." <> 0 THEN
+        IF NOT DimMgt.CheckDimIDComb(PaymentLine2."Dimension Set ID") THEN
+          ERROR(
+            Text010,
+            PaymentHeader."No.",PaymentLine2."Line No.",DimMgt.GetDimCombErr);
+    END;
+
+    LOCAL PROCEDURE CheckDim@1120006();
+    BEGIN
+      PaymentLine."Line No." := 0;
+      CheckDimComb(PaymentLine);
+
+      PaymentLine.SETRANGE("No.",PaymentHeader."No.");
+      IF PaymentLine.FINDSET THEN
+        REPEAT
+          CheckDimComb(PaymentLine);
+        UNTIL PaymentLine.NEXT = 0;
+    END;
+
+    PROCEDURE TestSourceCode@1120001(Code@1120000 : Code[10]);
+    VAR
+      SourceCode@1120001 : Record 230;
+    BEGIN
+      IF NOT SourceCode.GET(Code) THEN
+        ERROR(Text017,Code);
+    END;
+
+    PROCEDURE PaymentAddr@1120003(VAR AddrArray@1120001 : ARRAY [8] OF Text;PaymentAddress@1120000 : Record 10870);
+    VAR
+      FormatAddress@1120002 : Codeunit 365;
+    BEGIN
+      WITH PaymentAddress DO
+        FormatAddress.FormatAddr(
+          AddrArray,Name,"Name 2",Contact,Address,"Address 2",
+          City,"Post Code",County,"Country/Region Code");
+    END;
+
+    PROCEDURE PaymentBankAcc@1120002(VAR AddrArray@1000 : ARRAY [8] OF Text[50];BankAcc@1001 : Record 10865);
+    VAR
+      FormatAddress@1120000 : Codeunit 365;
+    BEGIN
+      WITH BankAcc DO
+        FormatAddress.FormatAddr(
+          AddrArray,"Bank Name","Bank Name 2","Bank Contact","Bank Address","Bank Address 2",
+          "Bank City","Bank Post Code","Bank County","Bank Country/Region Code");
+    END;
+
+    PROCEDURE ArchiveDocument@1120004(Document@1120000 : Record 10865);
+    VAR
+      ArchiveHeader@1120001 : Record 10867;
+      ArchiveLine@1120002 : Record 10868;
+      PaymentLine@1120003 : Record 10866;
+    BEGIN
+      Document.CALCFIELDS("Archiving Authorized");
+      IF NOT Document."Archiving Authorized" THEN
+        ERROR(Text022,Document."No.");
+      ArchiveHeader.TRANSFERFIELDS(Document);
+      ArchiveHeader.INSERT;
+      Document.DELETE;
+      PaymentLine.SETRANGE("No.",Document."No.");
+      IF PaymentLine.FIND('-') THEN
+        REPEAT
+          ArchiveLine.TRANSFERFIELDS(PaymentLine);
+          ArchiveLine.INSERT;
+          PaymentLine.DELETE;
+        UNTIL PaymentLine.NEXT = 0;
+    END;
+
+    PROCEDURE PickPaymentStep@1120005(PaymentHeader@1120001 : Record 10865;VAR PaymentStep@1120002 : Record 10862) : Boolean;
+    VAR
+      PaymentSteps@1120003 : Page 10866;
+    BEGIN
+      WITH PaymentStep DO BEGIN
+        FILTERGROUP(2);
+        // Filter on "Action Type" is passed with PaymentStep
+        SETRANGE("Payment Class",PaymentHeader."Payment Class");
+        SETRANGE("Previous Status",PaymentHeader."Status No.");
+        FILTERGROUP(0);
+        IF ISEMPTY THEN
+          EXIT(FALSE);
+
+        IF COUNT = 1 THEN BEGIN
+          FINDFIRST;
+          EXIT(CONFIRM(Name,TRUE));
+        END;
+
+        FINDSET;
+      END;
+      PaymentSteps.LOOKUPMODE(TRUE);
+      PaymentSteps.SETTABLEVIEW(PaymentStep);
+      PaymentSteps.SETRECORD(PaymentStep);
+      PaymentSteps.EDITABLE(FALSE);
+      IF PaymentSteps.RUNMODAL = ACTION::LookupOK THEN BEGIN
+        PaymentSteps.GETRECORD(PaymentStep);
+        EXIT(TRUE);
+      END;
+      EXIT(FALSE);
+    END;
+
+    PROCEDURE ProcessPaymentSteps@1120025(PaymentHeader@1120000 : Record 10865;VAR PaymentStep@1120001 : Record 10862);
+    BEGIN
+      PaymentHeader.TestNbOfLines;
+      IF PickPaymentStep(PaymentHeader,PaymentStep) THEN
+        ProcessPaymentStep(PaymentHeader."No.",PaymentStep);
+    END;
+
+    LOCAL PROCEDURE RunXmlPortExport@1120027(XMLPortID@1120000 : Integer;VAR PaymentHeader@1120005 : Record 10865);
+    BEGIN
+      PaymentClass.GET(PaymentHeader."Payment Class");
+      CASE PaymentClass."SEPA Transfer Type" OF
+        PaymentClass."SEPA Transfer Type"::"Credit Transfer":
+          ExportSEPACreditTransfer(XMLPortID,PaymentHeader);
+        PaymentClass."SEPA Transfer Type"::"Direct Debit":
+          ExportSEPADirectDebit(PaymentHeader);
+        ELSE
+          XMLPORT.RUN(XMLPortID,FALSE,FALSE,PaymentHeader);
+      END;
+    END;
+
+    LOCAL PROCEDURE ExportSEPACreditTransfer@1120024(XMLPortId@1120003 : Integer;VAR PaymentHeader@1120002 : Record 10865);
+    VAR
+      GenJnlLine@1120001 : Record 81;
+      SEPACTExportFile@1120000 : Codeunit 1220;
+    BEGIN
+      GenJnlLine.SETRANGE("Journal Template Name",'');
+      GenJnlLine.SETRANGE("Journal Batch Name",'');
+      GenJnlLine.SETRANGE("Document No.",PaymentHeader."No.");
+      IF SEPACTExportFile.Export(GenJnlLine,XMLPortId) THEN BEGIN
+        PaymentHeader."File Export Completed" := TRUE;
+        PaymentHeader.MODIFY;
+      END;
+    END;
+
+    LOCAL PROCEDURE ExportSEPADirectDebit@1120026(VAR PaymentHeader@1120000 : Record 10865);
+    VAR
+      DirectDebitCollection@1120004 : Record 1207;
+      DirectDebitCollectionEntry@1120003 : Record 1208;
+      LastError@1120001 : Text;
+    BEGIN
+      PaymentHeader.TESTFIELD("Account Type",PaymentHeader."Account Type"::"Bank Account");
+      DirectDebitCollection.CreateNew(PaymentHeader."No.",PaymentHeader."Account No.",PaymentHeader."Partner Type");
+      DirectDebitCollection."Source Table ID" := DATABASE::"Payment Header";
+      DirectDebitCollection.MODIFY;
+      DirectDebitCollectionEntry.SETRANGE("Direct Debit Collection No.",DirectDebitCollection."No.");
+      COMMIT;
+      CLEARLASTERROR;
+      IF CODEUNIT.RUN(CODEUNIT::"SEPA DD-Export File",DirectDebitCollectionEntry) THEN BEGIN
+        DeleteDirectDebitCollection(DirectDebitCollection."No.");
+        PaymentHeader."File Export Completed" := TRUE;
+        PaymentHeader.MODIFY;
+        EXIT;
+      END;
+
+      LastError := GETLASTERRORTEXT;
+      DeleteDirectDebitCollection(DirectDebitCollection."No.");
+      COMMIT;
+      ERROR(LastError);
+    END;
+
+    LOCAL PROCEDURE DeleteDirectDebitCollection@1120029(DirectDebitCollectionNo@1120000 : Integer);
+    VAR
+      DirectDebitCollection@1120001 : Record 1207;
+    BEGIN
+      IF DirectDebitCollection.GET(DirectDebitCollectionNo) THEN
+        DirectDebitCollection.DELETE(TRUE);
+    END;
+
+    LOCAL PROCEDURE PostInvPostingBuffer@1120028() : Integer;
+    VAR
+      GLEntry@1120000 : Record 17;
+    BEGIN
+      WITH GenJnlLine DO BEGIN
+        INIT;
+        "Posting Date" := PaymentHeader."Posting Date";
+        "Document Date" := PaymentHeader."Document Date";
+        Description := InvPostingBuffer[1].Description;
+        "Reason Code" := Step."Reason Code";
+        PaymentClass.GET(PaymentHeader."Payment Class");
+        "Delayed Unrealized VAT" :=
+          (PaymentClass."Unrealized VAT Reversal" = PaymentClass."Unrealized VAT Reversal"::Delayed);
+        "Realize VAT" := Step."Realize VAT";
+        "Created from No." := InvPostingBuffer[1]."Created from No.";
+        "Document Type" := InvPostingBuffer[1]."Document Type";
+        "Document No." := InvPostingBuffer[1]."Document No.";
+        "Account Type" := InvPostingBuffer[1]."Account Type";
+        "Account No." := InvPostingBuffer[1]."Account No.";
+        "System-Created Entry" := InvPostingBuffer[1]."System-Created Entry";
+        "Currency Code" := InvPostingBuffer[1]."Currency Code";
+        "Currency Factor" := InvPostingBuffer[1]."Currency Factor";
+        VALIDATE(Amount,InvPostingBuffer[1].Amount);
+        Correction := InvPostingBuffer[1].Correction;
+        IF PaymentHeader."Source Code" <> '' THEN BEGIN
+          TestSourceCode(PaymentHeader."Source Code");
+          "Source Code" := PaymentHeader."Source Code";
+        END ELSE BEGIN
+          Step.TESTFIELD("Source Code");
+          TestSourceCode(Step."Source Code");
+          "Source Code" := Step."Source Code";
+        END;
+        "Applies-to ID" := InvPostingBuffer[1]."Applies-to ID";
+        IF "Applies-to ID" = '' THEN BEGIN
+          "Applies-to Doc. Type" := InvPostingBuffer[1]."Applies-to Doc. Type";
+          "Applies-to Doc. No." := InvPostingBuffer[1]."Applies-to Doc. No.";
+        END;
+        "Posting Group" := InvPostingBuffer[1]."Posting Group";
+        "Source Type" := InvPostingBuffer[1]."Source Type";
+        "Source No." := InvPostingBuffer[1]."Source No.";
+        "External Document No." := InvPostingBuffer[1]."External Document No.";
+        "Due Date" := InvPostingBuffer[1]."Due Date";
+        "Shortcut Dimension 1 Code" := InvPostingBuffer[1]."Global Dimension 1 Code";
+        "Shortcut Dimension 2 Code" := InvPostingBuffer[1]."Global Dimension 2 Code";
+        "Dimension Set ID" := InvPostingBuffer[1]."Dimension Set ID";
+      END;
+
+      GenJnlPostLine.RunWithCheck(GenJnlLine);
+      GLEntry.SETRANGE("Document Type",GenJnlLine."Document Type");
+      GLEntry.SETRANGE("Document No.",GenJnlLine."Document No.");
+      IF GLEntry.FINDLAST THEN
+        EXIT(GLEntry."Entry No.");
+      EXIT(0);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

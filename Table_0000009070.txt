@@ -1,0 +1,50 @@
+OBJECT Table 9070 Accounting Services Cue
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Accounting Services Cue;
+               FRA=Pile services comptables];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Primary Key         ;Code10        ;CaptionML=[ENU=Primary Key;
+                                                              FRA=Cl‚ primaire] }
+    { 2   ;   ;Requests to Approve ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Approval Entry" WHERE (Status=CONST(Open),
+                                                                                             Approver ID=CONST(USERID)));
+                                                   CaptionML=[ENU=Requests to Approve;
+                                                              FRA=Demandes … approuver];
+                                                   Editable=No }
+    { 4   ;   ;Ongoing Sales Invoices;Integer     ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Sales Header" WHERE (Document Type=FILTER(Invoice)));
+                                                   CaptionML=[ENU=Ongoing Sales Invoices;
+                                                              FRA=Factures vente en cours] }
+    { 5   ;   ;My Incoming Documents;Integer      ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Incoming Document");
+                                                   CaptionML=[ENU=My Incoming Documents;
+                                                              FRA=Mes documents entrants] }
+    { 20  ;   ;User ID Filter      ;Code50        ;FieldClass=FlowFilter;
+                                                   CaptionML=[ENU=User ID Filter;
+                                                              FRA=Filtre code utilisateur] }
+  }
+  KEYS
+  {
+    {    ;Primary Key                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

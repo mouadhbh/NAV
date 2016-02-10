@@ -1,0 +1,41 @@
+OBJECT Table 2000000163 NAV App Object Prerequisites
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=NAV App Object Prerequisites;
+               FRA=Conditions prÇalables objet appli NAV];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Package ID          ;GUID          ;CaptionML=[ENU=Package ID;
+                                                              FRA=ID package] }
+    { 2   ;   ;Type                ;Option        ;CaptionML=[ENU=Type;
+                                                              FRA=Type];
+                                                   OptionCaptionML=[ENU=TableData,Table,,Report,,Codeunit,XMLport,MenuSuite,Page,Query;
+                                                                    FRA=DonnÇesTable,Table,,êtat,,Codeunit,XMLPort,MenuSuite,Page,Requàte];
+                                                   OptionString=TableData,Table,,Report,,Codeunit,XMLport,MenuSuite,Page,Query }
+    { 3   ;   ;ID                  ;Integer       ;CaptionML=[ENU=ID;
+                                                              FRA=ID] }
+  }
+  KEYS
+  {
+    {    ;Package ID,Type,ID                      ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

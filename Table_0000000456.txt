@@ -1,0 +1,139 @@
+OBJECT Table 456 Posted Approval Entry
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    OnDelete=VAR
+               PostedApprovalCommentLine@1000 : Record 457;
+             BEGIN
+               PostedApprovalCommentLine.SETRANGE("Posted Record ID","Posted Record ID");
+               PostedApprovalCommentLine.DELETEALL;
+             END;
+
+    CaptionML=[ENU=Posted Approval Entry;
+               FRA=êcriture approbation enreg.];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Table ID            ;Integer       ;CaptionML=[ENU=Table ID;
+                                                              FRA=ID table] }
+    { 3   ;   ;Document No.        ;Code20        ;CaptionML=[ENU=Document No.;
+                                                              FRA=N¯ document] }
+    { 4   ;   ;Sequence No.        ;Integer       ;CaptionML=[ENU=Sequence No.;
+                                                              FRA=N¯ sÇquence] }
+    { 5   ;   ;Approval Code       ;Code20        ;CaptionML=[ENU=Approval Code;
+                                                              FRA=Code approbation] }
+    { 6   ;   ;Sender ID           ;Code50        ;TableRelation=User."User Name";
+                                                   OnLookup=BEGIN
+                                                              UserMgt.LookupUserID("Sender ID");
+                                                            END;
+
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Sender ID;
+                                                              FRA=ID Çmetteur] }
+    { 7   ;   ;Salespers./Purch. Code;Code10      ;CaptionML=[ENU=Salespers./Purch. Code;
+                                                              FRA=Code vendeur/acheteur] }
+    { 8   ;   ;Approver ID         ;Code50        ;TableRelation=User."User Name";
+                                                   OnLookup=BEGIN
+                                                              UserMgt.LookupUserID("Approver ID");
+                                                            END;
+
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Approver ID;
+                                                              FRA=ID approbateur] }
+    { 9   ;   ;Status              ;Option        ;CaptionML=[ENU=Status;
+                                                              FRA=Statut];
+                                                   OptionCaptionML=[ENU=Created,Open,Canceled,Rejected,Approved;
+                                                                    FRA=CrÇÇ,Ouvert,AnnulÇ,RejetÇ,ApprouvÇ];
+                                                   OptionString=Created,Open,Canceled,Rejected,Approved }
+    { 10  ;   ;Date-Time Sent for Approval;DateTime;
+                                                   CaptionML=[ENU=Date-Time Sent for Approval;
+                                                              FRA=Date-heure envoi pour approbation] }
+    { 11  ;   ;Last Date-Time Modified;DateTime   ;CaptionML=[ENU=Last Date-Time Modified;
+                                                              FRA=Date-heure derniäre modification] }
+    { 12  ;   ;Last Modified By ID ;Code50        ;TableRelation=User."User Name";
+                                                   OnLookup=BEGIN
+                                                              UserMgt.LookupUserID("Last Modified By ID");
+                                                            END;
+
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Last Modified By ID;
+                                                              FRA=Derniäre modification par ID] }
+    { 13  ;   ;Comment             ;Boolean       ;FieldClass=FlowField;
+                                                   CalcFormula=Exist("Posted Approval Comment Line" WHERE (Table ID=FIELD(Table ID),
+                                                                                                           Document No.=FIELD(Document No.)));
+                                                   CaptionML=[ENU=Comment;
+                                                              FRA=Commentaires];
+                                                   Editable=No }
+    { 14  ;   ;Due Date            ;Date          ;CaptionML=[ENU=Due Date;
+                                                              FRA=Date d'ÇchÇance] }
+    { 15  ;   ;Amount              ;Decimal       ;CaptionML=[ENU=Amount;
+                                                              FRA=Montant];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 16  ;   ;Amount (LCY)        ;Decimal       ;CaptionML=[ENU=Amount (LCY);
+                                                              FRA=Montant DS];
+                                                   AutoFormatType=1 }
+    { 17  ;   ;Currency Code       ;Code10        ;TableRelation=Currency;
+                                                   CaptionML=[ENU=Currency Code;
+                                                              FRA=Code devise] }
+    { 18  ;   ;Approval Type       ;Option        ;CaptionML=[ENU=Approval Type;
+                                                              FRA=Type approbation];
+                                                   OptionCaptionML=[ENU=Workflow User Group,Sales Pers./Purchaser,Approver;
+                                                                    FRA=Groupe d'utilisateurs du flux de travail,Vendeur/Acheteur,Approbateur];
+                                                   OptionString=Workflow User Group,Sales Pers./Purchaser,Approver }
+    { 19  ;   ;Limit Type          ;Option        ;CaptionML=[ENU=Limit Type;
+                                                              FRA=Type limite];
+                                                   OptionCaptionML=[ENU=Approval Limits,Credit Limits,Request Limits,No Limits;
+                                                                    FRA=Limites approbation,Limites crÇdit,Limites demande,Aucune limite];
+                                                   OptionString=Approval Limits,Credit Limits,Request Limits,No Limits }
+    { 20  ;   ;Available Credit Limit (LCY);Decimal;
+                                                   CaptionML=[ENU=Available Credit Limit (LCY);
+                                                              FRA=Limite crÇdit disponible DS] }
+    { 22  ;   ;Posted Record ID    ;RecordID      ;CaptionML=[ENU=Posted Record ID;
+                                                              FRA=ID d'enregistrement validÇ] }
+    { 23  ;   ;Delegation Date Formula;DateFormula;CaptionML=[ENU=Delegation Date Formula;
+                                                              FRA=Formule date dÇlÇgation] }
+    { 26  ;   ;Number of Approved Requests;Integer;CaptionML=[ENU=Number of Approved Requests;
+                                                              FRA=Nombre de demandes approuvÇes] }
+    { 27  ;   ;Number of Rejected Requests;Integer;CaptionML=[ENU=Number of Rejected Requests;
+                                                              FRA=Nombre de demandes rejetÇes] }
+    { 28  ;   ;Iteration No.       ;Integer       ;CaptionML=[ENU=Iteration No.;
+                                                              FRA=N¯ itÇration] }
+    { 29  ;   ;Entry No.           ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=Entry No.;
+                                                              FRA="N¯ sÇquence "] }
+  }
+  KEYS
+  {
+    {    ;Entry No.                               ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      UserMgt@1000 : Codeunit 418;
+
+    PROCEDURE ShowRecord@1();
+    VAR
+      PageManagement@1001 : Codeunit 700;
+      RecRef@1000 : RecordRef;
+    BEGIN
+      IF NOT RecRef.GET("Posted Record ID") THEN
+        EXIT;
+      RecRef.SETRECFILTER;
+      PageManagement.PageRun(RecRef);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

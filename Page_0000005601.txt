@@ -1,0 +1,337 @@
+OBJECT Page 5601 Fixed Asset List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00,NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Fixed Asset List;
+               FRA=Liste des immobilisations];
+    SourceTable=Table5600;
+    PageType=List;
+    CardPageID=Fixed Asset Card;
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 30      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Fixed &Asset;
+                                 FRA=I&mmo.];
+                      Image=FixedAssets }
+      { 32      ;2   ;Action    ;
+                      CaptionML=[ENU=Depreciation &Books;
+                                 FRA=&Lois d'amortissement];
+                      RunObject=Page 5619;
+                      RunPageLink=FA No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=DepreciationBooks;
+                      PromotedCategory=Process }
+      { 46      ;2   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 FRA=Statistiques];
+                      RunObject=Page 5602;
+                      RunPageLink=FA No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process }
+      { 49      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      Image=Dimensions }
+      { 41      ;3   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions-Single;
+                                 FRA=Affectations - Simples];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(5600),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 50      ;3   ;Action    ;
+                      AccessByPermission=TableData 348=R;
+                      CaptionML=[ENU=Dimensions-&Multiple;
+                                 FRA=Affectations - &Multiples];
+                      Image=DimensionSets;
+                      OnAction=VAR
+                                 FA@1001 : Record 5600;
+                                 DefaultDimMultiple@1002 : Page 542;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(FA);
+                                 DefaultDimMultiple.SetMultiFA(FA);
+                                 DefaultDimMultiple.RUNMODAL;
+                               END;
+                                }
+      { 39      ;2   ;Action    ;
+                      CaptionML=[ENU=Main&tenance Ledger Entries;
+                                 FRA=êcritures comptables main&tenance];
+                      RunObject=Page 5641;
+                      RunPageView=SORTING(FA No.);
+                      RunPageLink=FA No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=MaintenanceLedgerEntries;
+                      PromotedCategory=Process }
+      { 42      ;2   ;Action    ;
+                      CaptionML=[ENU=Picture;
+                                 FRA=Image];
+                      RunObject=Page 5620;
+                      RunPageLink=No.=FIELD(No.);
+                      Image=Picture }
+      { 13      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=C&opy Fixed Asset;
+                                 FRA=C&opier immobilisation];
+                      Promoted=Yes;
+                      Image=CopyFixedAssets;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 CopyFA@1000 : Report 5685;
+                               BEGIN
+                                 CopyFA.SetFANo("No.");
+                                 CopyFA.RUNMODAL;
+                               END;
+                                }
+      { 48      ;2   ;Action    ;
+                      CaptionML=[ENU=FA Posting Types Overview;
+                                 FRA=Aperáu types compta. immo.];
+                      RunObject=Page 5662;
+                      Image=ShowMatrix }
+      { 40      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 FRA=Co&mmentaires];
+                      RunObject=Page 124;
+                      RunPageLink=Table Name=CONST(Fixed Asset),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 3       ;1   ;ActionGroup;
+                      CaptionML=[ENU=Main Asset;
+                                 FRA=Immobilisation principale];
+                      Image=Components }
+      { 44      ;2   ;Action    ;
+                      CaptionML=[ENU=M&ain Asset Components;
+                                 FRA=&Composants immo. principale];
+                      RunObject=Page 5658;
+                      RunPageLink=Main Asset No.=FIELD(No.);
+                      Image=Components }
+      { 47      ;2   ;Action    ;
+                      CaptionML=[ENU=Ma&in Asset Statistics;
+                                 FRA=Statistiques immo. pri&ncipale];
+                      RunObject=Page 5603;
+                      RunPageLink=FA No.=FIELD(No.);
+                      Image=StatisticsDocument }
+      { 45      ;2   ;Separator ;
+                      CaptionML=[ENU="";
+                                 FRA=""] }
+      { 5       ;1   ;ActionGroup;
+                      CaptionML=[ENU=History;
+                                 FRA=Historique];
+                      Image=History }
+      { 37      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 FRA=ê&critures comptables];
+                      RunObject=Page 5604;
+                      RunPageView=SORTING(FA No.);
+                      RunPageLink=FA No.=FIELD(No.);
+                      Promoted=No;
+                      Image=FixedAssetLedger;
+                      PromotedCategory=Process }
+      { 38      ;2   ;Action    ;
+                      CaptionML=[ENU=Error Ledger Entries;
+                                 FRA=Erreur Çcritures comptables];
+                      RunObject=Page 5605;
+                      RunPageView=SORTING(Canceled from FA No.);
+                      RunPageLink=Canceled from FA No.=FIELD(No.);
+                      Image=ErrorFALedgerEntries }
+      { 43      ;2   ;Action    ;
+                      CaptionML=[ENU=Maintenance &Registration;
+                                 FRA=S&aisie de la maintenance];
+                      RunObject=Page 5625;
+                      RunPageLink=FA No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=MaintenanceRegistrations;
+                      PromotedCategory=Process }
+      { 7       ;0   ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=Fixed Asset Journal;
+                                 FRA=Feuille immo];
+                      RunObject=Page 5629;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Journal;
+                      PromotedCategory=Process }
+      { 10      ;1   ;Action    ;
+                      CaptionML=[ENU=Fixed Asset G/L Journal;
+                                 FRA=Feuille compta. immo.];
+                      RunObject=Page 5628;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Journal;
+                      PromotedCategory=Process }
+      { 61      ;1   ;Action    ;
+                      CaptionML=[ENU=Fixed Asset Reclassification Journal;
+                                 FRA=Feuille reclassement immobilisation];
+                      RunObject=Page 5636;
+                      Promoted=Yes;
+                      Image=Journal;
+                      PromotedCategory=Process }
+      { 60      ;1   ;Action    ;
+                      CaptionML=[ENU=Recurring Fixed Asset Journal;
+                                 FRA=Feuille abonnement immo.];
+                      RunObject=Page 5634;
+                      Promoted=Yes;
+                      Image=Journal;
+                      PromotedCategory=Process }
+      { 11      ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Calculate Depreciation;
+                                 FRA=Calculer amortissement];
+                      RunObject=Report 5692;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CalculateDepreciation;
+                      PromotedCategory=Process }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1907091306;1 ;Action    ;
+                      CaptionML=[ENU=Fixed Assets List;
+                                 FRA=Liste immobilisations];
+                      RunObject=Report 5601;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1903109606;1 ;Action    ;
+                      CaptionML=[ENU=Acquisition List;
+                                 FRA=Liste des acquisitions];
+                      RunObject=Report 5608;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1901902606;1 ;Action    ;
+                      CaptionML=[ENU=Details;
+                                 FRA=DÇtails];
+                      RunObject=Report 5604;
+                      Promoted=Yes;
+                      Image=View;
+                      PromotedCategory=Report }
+      { 1905598506;1 ;Action    ;
+                      CaptionML=[ENU=Book Value 01;
+                                 FRA=Valeur comptable 01];
+                      RunObject=Report 5605;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1905598606;1 ;Action    ;
+                      CaptionML=[ENU=Book Value 02;
+                                 FRA=Valeur comptable 02];
+                      RunObject=Report 5606;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1901105406;1 ;Action    ;
+                      CaptionML=[ENU=Analysis;
+                                 FRA=Analyse];
+                      RunObject=Report 5600;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902048606;1 ;Action    ;
+                      CaptionML=[ENU=Projected Value;
+                                 FRA=Valeur projetÇe];
+                      RunObject=Report 5607;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1120000 ;1   ;Action    ;
+                      CaptionML=[ENU=Projected Value (Derogatory);
+                                 FRA=Valeur projetÇe (DÇrogatoire)];
+                      RunObject=Report 10886;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1903345906;1 ;Action    ;
+                      CaptionML=[ENU=G/L Analysis;
+                                 FRA=Analyse comptabilitÇ];
+                      RunObject=Report 5610;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1903807106;1 ;Action    ;
+                      CaptionML=[ENU=Register;
+                                 FRA=Transaction];
+                      RunObject=Report 5603;
+                      Promoted=Yes;
+                      Image=Confirm;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 23  ;2   ;Field     ;
+                SourceExpr="Vendor No." }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Maintenance Vendor No.";
+                Visible=TRUE }
+
+    { 35  ;2   ;Field     ;
+                SourceExpr="Responsible Employee";
+                Visible=TRUE }
+
+    { 25  ;2   ;Field     ;
+                SourceExpr="FA Class Code";
+                Visible=FALSE }
+
+    { 27  ;2   ;Field     ;
+                SourceExpr="FA Subclass Code";
+                Visible=FALSE }
+
+    { 33  ;2   ;Field     ;
+                SourceExpr="FA Location Code";
+                Visible=FALSE }
+
+    { 17  ;2   ;Field     ;
+                SourceExpr="Budgeted Asset";
+                Visible=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Search Description" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

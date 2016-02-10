@@ -1,0 +1,85 @@
+OBJECT Page 90011 Course List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=01/02/16;
+    Time=10:07:17;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=ENU=Course List;
+    SourceTable=Table90010;
+    PageType=List;
+    CardPageID=Course Card;
+    OnAfterGetRecord=BEGIN
+                       Level:='';
+                       Suggestion:='';
+                       SPA:=FALSE;
+                       CASE Difficulty OF
+                         1..5:
+                           BEGIN
+                             Level:='Beginner';
+                             Suggestion:='Take e-Learning or remote training';
+                           END;
+                         6..8:
+                           BEGIN
+                             Level:='Intermediate';
+                             Suggestion:='Attend instructor-Led';
+                           END;
+                         9..10:
+                           BEGIN
+                             Level:='Advanced';
+                             Suggestion:='Attend instructor-Led and self study';
+                           END;
+                         END;
+                         IF ("Passing Rate">=70)AND(Difficulty>=6)THEN
+                           SPA:=TRUE;
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1000000000;;Container;
+                CaptionML=ENU=Course List;
+                ContainerType=ContentArea }
+
+    { 1000000001;1;Group  ;
+                GroupType=Repeater }
+
+    { 1000000002;2;Field  ;
+                SourceExpr=Code }
+
+    { 1000000003;2;Field  ;
+                SourceExpr=Name }
+
+    { 1000000004;2;Field  ;
+                SourceExpr=Description }
+
+    { 1000000005;2;Field  ;
+                CaptionML=ENU=Level;
+                SourceExpr=Level }
+
+    { 1000000006;2;Field  ;
+                CaptionML=ENU=Suggestion;
+                SourceExpr=Suggestion }
+
+    { 1000000007;2;Field  ;
+                CaptionML=ENU=SPA;
+                SourceExpr=SPA }
+
+  }
+  CODE
+  {
+    VAR
+      Level@1000000000 : Text[30];
+      Suggestion@1000000001 : Text[80];
+      SPA@1000000002 : Boolean;
+
+    BEGIN
+    END.
+  }
+}
+

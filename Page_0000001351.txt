@@ -1,0 +1,141 @@
+OBJECT Page 1351 Mini Inventory Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Inventory Setup;
+               FRA=Paramätres stock];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table313;
+    PageType=Card;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,General,Posting,Journal Templates;
+                                FRA=Nouveau,Traitement,êtat,GÇnÇral,Validation,Modäles feuille];
+    OnOpenPage=BEGIN
+                 RESET;
+                 IF NOT GET THEN BEGIN
+                   INIT;
+                   INSERT;
+                 END;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 10      ;    ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 11      ;1   ;Action    ;
+                      CaptionML=[ENU=Inventory Periods;
+                                 FRA=PÇriodes inventaire];
+                      ToolTipML=[ENU=Set up periods in combinations with your accounting periods that define when you can post transactions that affect the value of your item inventory. When you close an inventory period, you cannot post any changes to the inventory value, either expected or actual value, before the ending date of the inventory period.;
+                                 FRA=ParamÇtrez des pÇriodes en combinaison avec vos pÇriodes comptables qui dÇfinissent le moment oó vous pouvez valider les transactions qui affectent la valeur de votre stock d'articles. Lorsque vous clìturez une pÇriode inventaire, vous ne pouvez valider aucune modification apportÇe Ö la valeur du stock (valeur escomptÇe ou rÇelle) avant la date de fin de la pÇriode inventaire.];
+                      RunObject=Page 5828;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Period;
+                      PromotedCategory=Category4 }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Units of Measure;
+                                 FRA=UnitÇs];
+                      ToolTipML=[ENU=Set up the units of measure, such as PSC or HOUR, that you can select from in the Item Units of Measure window that you access from the item card.;
+                                 FRA=ParamÇtrez les unitÇs de mesure parmi lesquelles opÇrer votre sÇlection, par exemple PSC ou HEURE, dans la fenàtre UnitÇs article Ö laquelle vous pouvez accÇder Ö partir de la fiche article.];
+                      RunObject=Page 209;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=UnitOfMeasure;
+                      PromotedCategory=Category4 }
+      { 20      ;1   ;Action    ;
+                      CaptionML=[ENU=Item Discount Groups;
+                                 FRA=Groupes remises article];
+                      ToolTipML=[ENU=Set up discount group codes that you can use as criteria when you define special discounts on a customer, vendor, or item card.;
+                                 FRA=ParamÇtrez des codes groupes remises que vous pouvez utiliser comme critäres lorsque vous dÇfinissez des remises spÇciales sur une fiche client, fournisseur ou article.];
+                      RunObject=Page 513;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Discount;
+                      PromotedCategory=Category4 }
+      { 13      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Posting;
+                                 FRA=Validation] }
+      { 14      ;2   ;Action    ;
+                      CaptionML=[ENU=Inventory Posting Setup;
+                                 FRA=Paramätres compta. stock];
+                      ToolTipML=[ENU=Set up links between inventory posting groups, inventory locations, and general ledger accounts to define where transactions for inventory items are recorded in the general ledger.;
+                                 FRA=ParamÇtrez des liens entre des groupes comptabilisation stock, des magasins et des comptes gÇnÇraux afin de dÇfinir l'emplacement d'enregistrement dans la comptabilitÇ des transactions pour les articles en stock.];
+                      RunObject=Page 5826;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostedInventoryPick;
+                      PromotedCategory=Category5 }
+      { 15      ;2   ;Action    ;
+                      CaptionML=[ENU=Inventory Posting Groups;
+                                 FRA=Groupes compta. stock];
+                      ToolTipML=[ENU=Set up the posting groups that you assign to item cards to link business transactions made for the item with an inventory account in the general ledger to group amounts for that item type.;
+                                 FRA=ParamÇtrez les groupes comptabilisation que vous affectez aux fiches articles pour lier les transactions commerciales effectuÇes pour l'article Ö un compte stock dans la comptabilitÇ afin de regrouper les montants de ce type d'article.];
+                      RunObject=Page 112;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=ItemGroup;
+                      PromotedCategory=Category5 }
+      { 16      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Journal Templates;
+                                 FRA=Modäles feuille] }
+      { 17      ;2   ;Action    ;
+                      CaptionML=[ENU=Item Journal Templates;
+                                 FRA=Modäles feuille article];
+                      ToolTipML=[ENU=Set up number series and reason codes in the journals that you use for inventory adjustment. By using different templates you can design windows with different layouts and you can assign trace codes, number series, and reports to each template.;
+                                 FRA=ParamÇtrez des souches de numÇros et des codes motif dans les feuilles que vous utilisez pour l'ajustement du stock. En utilisant diffÇrents modäles, vous pouvez crÇer des fenàtres d'aspects diffÇrents et vous pouvez affecter des codes suivi, des souches de numÇros et des Çtats Ö chaque modäle.];
+                      RunObject=Page 102;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=JournalSetup;
+                      PromotedCategory=Category6 }
+    }
+  }
+  CONTROLS
+  {
+    { 101 ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=Setup Fields;
+                           FRA=Champs de paramÇtrage];
+                GroupType=Group }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies that the Automatic Cost Posting function is used.;
+                           FRA=SpÇcifie que la fonction Compta. coñts automatique est utilisÇe.];
+                SourceExpr="Automatic Cost Posting" }
+
+    { 36  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies whether to adjust for any cost changes automatically every time that you post inventory transactions. The adjustment process and its consequences are the same as for the Adjust Cost - Item Entries batch job.;
+                           FRA=Indique s'il faut ajuster automatiquement toute modification de coñts chaque fois que vous validez des mouvements de stock. Le processus d'ajustement et ses consÇquences sont identiques Ö ceux du traitement par lots Ajuster coñt - Ecritures article.];
+                SourceExpr="Automatic Cost Adjustment" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies if you can post transactions that will bring inventory levels below zero.;
+                           FRA=Indique si vous pouvez valider des transactions qui entraåneraient des niveaux de stock nÇgatifs.];
+                SourceExpr="Prevent Negative Inventory" }
+
+    { 4   ;2   ;Field     ;
+                Lookup=Yes;
+                CaptionML=[ENU=Item Numbers;
+                           FRA=NumÇros d'article];
+                ToolTipML=[ENU=Specifies the code for the number series that will be used to assign numbers to items. To see the number series that have been set up in the No. Series table, choose the field.;
+                           FRA=Affiche le code de la souche numÇros utilisÇe pour affecter des numÇros aux articles. Pour visualiser les souches de numÇros qui ont ÇtÇ dÇfinies dans la table Souches de n¯, cliquez sur le champ.];
+                SourceExpr="Item Nos.";
+                TableRelation="No. Series".Code }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

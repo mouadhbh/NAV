@@ -1,0 +1,58 @@
+OBJECT Table 2000000110 Active Session
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Active Session;
+               FRA=Session active];
+  }
+  FIELDS
+  {
+    { 1   ;   ;User SID            ;GUID          ;TableRelation=User."User Security ID";
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=User SID;
+                                                              FRA=SID utilisateur] }
+    { 2   ;   ;Server Instance ID  ;Integer       ;TableRelation="Server Instance"."Server Instance ID";
+                                                   CaptionML=[ENU=Server Instance ID;
+                                                              FRA=ID instance de serveur] }
+    { 3   ;   ;Session ID          ;Integer       ;CaptionML=[ENU=Session ID;
+                                                              FRA=ID session] }
+    { 4   ;   ;Server Instance Name;Text250       ;CaptionML=[ENU=Server Instance Name;
+                                                              FRA=Nom d'instance de serveur] }
+    { 5   ;   ;Server Computer Name;Text250       ;CaptionML=[ENU=Server Computer Name;
+                                                              FRA=Nom du serveur] }
+    { 6   ;   ;User ID             ;Text132       ;CaptionML=[ENU=User ID;
+                                                              FRA=Code utilisateur] }
+    { 7   ;   ;Client Type         ;Option        ;CaptionML=[ENU=Client Type;
+                                                              FRA=Type de client];
+                                                   OptionCaptionML=[ENU=Windows Client,SharePoint Client,Web Service,Client Service,NAS,Background,Management Client,Web Client,Unknown,Tablet,Phone,Desktop;
+                                                                    FRA=Client Windows,Client SharePoint,Service Web,Service client,NAS,ArriŠre-plan,Gestion client,Client web,Inconnu,Tablette,T‚l‚phone,Bureau];
+                                                   OptionString=Windows Client,SharePoint Client,Web Service,Client Service,NAS,Background,Management Client,Web Client,Unknown,Tablet,Phone,Desktop }
+    { 8   ;   ;Client Computer Name;Text250       ;CaptionML=[ENU=Client Computer Name;
+                                                              FRA=Nom de l'ordinateur client] }
+    { 9   ;   ;Login Datetime      ;DateTime      ;CaptionML=[ENU=Login Datetime;
+                                                              FRA=Date et heure de connexion] }
+    { 10  ;   ;Database Name       ;Text250       ;CaptionML=[ENU=Database Name;
+                                                              FRA=Nom de la base de donn‚es] }
+  }
+  KEYS
+  {
+    {    ;Server Instance ID,Session ID           ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

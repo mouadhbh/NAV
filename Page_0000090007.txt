@@ -1,0 +1,234 @@
+OBJECT Page 90007 Test Array Page
+{
+  OBJECT-PROPERTIES
+  {
+    Date=01/02/16;
+    Time=14:44:25;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    ActionList=ACTIONS
+    {
+      { 1000000027;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1000000028;1 ;Action    ;
+                      Name=Clear;
+                      CaptionML=ENU=Clear;
+                      OnAction=BEGIN
+                                 CLEAR(InputNumber);
+                                 CLEAR(OutputNumber);
+                                 LoopCount:=0;
+                                 SwapCount:=0;
+                               END;
+                                }
+      { 1000000029;1 ;Action    ;
+                      Name=Generate Input;
+                      CaptionML=ENU=Generate Input;
+                      OnAction=BEGIN
+                                 LoopCount:=0;
+                                 SwapCount:=0;
+                                 FOR idx:=1 TO ARRAYLEN(InputNumber) DO
+                                   InputNumber[idx]:= RANDOM(ARRAYLEN(InputNumber));
+                               END;
+                                }
+      { 1000000030;1 ;Action    ;
+                      Name=Populate Output;
+                      CaptionML=ENU=Populate Output;
+                      OnAction=BEGIN
+                                 LoopCount:=0;
+                                 SwapCount:=0;
+                                 idx:=1;
+                                 WHILE(idx<=ARRAYLEN(InputNumber))AND(idx<=ARRAYLEN(OutputNumber))DO BEGIN
+                                   OutputNumber[idx]:=InputNumber[idx];
+                                   idx+=1;
+                                   END;
+                               END;
+                                }
+      { 1000000031;1 ;Action    ;
+                      Name=Sort;
+                      CaptionML=ENU=Sort;
+                      OnAction=BEGIN
+                                 LoopCount:=0;
+                                 SwapCount:=0;
+                                 REPEAT
+                                   IsSorted:=TRUE;
+                                   FOR idx:=ARRAYLEN(OutputNumber)DOWNTO 2 DO BEGIN
+                                     LoopCount+=1;
+                                     IF OutputNumber[idx]<OutputNumber[idx-1] THEN BEGIN
+                                       TempNumber:=OutputNumber[idx];
+                                       OutputNumber[idx]:=OutputNumber[idx-1];
+                                       OutputNumber[idx-1]:=TempNumber;
+                                       SwapCount+=1;
+                                       IsSorted:=FALSE;
+                                     END;
+                                   END;
+                                 UNTIL IsSorted
+                               END;
+                                }
+      { 1000000032;1 ;Action    ;
+                      Name=Improved Sort;
+                      CaptionML=ENU=Improved Sort;
+                      OnAction=BEGIN
+                                 LoopCount:=0;
+                                 SwapCount:=0;
+                                 LowestSwitch:=2;
+                                 REPEAT
+                                   IsSorted:=TRUE;
+                                   FOR idx:=ARRAYLEN(OutputNumber)DOWNTO LowestSwitch DO BEGIN
+                                     LoopCount+=1;
+                                     IF OutputNumber[idx]<OutputNumber[idx-1] THEN BEGIN
+                                       TempNumber:=OutputNumber[idx];
+                                       OutputNumber[idx]:=OutputNumber[idx-1];
+                                       OutputNumber[idx-1]:=TempNumber;
+                                       SwapCount+=1;
+                                       IsSorted:=FALSE;
+                                       LowestSwitch:=idx+1;
+                                     END;
+                                   END;
+                                 UNTIL IsSorted
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1000000000;;Container;
+                CaptionML=ENU=Test Array Page;
+                ContainerType=ContentArea }
+
+    { 1000000001;1;Group  ;
+                CaptionML=ENU=General;
+                GroupType=Group }
+
+    { 1000000002;2;Group  ;
+                CaptionML=ENU=Input;
+                GroupType=Group }
+
+    { 1000000003;3;Field  ;
+                CaptionML=ENU=InputNumber[1];
+                SourceExpr=InputNumber[1] }
+
+    { 1000000004;3;Field  ;
+                CaptionML=ENU=InputNumber[2];
+                SourceExpr=InputNumber[2] }
+
+    { 1000000005;3;Field  ;
+                CaptionML=ENU=InputNumber[3];
+                SourceExpr=InputNumber[3] }
+
+    { 1000000006;3;Field  ;
+                CaptionML=ENU=InputNumber[4];
+                SourceExpr=InputNumber[4] }
+
+    { 1000000007;3;Field  ;
+                CaptionML=ENU=InputNumber[5];
+                SourceExpr=InputNumber[5] }
+
+    { 1000000008;3;Field  ;
+                CaptionML=ENU=InputNumber[6];
+                SourceExpr=InputNumber[6] }
+
+    { 1000000009;3;Field  ;
+                CaptionML=ENU=InputNumber[7];
+                SourceExpr=InputNumber[7] }
+
+    { 1000000010;3;Field  ;
+                CaptionML=ENU=InputNumber[8];
+                SourceExpr=InputNumber[8] }
+
+    { 1000000011;3;Field  ;
+                CaptionML=ENU=InputNumber[9];
+                SourceExpr=InputNumber[9] }
+
+    { 1000000012;3;Field  ;
+                CaptionML=ENU=InputNumber[10];
+                SourceExpr=InputNumber[10] }
+
+    { 1000000013;2;Group  ;
+                CaptionML=ENU=Output;
+                GroupType=Group }
+
+    { 1000000023;3;Field  ;
+                CaptionML=ENU=OutputNumber[1];
+                SourceExpr=OutputNumber[1];
+                Editable=FALSE }
+
+    { 1000000022;3;Field  ;
+                CaptionML=ENU=OuputNumber[2];
+                SourceExpr=OutputNumber[2];
+                Editable=FALSE }
+
+    { 1000000021;3;Field  ;
+                CaptionML=ENU=OutputNumber[3];
+                SourceExpr=OutputNumber[3];
+                Editable=FALSE }
+
+    { 1000000020;3;Field  ;
+                CaptionML=ENU=OutputNumber[4];
+                SourceExpr=OutputNumber[4];
+                Editable=FALSE }
+
+    { 1000000019;3;Field  ;
+                CaptionML=ENU=OutputNumber[5];
+                SourceExpr=OutputNumber[5];
+                Editable=FALSE }
+
+    { 1000000018;3;Field  ;
+                CaptionML=ENU=OutputNumber[6];
+                SourceExpr=OutputNumber[6];
+                Editable=FALSE }
+
+    { 1000000017;3;Field  ;
+                CaptionML=ENU=OutputNumber[7];
+                SourceExpr=OutputNumber[7];
+                Editable=FALSE }
+
+    { 1000000016;3;Field  ;
+                CaptionML=ENU=OutputNumber[8];
+                SourceExpr=OutputNumber[8];
+                Editable=FALSE }
+
+    { 1000000015;3;Field  ;
+                CaptionML=ENU=OutputNumber[9];
+                SourceExpr=OutputNumber[9];
+                Editable=FALSE }
+
+    { 1000000014;3;Field  ;
+                CaptionML=ENU=OutputNumber[10];
+                SourceExpr=OutputNumber[10];
+                Editable=FALSE }
+
+    { 1000000024;2;Group  ;
+                CaptionML=ENU=Counter;
+                GroupType=Group }
+
+    { 1000000025;3;Field  ;
+                CaptionML=ENU=LoopCount;
+                SourceExpr=LoopCount;
+                Editable=FALSE }
+
+    { 1000000026;3;Field  ;
+                CaptionML=ENU=SwapCount;
+                SourceExpr=SwapCount;
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+    VAR
+      InputNumber@1000000000 : ARRAY [10] OF Integer;
+      OutputNumber@1000000001 : ARRAY [10] OF Integer;
+      LoopCount@1000000002 : Integer;
+      SwapCount@1000000003 : Integer;
+      idx@1000000004 : Integer;
+      IsSorted@1000000005 : Boolean;
+      LowestSwitch@1000000006 : Integer;
+      TempNumber@1000000007 : Integer;
+
+    BEGIN
+    END.
+  }
+}
+

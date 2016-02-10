@@ -1,0 +1,56 @@
+OBJECT Table 2000000161 NAV App Dependencies
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=NAV App Dependencies;
+               FRA=DÇpendances appli NAV];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Package ID          ;GUID          ;CaptionML=[ENU=Package ID;
+                                                              FRA=ID package] }
+    { 2   ;   ;ID                  ;GUID          ;CaptionML=[ENU=ID;
+                                                              FRA=ID] }
+    { 3   ;   ;Name                ;Text250       ;CaptionML=[ENU=Name;
+                                                              FRA=Nom] }
+    { 4   ;   ;Publisher           ;Text250       ;CaptionML=[ENU=Publisher;
+                                                              FRA=êditeur] }
+    { 5   ;   ;Version Major       ;Integer       ;CaptionML=[ENU=Version Major;
+                                                              FRA=Version majeure] }
+    { 6   ;   ;Version Minor       ;Integer       ;CaptionML=[ENU=Version Minor;
+                                                              FRA=Version mineure] }
+    { 7   ;   ;Version Build       ;Integer       ;CaptionML=[ENU=Version Build;
+                                                              FRA=Build version] }
+    { 8   ;   ;Version Revision    ;Integer       ;CaptionML=[ENU=Version Revision;
+                                                              FRA=RÇvision version] }
+    { 9   ;   ;Compatibility Major ;Integer       ;CaptionML=[ENU=Compatibility Major;
+                                                              FRA=CompatibilitÇ majeure] }
+    { 10  ;   ;Compatibility Minor ;Integer       ;CaptionML=[ENU=Compatibility Minor;
+                                                              FRA=CompatibilitÇ mineure] }
+    { 11  ;   ;Compatibility Build ;Integer       ;CaptionML=[ENU=Compatibility Build;
+                                                              FRA=Build compatibilitÇ] }
+    { 12  ;   ;Compatibility Revision;Integer     ;CaptionML=[ENU=Compatibility Revision;
+                                                              FRA=RÇvision compatibilitÇ] }
+  }
+  KEYS
+  {
+    {    ;Package ID,ID                           ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

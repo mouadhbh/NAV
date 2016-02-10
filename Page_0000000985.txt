@@ -1,0 +1,112 @@
+OBJECT Page 985 Document Search
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Document Search;
+               FRA=Recherche de documents];
+    PageType=Card;
+    ShowFilter=No;
+    ActionList=ACTIONS
+    {
+      { 1       ;    ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 12      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Search;
+                                 FRA=Rechercher] }
+      { 4       ;2   ;Action    ;
+                      Name=Search;
+                      CaptionML=[ENU=Search;
+                                 FRA=Rechercher];
+                      ToolTipML=[ENU=Search for unposted documents that have the specified numbers or amount.;
+                                 FRA=Recherchez les documents non valid‚s avec le montant ou les num‚ros sp‚cifi‚s.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Navigate;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 PaymentRegistrationMgt.FindRecords(TempDocumentSearchResult,DocumentNo,Amount,AmountTolerance);
+                                 PAGE.RUN(PAGE::"Document Search Result",TempDocumentSearchResult);
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 3   ;    ;Container ;
+                Name=Content1;
+                ContainerType=ContentArea }
+
+    { 7   ;1   ;Group     ;
+                CaptionML=[ENU=Search Criteria;
+                           FRA=CritŠres de recherche];
+                GroupType=Group }
+
+    { 5   ;2   ;Field     ;
+                Name=DocumentNo;
+                CaptionML=[ENU=Document No.;
+                           FRA=Nø document];
+                SourceExpr=DocumentNo }
+
+    { 6   ;2   ;Field     ;
+                Name=Amount;
+                CaptionML=[ENU=Amount;
+                           FRA=Montant];
+                BlankZero=Yes;
+                SourceExpr=Amount;
+                OnValidate=BEGIN
+                             Warning := PaymentRegistrationMgt.SetToleranceLimits(Amount,AmountTolerance,ToleranceTxt);
+                           END;
+                            }
+
+    { 2   ;2   ;Field     ;
+                Name=AmountTolerance;
+                CaptionML=[ENU=Amount Tolerance %;
+                           FRA=% ‚cart de quantit‚];
+                BlankZero=Yes;
+                SourceExpr=AmountTolerance;
+                MinValue=0;
+                MaxValue=100;
+                OnValidate=BEGIN
+                             Warning := PaymentRegistrationMgt.SetToleranceLimits(Amount,AmountTolerance,ToleranceTxt)
+                           END;
+                            }
+
+    { 10  ;1   ;Group     ;
+                CaptionML=[ENU=Information;
+                           FRA=Informations];
+                GroupType=Group }
+
+    { 9   ;2   ;Group     ;
+                GroupType=FixedLayout }
+
+    { 8   ;3   ;Group     ;
+                GroupType=Group }
+
+    { 11  ;4   ;Field     ;
+                SourceExpr=Warning;
+                Editable=FALSE;
+                Style=Strong }
+
+  }
+  CODE
+  {
+    VAR
+      TempDocumentSearchResult@1003 : TEMPORARY Record 983;
+      PaymentRegistrationMgt@1002 : Codeunit 980;
+      Warning@1001 : Text;
+      DocumentNo@1004 : Code[20];
+      Amount@1005 : Decimal;
+      AmountTolerance@1000 : Decimal;
+      ToleranceTxt@1006 : TextConst 'ENU=The program will search for documents with amounts between %1 and %2.;FRA=Le programme va rechercher les documents avec des montants compris entre %1 et %2.';
+
+    BEGIN
+    END.
+  }
+}
+

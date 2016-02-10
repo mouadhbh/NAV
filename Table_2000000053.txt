@@ -1,0 +1,68 @@
+OBJECT Table 2000000053 Access Control
+{
+  OBJECT-PROPERTIES
+  {
+    Date=25/05/05;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Access Control;
+               FRA=Contr“le d'accŠs];
+  }
+  FIELDS
+  {
+    { 1   ;   ;User Security ID    ;GUID          ;TableRelation=User."User Security ID";
+                                                   CaptionML=[ENU=User Security ID;
+                                                              FRA=ID s‚curit‚ utilisateur] }
+    { 2   ;   ;Role ID             ;Code20        ;TableRelation="Aggregate Permission Set"."Role ID";
+                                                   CaptionML=[ENU=Role ID;
+                                                              FRA=ID r“le] }
+    { 3   ;   ;Company Name        ;Text30        ;TableRelation=Company.Name;
+                                                   CaptionML=[ENU=Company Name;
+                                                              FRA=Nom de la soci‚t‚] }
+    { 5   ;   ;User Name           ;Code50        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(User."User Name" WHERE (User Security ID=FIELD(User Security ID)));
+                                                   CaptionML=[ENU=User Name;
+                                                              FRA=Nom utilisateur] }
+    { 7   ;   ;Role Name           ;Text30        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup("Aggregate Permission Set".Name WHERE (Scope=FIELD(Scope),
+                                                                                                             App ID=FIELD(App ID),
+                                                                                                             Role ID=FIELD(Role ID)));
+                                                   CaptionML=[ENU=Role Name;
+                                                              FRA=Nom r“le] }
+    { 8   ;   ;Scope               ;Option        ;TableRelation="Aggregate Permission Set".Scope;
+                                                   CaptionML=[ENU=Scope;
+                                                              FRA=Port‚e];
+                                                   OptionCaptionML=[ENU=System,Tenant;
+                                                                    FRA=SystŠme,Abonn‚];
+                                                   OptionString=System,Tenant }
+    { 9   ;   ;App ID              ;GUID          ;TableRelation="Aggregate Permission Set"."App ID";
+                                                   CaptionML=[ENU=App ID;
+                                                              FRA=ID appli] }
+    { 10  ;   ;App Name            ;Text250       ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup("Aggregate Permission Set"."App Name" WHERE (Scope=FIELD(Scope),
+                                                                                                                   App ID=FIELD(App ID),
+                                                                                                                   Role ID=FIELD(Role ID)));
+                                                   CaptionML=[ENU=App Name;
+                                                              FRA=Nom appli] }
+  }
+  KEYS
+  {
+    {    ;User Security ID,Role ID,Company Name,Scope,App ID;
+                                                   Clustered=Yes }
+    {    ;Role ID                                  }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,393 @@
+OBJECT Page 10869 Payment Slip Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVFR8.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Lines;
+               FRA=Lignes];
+    SourceTable=Table10866;
+    DelayedInsert=Yes;
+    PageType=ListPart;
+    AutoSplitKey=Yes;
+    OnInit=BEGIN
+             BankAccountCodeVisible := TRUE;
+             CreditAmountVisible := TRUE;
+             DebitAmountVisible := TRUE;
+             AmountVisible := TRUE;
+             AcceptationCodeVisible := TRUE;
+             RIBVisible := TRUE;
+           END;
+
+    OnAfterGetRecord=BEGIN
+                       ActivateControls;
+                       BankInfoEditable := IsBankInfoEditable;
+                       AccountNoEmphasize := "Copied To No." <> '';
+                     END;
+
+    OnNewRecord=BEGIN
+                  SetUpNewLine(xRec,BelowxRec);
+                END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1906587504;1 ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 FRA=Fonction&s];
+                      Image=Action }
+      { 1900654604;2 ;Action    ;
+                      CaptionML=[ENU=Set Document ID;
+                                 FRA=Attribuer n¯ document];
+                      OnAction=BEGIN
+                                 SetDocumentID;
+                               END;
+                                }
+      { 1907935204;1 ;ActionGroup;
+                      CaptionML=[ENU=&Line;
+                                 FRA=&Ligne];
+                      Image=Line }
+      { 1906127004;2 ;Action    ;
+                      Name=Application;
+                      ShortCutKey=Shift+F11;
+                      CaptionML=[ENU=&Application;
+                                 FRA=Lettr&age];
+                      OnAction=BEGIN
+                                 Application;
+                               END;
+                                }
+      { 1900201904;2 ;Action    ;
+                      Name=Dimensions;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      Image=Dimensions;
+                      OnAction=BEGIN
+                                 ShowDimensions;
+                               END;
+                                }
+      { 1900724704;2 ;Action    ;
+                      CaptionML=[ENU=Modify;
+                                 FRA=Modifier];
+                      Image=EditFilter;
+                      OnAction=BEGIN
+                                 OnModify;
+                               END;
+                                }
+      { 1900724604;2 ;Action    ;
+                      CaptionML=[ENU=Insert;
+                                 FRA=Insertion];
+                      OnAction=BEGIN
+                                 OnInsert;
+                               END;
+                                }
+      { 1900724504;2 ;Action    ;
+                      Name=Remove;
+                      CaptionML=[ENU=Remove;
+                                 FRA=Supprimer];
+                      Image=Cancel;
+                      OnAction=BEGIN
+                                 OnDelete;
+                               END;
+                                }
+      { 1905048704;2 ;ActionGroup;
+                      CaptionML=[ENU=A&ccount;
+                                 FRA=&Compte];
+                      Image=ChartOfAccounts }
+      { 1903237904;3 ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Card;
+                                 FRA=Fiche];
+                      Image=EditLines;
+                      OnAction=BEGIN
+                                 ShowAccount;
+                               END;
+                                }
+      { 1905215804;3 ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 FRA=ê&critures comptables];
+                      OnAction=BEGIN
+                                 ShowEntries;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Account Type";
+                OnValidate=BEGIN
+                             BankInfoEditable := IsBankInfoEditable;
+                           END;
+                            }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr="Account No.";
+                Style=Strong;
+                StyleExpr=AccountNoEmphasize }
+
+    { 1120014;2;Field     ;
+                SourceExpr="Document No." }
+
+    { 1120024;2;Field     ;
+                SourceExpr="External Document No.";
+                Visible=FALSE }
+
+    { 1120026;2;Field     ;
+                SourceExpr="Drawee Reference" }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr="Posting Group";
+                Visible=FALSE }
+
+    { 13  ;2   ;Field     ;
+                SourceExpr="Due Date" }
+
+    { 1120016;2;Field     ;
+                SourceExpr="Debit Amount";
+                Visible=DebitAmountVisible }
+
+    { 1120018;2;Field     ;
+                SourceExpr="Credit Amount";
+                Visible=CreditAmountVisible }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Amount;
+                Visible=AmountVisible }
+
+    { 1120030;2;Field     ;
+                SourceExpr=IBAN;
+                Editable=BankInfoEditable }
+
+    { 1120032;2;Field     ;
+                SourceExpr="SWIFT Code";
+                Editable=BankInfoEditable }
+
+    { 1120000;2;Field     ;
+                SourceExpr="Bank Account Code";
+                Visible=BankAccountCodeVisible }
+
+    { 1120002;2;Field     ;
+                SourceExpr="Acceptation Code";
+                Visible=AcceptationCodeVisible }
+
+    { 1120022;2;Field     ;
+                SourceExpr="Payment Address Code" }
+
+    { 1120004;2;Field     ;
+                SourceExpr="Bank Branch No.";
+                Visible=RIBVisible;
+                Editable=BankInfoEditable }
+
+    { 1120008;2;Field     ;
+                SourceExpr="Agency Code";
+                Visible=RIBVisible;
+                Editable=BankInfoEditable }
+
+    { 1120006;2;Field     ;
+                SourceExpr="Bank Account No.";
+                Visible=RIBVisible;
+                Editable=BankInfoEditable }
+
+    { 1120020;2;Field     ;
+                SourceExpr="Bank Account Name";
+                Visible=RIBVisible;
+                Editable=BankInfoEditable }
+
+    { 1120028;2;Field     ;
+                SourceExpr="Bank City";
+                Visible=FALSE;
+                Editable=BankInfoEditable }
+
+    { 1120010;2;Field     ;
+                SourceExpr="RIB Key";
+                Visible=RIBVisible;
+                Editable=BankInfoEditable }
+
+    { 1120012;2;Field     ;
+                SourceExpr="RIB Checked";
+                Visible=RIBVisible }
+
+    { 1120001;2;Field     ;
+                SourceExpr="Has Payment Export Error" }
+
+    { 1120003;2;Field     ;
+                SourceExpr="Direct Debit Mandate ID" }
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1120000 : TextConst 'ENU=Assign No. ?;FRA=Affectation des n¯ ?';
+      Header@1120001 : Record 10865;
+      Status@1120002 : Record 10861;
+      Text001@1120003 : TextConst 'ENU=There is no line to modify.;FRA=Il n''y a pas de ligne Ö modifier.';
+      Text002@1120004 : TextConst 'ENU=A posted line cannot be modified.;FRA=Une ligne validÇe ne peut pas àtre modifiÇe.';
+      Text003@1120005 : TextConst 'ENU=You cannot assign numbers to a posted header.;FRA=Vous ne pouvez pas affecter de numÇros Ö un bordereau validÇ.';
+      Navigate@1120008 : Page 344;
+      AccountNoEmphasize@1120016 : Boolean INDATASET;
+      AcceptationCodeVisible@1120014 : Boolean INDATASET;
+      AmountVisible@1120013 : Boolean INDATASET;
+      BankAccountCodeVisible@1120010 : Boolean INDATASET;
+      BankInfoEditable@1120009 : Boolean INDATASET;
+      CreditAmountVisible@1120011 : Boolean INDATASET;
+      DebitAmountVisible@1120012 : Boolean INDATASET;
+      RIBVisible@1120015 : Boolean INDATASET;
+
+    LOCAL PROCEDURE Application@1();
+    BEGIN
+      CODEUNIT.RUN(CODEUNIT::"Payment-Apply",Rec);
+    END;
+
+    LOCAL PROCEDURE DisableFields@2();
+    BEGIN
+      IF Header.GET("No.") THEN
+        CurrPage.EDITABLE((Header."Status No." = 0) AND ("Copied To No." = ''));
+    END;
+
+    LOCAL PROCEDURE OnModify@3();
+    VAR
+      PaymentLine@1120001 : Record 10866;
+      PaymentModification@1120000 : Page 10871;
+    BEGIN
+      IF "Line No." = 0 THEN
+        MESSAGE(Text001)
+      ELSE
+        IF NOT Posted THEN BEGIN
+          PaymentLine.COPY(Rec);
+          PaymentLine.SETRANGE("No.","No.");
+          PaymentLine.SETRANGE("Line No.","Line No.");
+          PaymentModification.SETTABLEVIEW(PaymentLine);
+          PaymentModification.RUNMODAL;
+        END ELSE
+          MESSAGE(Text002);
+    END;
+
+    LOCAL PROCEDURE OnInsert@1120007();
+    VAR
+      PaymentManagement@1120000 : Codeunit 10860;
+    BEGIN
+      PaymentManagement.LinesInsert("No.");
+    END;
+
+    LOCAL PROCEDURE OnDelete@4();
+    VAR
+      StatementLine@1120001 : Record 10866;
+      PostingStatement@1120000 : Codeunit 10860;
+    BEGIN
+      StatementLine.COPY(Rec);
+      CurrPage.SETSELECTIONFILTER(StatementLine);
+      PostingStatement.DeleteLigBorCopy(StatementLine);
+    END;
+
+    LOCAL PROCEDURE SetDocumentID@1120000();
+    VAR
+      StatementLine@1120000 : Record 10866;
+      PostingStatement@1120001 : Codeunit 10860;
+      No@1120002 : Code[20];
+    BEGIN
+      IF "Status No." <> 0 THEN BEGIN
+        MESSAGE(Text003);
+        EXIT;
+      END;
+      IF CONFIRM(Text000) THEN BEGIN
+        CurrPage.SETSELECTIONFILTER(StatementLine);
+        StatementLine.MARKEDONLY(TRUE);
+        IF NOT StatementLine.FIND('-') THEN
+          StatementLine.MARKEDONLY(FALSE);
+        IF StatementLine.FIND('-') THEN BEGIN
+          No := StatementLine."Document No.";
+          WHILE StatementLine.NEXT <> 0 DO BEGIN
+            PostingStatement.IncrementNoText(No,1);
+            StatementLine."Document No." := No;
+            StatementLine.MODIFY;
+          END;
+        END;
+      END;
+    END;
+
+    LOCAL PROCEDURE ShowAccount@1120001();
+    VAR
+      GenJnlLine@1120005 : Record 81;
+    BEGIN
+      GenJnlLine."Account Type" := "Account Type";
+      GenJnlLine."Account No." := "Account No.";
+      CODEUNIT.RUN(CODEUNIT::"Gen. Jnl.-Show Card",GenJnlLine);
+    END;
+
+    LOCAL PROCEDURE ShowEntries@1120002();
+    VAR
+      GenJnlLine@1120000 : Record 81;
+    BEGIN
+      GenJnlLine."Account Type" := "Account Type";
+      GenJnlLine."Account No." := "Account No.";
+      CODEUNIT.RUN(CODEUNIT::"Gen. Jnl.-Show Entries",GenJnlLine);
+    END;
+
+    PROCEDURE MarkLines@1120003(ToMark@1120000 : Boolean);
+    VAR
+      LineCopy@1120002 : Record 10866;
+      NumLines@1120003 : Integer;
+    BEGIN
+      IF ToMark THEN BEGIN
+        CurrPage.SETSELECTIONFILTER(LineCopy);
+        NumLines := LineCopy.COUNT;
+        IF NumLines > 0 THEN BEGIN
+          LineCopy.FIND('-');
+          REPEAT
+            LineCopy.Marked := TRUE;
+            LineCopy.MODIFY;
+          UNTIL LineCopy.NEXT = 0;
+        END ELSE
+          LineCopy.RESET;
+        LineCopy.SETRANGE("No.","No.");
+        LineCopy.MODIFYALL(Marked,TRUE);
+      END ELSE BEGIN
+        LineCopy.SETRANGE("No.","No.");
+        LineCopy.MODIFYALL(Marked,FALSE);
+      END;
+      COMMIT;
+    END;
+
+    LOCAL PROCEDURE ActivateControls@1120004();
+    BEGIN
+      IF Header.GET("No.") THEN BEGIN
+        Status.GET(Header."Payment Class",Header."Status No.");
+        RIBVisible := Status.RIB;
+        AcceptationCodeVisible := Status."Acceptation Code";
+        AmountVisible := Status.Amount;
+        DebitAmountVisible := Status.Debit;
+        CreditAmountVisible := Status.Credit;
+        BankAccountCodeVisible := Status."Bank Account";
+        DisableFields;
+      END;
+    END;
+
+    PROCEDURE NavigateLine@1120006(PostingDate@1120000 : Date);
+    BEGIN
+      Navigate.SetDoc(PostingDate,"Document No.");
+      Navigate.RUN;
+    END;
+
+    LOCAL PROCEDURE IsBankInfoEditable@1120008() : Boolean;
+    BEGIN
+      EXIT(NOT ("Account Type" IN ["Account Type"::Customer,"Account Type"::Vendor]));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

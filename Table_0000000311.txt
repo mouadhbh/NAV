@@ -1,0 +1,229 @@
+OBJECT Table 311 Sales & Receivables Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Sales & Receivables Setup;
+               FRA=ParamŠtres ventes];
+    LookupPageID=Page459;
+    DrillDownPageID=Page459;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Primary Key         ;Code10        ;CaptionML=[ENU=Primary Key;
+                                                              FRA=Cl‚ primaire] }
+    { 2   ;   ;Discount Posting    ;Option        ;CaptionML=[ENU=Discount Posting;
+                                                              FRA=Comptabilisation remise];
+                                                   OptionCaptionML=[ENU=No Discounts,Invoice Discounts,Line Discounts,All Discounts;
+                                                                    FRA=Remises d‚duites,Remises facture,Remises ligne,Toutes remises];
+                                                   OptionString=No Discounts,Invoice Discounts,Line Discounts,All Discounts }
+    { 4   ;   ;Credit Warnings     ;Option        ;CaptionML=[ENU=Credit Warnings;
+                                                              FRA=Alertes cr‚dit];
+                                                   OptionCaptionML=[ENU=Both Warnings,Credit Limit,Overdue Balance,No Warning;
+                                                                    FRA=Toutes les alertes,Cr‚dit autoris‚,Solde ‚chu,Aucune alerte];
+                                                   OptionString=Both Warnings,Credit Limit,Overdue Balance,No Warning }
+    { 5   ;   ;Stockout Warning    ;Boolean       ;InitValue=Yes;
+                                                   CaptionML=[ENU=Stockout Warning;
+                                                              FRA=Alerte rupture stock] }
+    { 6   ;   ;Shipment on Invoice ;Boolean       ;AccessByPermission=TableData 110=R;
+                                                   CaptionML=[ENU=Shipment on Invoice;
+                                                              FRA=B.L sur facture] }
+    { 7   ;   ;Invoice Rounding    ;Boolean       ;CaptionML=[ENU=Invoice Rounding;
+                                                              FRA=Arrondi facture] }
+    { 8   ;   ;Ext. Doc. No. Mandatory;Boolean    ;CaptionML=[ENU=Ext. Doc. No. Mandatory;
+                                                              FRA=Nø doc. ext. obligatoire] }
+    { 9   ;   ;Customer Nos.       ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Customer Nos.;
+                                                              FRA=Nø client] }
+    { 10  ;   ;Quote Nos.          ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Quote Nos.;
+                                                              FRA=Nø devis] }
+    { 11  ;   ;Order Nos.          ;Code10        ;TableRelation="No. Series";
+                                                   AccessByPermission=TableData 110=R;
+                                                   CaptionML=[ENU=Order Nos.;
+                                                              FRA=Nø commande] }
+    { 12  ;   ;Invoice Nos.        ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Invoice Nos.;
+                                                              FRA=Nø facture] }
+    { 13  ;   ;Posted Invoice Nos. ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Posted Invoice Nos.;
+                                                              FRA=Nø facture enregistr‚e] }
+    { 14  ;   ;Credit Memo Nos.    ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Credit Memo Nos.;
+                                                              FRA=Nø avoir] }
+    { 15  ;   ;Posted Credit Memo Nos.;Code10     ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Posted Credit Memo Nos.;
+                                                              FRA=Nø avoir enregistr‚] }
+    { 16  ;   ;Posted Shipment Nos.;Code10        ;TableRelation="No. Series";
+                                                   AccessByPermission=TableData 110=R;
+                                                   CaptionML=[ENU=Posted Shipment Nos.;
+                                                              FRA=Nø exp‚dition enregistr‚e] }
+    { 17  ;   ;Reminder Nos.       ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Reminder Nos.;
+                                                              FRA=Nø relance] }
+    { 18  ;   ;Issued Reminder Nos.;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Issued Reminder Nos.;
+                                                              FRA=Nø relance ‚mise] }
+    { 19  ;   ;Fin. Chrg. Memo Nos.;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Fin. Chrg. Memo Nos.;
+                                                              FRA=Nø facture d'int‚rˆts] }
+    { 20  ;   ;Issued Fin. Chrg. M. Nos.;Code10   ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Issued Fin. Chrg. M. Nos.;
+                                                              FRA=Nø fact. d'int‚rˆts ‚mise] }
+    { 21  ;   ;Posted Prepmt. Inv. Nos.;Code10    ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Posted Prepmt. Inv. Nos.;
+                                                              FRA=Nø fact. acompte enreg.] }
+    { 22  ;   ;Posted Prepmt. Cr. Memo Nos.;Code10;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Posted Prepmt. Cr. Memo Nos.;
+                                                              FRA=Nø avoir acompte enreg.] }
+    { 23  ;   ;Blanket Order Nos.  ;Code10        ;TableRelation="No. Series";
+                                                   AccessByPermission=TableData 110=R;
+                                                   CaptionML=[ENU=Blanket Order Nos.;
+                                                              FRA=Nø commande ouverte] }
+    { 24  ;   ;Calc. Inv. Discount ;Boolean       ;CaptionML=[ENU=Calc. Inv. Discount;
+                                                              FRA=Calculer remise facture] }
+    { 25  ;   ;Appln. between Currencies;Option   ;AccessByPermission=TableData 4=R;
+                                                   CaptionML=[ENU=Appln. between Currencies;
+                                                              FRA=Lettrage entre devises];
+                                                   OptionCaptionML=[ENU=None,EMU,All;
+                                                                    FRA=Aucune devise,Devises U.M.E.,Toutes devises];
+                                                   OptionString=None,EMU,All }
+    { 26  ;   ;Copy Comments Blanket to Order;Boolean;
+                                                   InitValue=Yes;
+                                                   AccessByPermission=TableData 110=R;
+                                                   CaptionML=[ENU=Copy Comments Blanket to Order;
+                                                              FRA=Copier com. cde ouv. -> cde] }
+    { 27  ;   ;Copy Comments Order to Invoice;Boolean;
+                                                   InitValue=Yes;
+                                                   AccessByPermission=TableData 110=R;
+                                                   CaptionML=[ENU=Copy Comments Order to Invoice;
+                                                              FRA=Copier com. cde -> facture] }
+    { 28  ;   ;Copy Comments Order to Shpt.;Boolean;
+                                                   InitValue=Yes;
+                                                   AccessByPermission=TableData 110=R;
+                                                   CaptionML=[ENU=Copy Comments Order to Shpt.;
+                                                              FRA=Copier com. cde -> exp‚dition] }
+    { 29  ;   ;Allow VAT Difference;Boolean       ;CaptionML=[ENU=Allow VAT Difference;
+                                                              FRA=Autoriser diff‚rence TVA] }
+    { 30  ;   ;Calc. Inv. Disc. per VAT ID;Boolean;CaptionML=[ENU=Calc. Inv. Disc. per VAT ID;
+                                                              FRA=Calc. remise fact. par ident. TVA] }
+    { 31  ;   ;Logo Position on Documents;Option  ;CaptionML=[ENU=Logo Position on Documents;
+                                                              FRA=Position du logo sur les documents];
+                                                   OptionCaptionML=[ENU=No Logo,Left,Center,Right;
+                                                                    FRA=Aucun logo,Gauche,Centre,Droite];
+                                                   OptionString=No Logo,Left,Center,Right }
+    { 32  ;   ;Check Prepmt. when Posting;Boolean ;CaptionML=[ENU=Check Prepmt. when Posting;
+                                                              FRA=V‚rifier acompte lors de la validation] }
+    { 35  ;   ;Default Posting Date;Option        ;CaptionML=[ENU=Default Posting Date;
+                                                              FRA=Date comptabilisation par d‚faut];
+                                                   OptionCaptionML=[ENU=Work Date,No Date;
+                                                                    FRA=Date de travail,Aucune date];
+                                                   OptionString=Work Date,No Date }
+    { 36  ;   ;Default Quantity to Ship;Option    ;AccessByPermission=TableData 110=R;
+                                                   CaptionML=[ENU=Default Quantity to Ship;
+                                                              FRA=Qt‚ … exp‚dier par d‚faut];
+                                                   OptionCaptionML=[ENU=Remainder,Blank;
+                                                                    FRA=Solde,Vide];
+                                                   OptionString=Remainder,Blank }
+    { 37  ;   ;Archive Quotes and Orders;Boolean  ;CaptionML=[ENU=Archive Quotes and Orders;
+                                                              FRA=Archiver devis et commandes] }
+    { 38  ;   ;Post with Job Queue ;Boolean       ;CaptionML=[ENU=Post with Job Queue;
+                                                              FRA=Valider avec la file d'attente des travaux] }
+    { 39  ;   ;Job Queue Category Code;Code10     ;TableRelation="Job Queue Category";
+                                                   CaptionML=[ENU=Job Queue Category Code;
+                                                              FRA=Code cat‚gorie de la file d'attente des travaux] }
+    { 40  ;   ;Job Queue Priority for Post;Integer;InitValue=1000;
+                                                   OnValidate=BEGIN
+                                                                IF "Job Queue Priority for Post" < 0 THEN
+                                                                  ERROR(Text001);
+                                                              END;
+
+                                                   CaptionML=[ENU=Job Queue Priority for Post;
+                                                              FRA=Priorit‚ de la file d'attente des travaux pour validation];
+                                                   MinValue=0 }
+    { 41  ;   ;Post & Print with Job Queue;Boolean;CaptionML=[ENU=Post & Print with Job Queue;
+                                                              FRA=Valider et imprimer avec la file d'attente des travaux] }
+    { 42  ;   ;Job Q. Prio. for Post & Print;Integer;
+                                                   InitValue=1000;
+                                                   OnValidate=BEGIN
+                                                                IF "Job Queue Priority for Post" < 0 THEN
+                                                                  ERROR(Text001);
+                                                              END;
+
+                                                   CaptionML=[ENU=Job Q. Prio. for Post & Print;
+                                                              FRA=Priorit‚ de la file d'attente des travaux pour validation et impression];
+                                                   MinValue=0 }
+    { 43  ;   ;Notify On Success   ;Boolean       ;CaptionML=[ENU=Notify On Success;
+                                                              FRA=Notification si r‚ussite] }
+    { 44  ;   ;VAT Bus. Posting Gr. (Price);Code10;TableRelation="VAT Business Posting Group";
+                                                   CaptionML=[ENU=VAT Bus. Posting Gr. (Price);
+                                                              FRA=Gpe compta. march‚ TVA (prix)] }
+    { 45  ;   ;Direct Debit Mandate Nos.;Code10   ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Direct Debit Mandate Nos.;
+                                                              FRA=Nø mandat de pr‚lŠvement] }
+    { 5800;   ;Posted Return Receipt Nos.;Code10  ;TableRelation="No. Series";
+                                                   AccessByPermission=TableData 6660=R;
+                                                   CaptionML=[ENU=Posted Return Receipt Nos.;
+                                                              FRA=Nø r‚ception retour enregistr‚e] }
+    { 5801;   ;Copy Cmts Ret.Ord. to Ret.Rcpt;Boolean;
+                                                   InitValue=Yes;
+                                                   AccessByPermission=TableData 6660=R;
+                                                   CaptionML=[ENU=Copy Cmts Ret.Ord. to Ret.Rcpt;
+                                                              FRA=Copier com. ret. -> r‚ception retour] }
+    { 5802;   ;Copy Cmts Ret.Ord. to Cr. Memo;Boolean;
+                                                   InitValue=Yes;
+                                                   AccessByPermission=TableData 6660=R;
+                                                   CaptionML=[ENU=Copy Cmts Ret.Ord. to Cr. Memo;
+                                                              FRA=Copier com. ret. -> avoir] }
+    { 6600;   ;Return Order Nos.   ;Code10        ;TableRelation="No. Series";
+                                                   AccessByPermission=TableData 6660=R;
+                                                   CaptionML=[ENU=Return Order Nos.;
+                                                              FRA=Nø retour] }
+    { 6601;   ;Return Receipt on Credit Memo;Boolean;
+                                                   AccessByPermission=TableData 6660=R;
+                                                   CaptionML=[ENU=Return Receipt on Credit Memo;
+                                                              FRA=R‚ception retour sur avoir] }
+    { 6602;   ;Exact Cost Reversing Mandatory;Boolean;
+                                                   CaptionML=[ENU=Exact Cost Reversing Mandatory;
+                                                              FRA=Co–t retour identique obligatoire] }
+    { 7101;   ;Customer Group Dimension Code;Code20;
+                                                   TableRelation=Dimension;
+                                                   CaptionML=[ENU=Customer Group Dimension Code;
+                                                              FRA=Code axe groupe clients] }
+    { 7102;   ;Salesperson Dimension Code;Code20  ;TableRelation=Dimension;
+                                                   CaptionML=[ENU=Salesperson Dimension Code;
+                                                              FRA=Code axe vendeur] }
+  }
+  KEYS
+  {
+    {    ;Primary Key                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      Text001@1000 : TextConst 'ENU=Job Queue Priority must be zero or positive.;FRA=La valeur de la priorit‚ file d''attente des travaux doit ˆtre nulle ou positive.';
+
+    PROCEDURE GetLegalStatement@11() : Text;
+    BEGIN
+      EXIT('');
+    END;
+
+    PROCEDURE JobQueueActive@1() : Boolean;
+    BEGIN
+      GET;
+      EXIT("Post with Job Queue" OR "Post & Print with Job Queue");
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

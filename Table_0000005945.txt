@@ -1,0 +1,63 @@
+OBJECT Table 5945 Troubleshooting Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    DataCaptionFields=No.;
+    CaptionML=[ENU=Troubleshooting Setup;
+               FRA=ParamŠtres incidents];
+    LookupPageID=Page5993;
+    DrillDownPageID=Page5993;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Type                ;Option        ;OnValidate=BEGIN
+                                                                IF Type <> xRec.Type THEN
+                                                                  "No." := '';
+                                                              END;
+
+                                                   CaptionML=[ENU=Type;
+                                                              FRA=Type];
+                                                   OptionCaptionML=[ENU=Service Item Group,Item,Service Item;
+                                                                    FRA=Gpe articles service,Article,Article de service];
+                                                   OptionString=Service Item Group,Item,Service Item }
+    { 2   ;   ;No.                 ;Code20        ;TableRelation=IF (Type=CONST(Service Item Group)) "Service Item Group"
+                                                                 ELSE IF (Type=CONST(Item)) Item
+                                                                 ELSE IF (Type=CONST(Service Item)) "Service Item";
+                                                   CaptionML=[ENU=No.;
+                                                              FRA=Nø] }
+    { 3   ;   ;Troubleshooting No. ;Code20        ;TableRelation="Troubleshooting Header";
+                                                   OnValidate=BEGIN
+                                                                CALCFIELDS("Troubleshooting Description");
+                                                              END;
+
+                                                   CaptionML=[ENU=Troubleshooting No.;
+                                                              FRA=Nø incident];
+                                                   NotBlank=Yes }
+    { 4   ;   ;Troubleshooting Description;Text50 ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup("Troubleshooting Header".Description WHERE (No.=FIELD(Troubleshooting No.)));
+                                                   CaptionML=[ENU=Troubleshooting Description;
+                                                              FRA=D‚signation incident];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Type,No.,Troubleshooting No.            ;Clustered=Yes }
+    {    ;Troubleshooting No.,Type,No.             }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

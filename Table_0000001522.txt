@@ -1,0 +1,50 @@
+OBJECT Table 1522 Workflow Event Queue
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Workflow Event Queue;
+               FRA=File d'attente des ‚v‚nements de flux de travail];
+  }
+  FIELDS
+  {
+    { 1   ;   ;ID                  ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=ID;
+                                                              FRA=ID] }
+    { 2   ;   ;Session ID          ;Integer       ;CaptionML=[ENU=Session ID;
+                                                              FRA=ID session] }
+    { 3   ;   ;Step Record ID      ;RecordID      ;CaptionML=[ENU=Step Record ID;
+                                                              FRA=ID d'enregistrement d'‚tape] }
+    { 4   ;   ;Record ID           ;RecordID      ;CaptionML=[ENU=Record ID;
+                                                              FRA=ID d'enregistrement] }
+    { 5   ;   ;Status              ;Option        ;CaptionML=[ENU=Status;
+                                                              FRA=Statut];
+                                                   OptionCaptionML=[ENU=Queued,Executing,Executed;
+                                                                    FRA=En file d'attente,En cours d'ex‚cution,Ex‚cut‚];
+                                                   OptionString=Queued,Executing,Executed }
+    { 6   ;   ;Record Index        ;Integer       ;CaptionML=[ENU=Record Index;
+                                                              FRA=Index d'enregistrement] }
+    { 7   ;   ;xRecord Index       ;Integer       ;CaptionML=[@@@={Locked};
+                                                              ENU=xRecord Index;
+                                                              FRA=xRecord Index] }
+  }
+  KEYS
+  {
+    {    ;ID                                      ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

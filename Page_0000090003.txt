@@ -1,0 +1,81 @@
+OBJECT Page 90003 Vendor List - New
+{
+  OBJECT-PROPERTIES
+  {
+    Date=26/01/16;
+    Time=15:43:36;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    SourceTable=Table23;
+    PageType=List;
+    CardPageID=Vendor Card - New;
+  }
+  CONTROLS
+  {
+    { 1000000000;0;Container;
+                ContainerType=ContentArea }
+
+    { 1000000001;1;Group  ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 1000000002;2;Field  ;
+                SourceExpr="No." }
+
+    { 1000000003;2;Field  ;
+                SourceExpr=Name }
+
+    { 1000000004;2;Field  ;
+                SourceExpr=City }
+
+    { 1000000005;2;Field  ;
+                SourceExpr="Vendor Posting Group" }
+
+    { 1000000006;2;Field  ;
+                SourceExpr="Currency Code" }
+
+    { 1000000007;2;Field  ;
+                SourceExpr="Purchaser Code" }
+
+    { 1000000008;2;Field  ;
+                SourceExpr="Country/Region Code" }
+
+    { 1000000009;2;Field  ;
+                SourceExpr="Gen. Bus. Posting Group" }
+
+    { 1000000010;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1000000011;1;Part   ;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page9093;
+                PartType=Page }
+
+    { 1000000012;1;Part   ;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page9094;
+                PartType=Page }
+
+    { 1000000013;1;Part   ;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page9095;
+                PartType=Page }
+
+    { 1000000014;1;Part   ;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page9096;
+                PartType=Page }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

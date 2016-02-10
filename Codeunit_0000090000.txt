@@ -1,0 +1,61 @@
+OBJECT Codeunit 90000 My Codeunit
+{
+  OBJECT-PROPERTIES
+  {
+    Date=28/01/16;
+    Time=10:59:46;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+            // LoopNo := 25;
+            // MESSAGE('the value of %1 is %2','LoopNo',LoopNo);
+            // Amount := 27.5;
+            // MESSAGE('the value of %1 is %2','Amount',Amount);
+            // "When Was It" := 300997D;
+            // MESSAGE('the value of %1 is %2','When Was It',"When Was It");
+            // "Code Number" := 'abc 123 x';
+            // MESSAGE('the value of %1 is %2','Code Number',"Code Number");
+            // YesOrNo:=TRUE;
+            // MESSAGE('The value of %1 is %2','YesOrNo',YesOrNo);
+            // Description:='Now is the time.';
+            // MESSAGE('The value of %1 is %2','Description',Description);
+            // "What Time":=153000T;
+            // MESSAGE('the value of %1 is %2','What Time',"What Time");
+            // Ch:=65;
+            // MESSAGE('the value of %1 is %2','Ch',Ch);
+            // Ch:='A';
+            // MESSAGE('the value of %1 is %2','Ch',Ch);
+            // Color:=3;
+            // MESSAGE('the value of %1 is %2', 'Color',Color);
+            // Color:=Color::Yellow;
+            // MESSAGE('the value of %1 is %2', 'Color',Color);
+            //Compile-time and run-time errors
+            //Description:='now is the time. here is the place.';
+            //LoopNo:=27.5;
+            //YesOrNo:=1;
+            // Amount:=27.5;
+            // LoopNo:=Amount;
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      LoopNo@1000000000 : Integer;
+      YesOrNo@1000000001 : Boolean;
+      Amount@1000000002 : Decimal;
+      "When Was It"@1000000003 : Date;
+      "What Time"@1000000004 : Time;
+      Description@1000000005 : Text[30];
+      "Code Number"@1000000006 : Code[10];
+      Ch@1000000007 : Char;
+      Color@1000000008 : '"Red,Orange,Yellow,Green,Blue,Violet"';
+
+    BEGIN
+    END.
+  }
+}
+

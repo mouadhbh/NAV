@@ -1,0 +1,48 @@
+OBJECT Table 8628 Config. Field Mapping
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Config. Field Mapping;
+               FRA=Correspondance champ config.];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Package Code        ;Code20        ;TableRelation="Config. Package";
+                                                   CaptionML=[ENU=Package Code;
+                                                              FRA=Code package];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Table ID            ;Integer       ;TableRelation=AllObj."Object ID" WHERE (Object Type=CONST(Table));
+                                                   CaptionML=[ENU=Table ID;
+                                                              FRA=ID table];
+                                                   NotBlank=Yes }
+    { 3   ;   ;Field ID            ;Integer       ;CaptionML=[ENU=Field ID;
+                                                              FRA=ID champ];
+                                                   NotBlank=Yes }
+    { 4   ;   ;Field Name          ;Text30        ;CaptionML=[ENU=Field Name;
+                                                              FRA=Nom de champ] }
+    { 5   ;   ;Old Value           ;Text250       ;CaptionML=[ENU=Old Value;
+                                                              FRA=Ancienne valeur] }
+    { 6   ;   ;New Value           ;Text250       ;CaptionML=[ENU=New Value;
+                                                              FRA=Nouvelle valeur] }
+  }
+  KEYS
+  {
+    {    ;Package Code,Table ID,Field ID,Old Value;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

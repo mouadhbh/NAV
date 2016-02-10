@@ -1,0 +1,402 @@
+OBJECT Page 9003 Acc. Receivables Adm. RC
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00,NAVFR8.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               FRA=Tableau de bord];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 9       ;1   ;Action    ;
+                      CaptionML=[ENU=C&ustomer - List;
+                                 FRA=Cli&ents : Liste];
+                      RunObject=Report 101;
+                      Image=Report }
+      { 13      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer - &Balance to Date;
+                                 FRA=Clients - êcrit&ures ouvertes];
+                      RunObject=Report 121;
+                      Image=Report }
+      { 16      ;1   ;Action    ;
+                      CaptionML=[ENU=Aged &Accounts Receivable;
+                                 FRA=Compt&abilitÇ client ÉgÇe];
+                      RunObject=Report 120;
+                      Image=Report }
+      { 17      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer - &Summary Aging Simp.;
+                                 FRA=Client&s : Balance ÉgÇe];
+                      RunObject=Report 109;
+                      Image=Report }
+      { 18      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Trial Balan&ce;
+                                 FRA=Balance &clients];
+                      RunObject=Report 10805 }
+      { 1120003 ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Detail Trial Balance;
+                                 FRA=Grand livre clients];
+                      RunObject=Report 10806;
+                      Image=Report }
+      { 19      ;1   ;Action    ;
+                      CaptionML=[ENU=Cus&tomer/Item Sales;
+                                 FRA=Client/Ven&tes d'articles];
+                      RunObject=Report 113;
+                      Image=Report }
+      { 1120004 ;1   ;Action    ;
+                      CaptionML=[ENU=Customer Journal;
+                                 FRA=Journal comptes clients];
+                      RunObject=Report 10813;
+                      Image=Report }
+      { 20      ;1   ;Separator  }
+      { 22      ;1   ;Action    ;
+                      CaptionML=[ENU=Customer &Document Nos.;
+                                 FRA=N¯ &document client];
+                      RunObject=Report 128;
+                      Image=Report }
+      { 23      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales &Invoice Nos.;
+                                 FRA=N¯ &facture vente];
+                      RunObject=Report 124;
+                      Image=Report }
+      { 24      ;1   ;Action    ;
+                      CaptionML=[ENU=Sa&les Credit Memo Nos.;
+                                 FRA=N¯ avo&ir vente];
+                      RunObject=Report 125;
+                      Image=Report }
+      { 27      ;1   ;Action    ;
+                      CaptionML=[ENU=Re&minder Nos.;
+                                 FRA=N¯ re&lance];
+                      RunObject=Report 126;
+                      Image=Report }
+      { 28      ;1   ;Action    ;
+                      CaptionML=[ENU=Finance Cha&rge Memo Nos.;
+                                 FRA=N¯ factu&re d'intÇràts];
+                      RunObject=Report 127;
+                      Image=Report }
+      { 1120005 ;1   ;Separator  }
+      { 1120006 ;1   ;Action    ;
+                      CaptionML=[ENU=Payments Lists;
+                                 FRA=Listes de räglements];
+                      RunObject=Report 10860;
+                      Image=Report }
+      { 1120007 ;1   ;Action    ;
+                      CaptionML=[ENU=GL/Cust. Ledger Reconciliation;
+                                 FRA=Rapprochement cpta. gÇn./client];
+                      RunObject=Report 10861;
+                      Image=Report }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Customers;
+                                 FRA=Clients];
+                      RunObject=Page 22;
+                      Image=Customer }
+      { 2       ;1   ;Action    ;
+                      CaptionML=[ENU=Balance;
+                                 FRA=Solde];
+                      RunObject=Page 22;
+                      RunPageView=WHERE(Balance (LCY)=FILTER(<>0));
+                      Image=Balance }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Orders;
+                                 FRA=Commandes vente];
+                      RunObject=Page 9305;
+                      Image=Order }
+      { 92      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Invoices;
+                                 FRA=Factures vente];
+                      RunObject=Page 9301;
+                      Image=Invoice }
+      { 3       ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Return Orders;
+                                 FRA=Retours vente];
+                      RunObject=Page 9304;
+                      Image=ReturnOrder }
+      { 5       ;1   ;Action    ;
+                      CaptionML=[ENU=Bank Accounts;
+                                 FRA=Comptes bancaires];
+                      RunObject=Page 371;
+                      Image=BankAccount }
+      { 6       ;1   ;Action    ;
+                      CaptionML=[ENU=Reminders;
+                                 FRA=Relances];
+                      RunObject=Page 436;
+                      Image=Reminder }
+      { 7       ;1   ;Action    ;
+                      CaptionML=[ENU=Finance Charge Memos;
+                                 FRA=Factures d'intÇràts];
+                      RunObject=Page 448;
+                      Image=FinChargeMemo }
+      { 8       ;1   ;Action    ;
+                      CaptionML=[ENU=Items;
+                                 FRA=Articles];
+                      RunObject=Page 31;
+                      Image=Item }
+      { 31      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Journals;
+                                 FRA=Feuilles vente];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Sales),
+                                        Recurring=CONST(No)) }
+      { 32      ;1   ;Action    ;
+                      CaptionML=[ENU=Cash Receipt Journals;
+                                 FRA=Feuilles räglement];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(Cash Receipts),
+                                        Recurring=CONST(No));
+                      Image=Journals }
+      { 1120000 ;1   ;Action    ;
+                      CaptionML=[ENU=Payment Slips;
+                                 FRA=Bordereaux paiement];
+                      RunObject=Page 10870 }
+      { 33      ;1   ;Action    ;
+                      CaptionML=[ENU=General Journals;
+                                 FRA=Feuilles comptabilitÇ];
+                      RunObject=Page 251;
+                      RunPageView=WHERE(Template Type=CONST(General),
+                                        Recurring=CONST(No));
+                      Image=Journal }
+      { 4       ;1   ;Action    ;
+                      CaptionML=[ENU=Direct Debit Collections;
+                                 FRA=Recouvrements prÇlävement];
+                      RunObject=Page 1207 }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 39      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Posted Documents;
+                                 FRA=Documents validÇs];
+                      Image=FiledPosted }
+      { 11      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Shipments;
+                                 FRA=ExpÇditions vente enregistrÇes];
+                      RunObject=Page 142;
+                      Image=PostedShipment }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Invoices;
+                                 FRA=Factures vente enregistrÇes];
+                      RunObject=Page 143;
+                      Image=PostedOrder }
+      { 10      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Return Receipts;
+                                 FRA=RÇceptions retour enregistrÇes];
+                      RunObject=Page 6662;
+                      Image=PostedReturnReceipt }
+      { 26      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Sales Credit Memos;
+                                 FRA=Avoirs vente enregistrÇs];
+                      RunObject=Page 144;
+                      Image=PostedOrder }
+      { 34      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Invoices;
+                                 FRA=Factures achat enregistrÇes];
+                      RunObject=Page 146 }
+      { 35      ;2   ;Action    ;
+                      CaptionML=[ENU=Posted Purchase Credit Memos;
+                                 FRA=Avoirs achat enregistrÇs];
+                      RunObject=Page 147 }
+      { 29      ;2   ;Action    ;
+                      CaptionML=[ENU=Issued Reminders;
+                                 FRA=Relances Çmises];
+                      RunObject=Page 440;
+                      Image=OrderReminder }
+      { 30      ;2   ;Action    ;
+                      CaptionML=[ENU=Issued Fin. Charge Memos;
+                                 FRA=Factures d'intÇràts Çmises];
+                      RunObject=Page 452;
+                      Image=PostedMemo }
+      { 102     ;2   ;Action    ;
+                      CaptionML=[ENU=G/L Registers;
+                                 FRA=Historiques des transactions comptabilitÇ];
+                      RunObject=Page 116;
+                      Image=GLRegisters }
+      { 1120001 ;2   ;Action    ;
+                      CaptionML=[ENU=Simulation Registers;
+                                 FRA=Hist. transactions simulation];
+                      RunObject=Page 10810 }
+      { 1120002 ;2   ;Action    ;
+                      CaptionML=[ENU=Payment Slip List Archives;
+                                 FRA=Archives liste bordereau paiement];
+                      RunObject=Page 10879 }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 64      ;1   ;Separator ;
+                      CaptionML=[ENU=New;
+                                 FRA=Nouveau];
+                      IsHeader=Yes }
+      { 103     ;1   ;Action    ;
+                      CaptionML=[ENU=C&ustomer;
+                                 FRA=&Client];
+                      RunObject=Page 21;
+                      Promoted=No;
+                      Image=Customer;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 36      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Sales;
+                                 FRA=&Ventes];
+                      Image=Sales }
+      { 37      ;2   ;Action    ;
+                      CaptionML=[ENU=Sales &Order;
+                                 FRA=Commande ve&nte];
+                      RunObject=Page 42;
+                      Promoted=No;
+                      Image=Document;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 104     ;2   ;Action    ;
+                      CaptionML=[ENU=Sales &Invoice;
+                                 FRA=Fac&ture vente];
+                      RunObject=Page 43;
+                      Promoted=No;
+                      Image=Invoice;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 65      ;2   ;Action    ;
+                      CaptionML=[ENU=Sales &Credit Memo;
+                                 FRA=&Avoir vente];
+                      RunObject=Page 44;
+                      Promoted=No;
+                      Image=CreditMemo;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 105     ;2   ;Action    ;
+                      CaptionML=[ENU=Sales &Fin. Charge Memo;
+                                 FRA=&Facture d'intÇràts vente];
+                      RunObject=Page 446;
+                      Promoted=No;
+                      Image=FinChargeMemo;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 106     ;2   ;Action    ;
+                      CaptionML=[ENU=Sales &Reminder;
+                                 FRA=&Relance vente];
+                      RunObject=Page 434;
+                      Promoted=No;
+                      Image=Reminder;
+                      PromotedCategory=Process;
+                      RunPageMode=Create }
+      { 67      ;1   ;Separator ;
+                      CaptionML=[ENU=Tasks;
+                                 FRA=TÉches];
+                      IsHeader=Yes }
+      { 74      ;1   ;Action    ;
+                      CaptionML=[ENU=Cash Receipt &Journal;
+                                 FRA=Feuille &räglement];
+                      RunObject=Page 255;
+                      Image=CashReceiptJournal }
+      { 1120008 ;1   ;Action    ;
+                      CaptionML=[ENU=Payment Slip;
+                                 FRA=Bordereau paiement];
+                      RunObject=Page 10868 }
+      { 1120009 ;1   ;Action    ;
+                      CaptionML=[ENU=Look/Edit Payment Line;
+                                 FRA=Consulter/êditer ligne paiement];
+                      RunObject=Page 10862 }
+      { 1120010 ;1   ;Action    ;
+                      CaptionML=[ENU=Payment Report;
+                                 FRA=êtat räglement];
+                      RunObject=Page 10863 }
+      { 1120011 ;1   ;Action    ;
+                      CaptionML=[ENU=Archive Payment Journals;
+                                 FRA=Archiver les feuilles paiement];
+                      RunObject=Report 10873;
+                      Image=Report }
+      { 1120012 ;1   ;Action    ;
+                      CaptionML=[ENU=Create Payment Slip;
+                                 FRA=CrÇer bordereau paiement];
+                      RunObject=Codeunit 10860 }
+      { 111     ;1   ;Separator  }
+      { 112     ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Combine Shi&pments;
+                                 FRA=Regrou&per les B.L];
+                      RunObject=Report 295;
+                      Image=Action }
+      { 113     ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Combine Return S&hipments;
+                                 FRA=Regrouper les expÇ&ditions retour];
+                      RunObject=Report 6653;
+                      Image=Action }
+      { 15      ;1   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Create Recurring Invoices;
+                                 FRA=CrÇer des factures rÇcurrentes];
+                      RunObject=Report 172;
+                      Image=CreateDocument }
+      { 84      ;1   ;Separator ;
+                      CaptionML=[ENU=Administration;
+                                 FRA=Administration];
+                      IsHeader=Yes }
+      { 86      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales && Recei&vables Setup;
+                                 FRA=Paramätres &ventes];
+                      RunObject=Page 459;
+                      Image=Setup }
+      { 89      ;1   ;Separator ;
+                      CaptionML=[ENU=History;
+                                 FRA=Historique];
+                      IsHeader=Yes }
+      { 90      ;1   ;Action    ;
+                      CaptionML=[ENU=Navi&gate;
+                                 FRA=&Naviguer];
+                      RunObject=Page 344;
+                      Image=Navigate }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 1902899408;2;Part   ;
+                PagePartID=Page9034;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 1907692008;2;Part   ;
+                PagePartID=Page9150;
+                PartType=Page }
+
+    { 1905989608;2;Part   ;
+                PagePartID=Page9152;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 38  ;2   ;Part      ;
+                PagePartID=Page681;
+                PartType=Page }
+
+    { 1   ;2   ;Part      ;
+                PagePartID=Page675;
+                Visible=false;
+                PartType=Page }
+
+    { 1903012608;2;Part   ;
+                PagePartID=Page9175;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1901377608;2;Part   ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

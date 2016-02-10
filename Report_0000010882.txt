@@ -1,0 +1,319 @@
+OBJECT Report 10882 Transfer
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Transfer;
+               FRA=Virement];
+    ProcessingOnly=Yes;
+    OnPreReport=VAR
+                  FileMgt@1101100000 : Codeunit 419;
+                BEGIN
+                  CompanyInfo.GET;
+                  CompanyInfo.TESTFIELD(Name);
+
+                  GLSetup.GET;
+
+                  ExportFileName := FileMgt.ServerTempFileName('');
+
+                  ExportFile.TEXTMODE := TRUE;
+                  ExportFile.WRITEMODE := TRUE;
+                  ExportFile.CREATE(ExportFileName);
+                END;
+
+    OnPostReport=VAR
+                   ToFile@1101100000 : Text[260];
+                 BEGIN
+                   ExportFile.CLOSE;
+                   ToFile := Text012;
+                   DOWNLOAD(ExportFileName,GetCaption,'',Text013,ToFile);
+                 END;
+
+  }
+  DATASET
+  {
+    { 6483;    ;DataItem;                    ;
+               DataItemTable=Table10865;
+               DataItemTableView=SORTING(No.);
+               MaxIteration=1;
+               OnAfterGetRecord=VAR
+                                  ExportedText@1120001 : Text;
+                                  RecordCode@1101100001 : Text;
+                                  OperationCode@1101100002 : Text;
+                                  FromPaymentNo@1101100003 : Text;
+                                  ExecutionDate@1101100004 : Text;
+                                  CompanyName@1101100005 : Text;
+                                  BankBranchNo@1101100007 : Text;
+                                  AgencyCode@1101100008 : Text;
+                                  BankAccountNo@1101100009 : Text;
+                                  CurrencyIdentifier@1120000 : Code[1];
+                                BEGIN
+                                  TESTFIELD("Account Type","Account Type"::"Bank Account");
+                                  TESTFIELD("National Issuer No.");
+                                  TESTFIELD("No.");
+
+                                  IF STRLEN("Bank Branch No.") > 5 THEN
+                                    ERROR(Text003,"No.");
+
+                                  IF STRLEN("Agency Code") > 5 THEN
+                                    ERROR(Text003,"No.");
+
+                                  IF STRLEN("Bank Account No.") > 11 THEN
+                                    ERROR(Text003,"No.");
+
+                                  IF NOT "RIB Checked" THEN
+                                    ERROR(Text004,"No.");
+
+                                  IF ("Currency Code" <> '') AND ("Currency Code" <> GLSetup."LCY Code") THEN
+                                    ERROR(Text006,GLSetup."LCY Code");
+
+                                  CASE "Currency Code" = '' OF
+                                    TRUE:
+                                      CurrencyIdentifier := 'E';
+                                    FALSE:
+                                      CurrencyIdentifier := 'F';
+                                  END;
+
+                                  CALCFIELDS(Amount);
+
+                                  RecordCode := '03';
+                                  OperationCode := '02';
+                                  FromPaymentNo := PADSTR("National Issuer No.",6);
+                                  ExecutionDate := FORMAT("Posting Date",4,'<Day,2><Month,2>') + COPYSTR(FORMAT("Posting Date",2,'<Year,2>'),2,1);
+                                  CompanyName := PADSTR(CompanyInfo.Name,24);
+                                  BankBranchNo := PADSTR2("Bank Branch No.",5,'0');
+                                  AgencyCode := PADSTR2("Agency Code",5,'0');
+                                  BankAccountNo := PADSTR2("Bank Account No.",11,'0');
+                                  ExportedText :=
+                                    RecordCode +
+                                    OperationCode +
+                                    PADSTR('',8) +
+                                    FromPaymentNo +
+                                    PADSTR('',7) +
+                                    ExecutionDate +
+                                    CompanyName +
+                                    PADSTR('',26) +
+                                    CurrencyIdentifier +
+                                    PADSTR('',5) +
+                                    AgencyCode +
+                                    BankAccountNo +
+                                    PADSTR('',47) +
+                                    BankBranchNo;
+
+                                  ExportFile.WRITE(PADSTR(ExportedText,160));
+                                END;
+                                 }
+
+    { 3474;1   ;DataItem;                    ;
+               DataItemTable=Table10866;
+               DataItemTableView=SORTING(No.,Line No.);
+               OnAfterGetRecord=VAR
+                                  GLAcct@1120003 : Record 15;
+                                  Cust@1120005 : Record 18;
+                                  Vend@1120006 : Record 23;
+                                  BankAcct@1120007 : Record 270;
+                                  FixedAsset@1120008 : Record 5600;
+                                  PaymentClass@1120015 : Record 10860;
+                                  RecordCode@1120000 : Text;
+                                  OperationCode@1120001 : Text;
+                                  FromPaymentNo@1120002 : Text;
+                                  VendName@1120004 : Text;
+                                  VendBankName@1120009 : Text;
+                                  BankBranchNo@1120010 : Text;
+                                  AgencyCode@1120011 : Text;
+                                  BankAccountNo@1120012 : Text;
+                                  Designation@1120014 : Text;
+                                  PrintAmount@1120013 : Text;
+                                  ExportedText@1120016 : Text;
+                                BEGIN
+                                  TESTFIELD("Account No.");
+                                  TESTFIELD("Bank Account No.");
+
+                                  IF STRLEN("Bank Branch No.") > 5 THEN
+                                    ERROR(Text008,"Bank Account Name");
+
+                                  IF STRLEN("Agency Code") > 5 THEN
+                                    ERROR(Text008,"Bank Account Name");
+
+                                  IF STRLEN("Bank Account No.") > 11 THEN
+                                    ERROR(Text008,"Bank Account Name");
+
+                                  IF NOT "RIB Checked" THEN
+                                    ERROR(Text009,"Bank Account Name","Account No.");
+
+                                  IF "Currency Code" <> "Payment Header"."Currency Code" THEN
+                                    ERROR(Text010);
+
+                                  PaymentClass.GET("Payment Header"."Payment Class");
+                                  IF (PaymentClass."Line No. Series" <> '') AND ("Document No." = '') THEN
+                                    ERROR(Text011);
+
+                                  RecordCode := '06';
+                                  OperationCode := '02';
+                                  FromPaymentNo := PADSTR("Payment Header"."National Issuer No.",6);
+
+                                  CASE "Account Type" OF
+                                    "Account Type"::"G/L Account":
+                                      BEGIN
+                                        GLAcct.GET("Account No.");
+                                        VendName := PADSTR(GLAcct.Name,24);
+                                      END;
+                                    "Account Type"::Customer:
+                                      BEGIN
+                                        Cust.GET("Account No.");
+                                        VendName := PADSTR(Cust.Name,24);
+                                      END;
+                                    "Account Type"::Vendor:
+                                      BEGIN
+                                        Vend.GET("Account No.");
+                                        VendName := PADSTR(Vend.Name,24);
+                                      END;
+                                    "Account Type"::"Bank Account":
+                                      BEGIN
+                                        BankAcct.GET("Account No.");
+                                        VendName := PADSTR(BankAcct.Name,24);
+                                      END;
+                                    "Account Type"::"Fixed Asset":
+                                      BEGIN
+                                        FixedAsset.GET("Account No.");
+                                        VendName := PADSTR(FixedAsset.Description,24);
+                                      END;
+                                  END;
+
+                                  "Payment Header".CALCFIELDS("Status Name");
+
+                                  VendBankName := PADSTR("Bank Account Name",20);
+                                  BankBranchNo := PADSTR2("Bank Branch No.",5,'0');
+                                  AgencyCode := PADSTR2("Agency Code",5,'0');
+                                  BankAccountNo := PADSTR2("Bank Account No.",11,'0');
+                                  Designation := PADSTR("Payment Header"."Status Name",31);
+                                  PrintAmount := FormatAmount(Amount,16);
+                                  ExportedText :=
+                                    RecordCode +
+                                    OperationCode +
+                                    PADSTR('',8) +
+                                    FromPaymentNo +
+                                    PADSTR('',12) +
+                                    VendName +
+                                    VendBankName +
+                                    PADSTR('',12) +
+                                    AgencyCode +
+                                    BankAccountNo +
+                                    PrintAmount +
+                                    Designation +
+                                    BankBranchNo;
+
+                                  ExportFile.WRITE(PADSTR(ExportedText,160));
+                                END;
+
+               OnPostDataItem=VAR
+                                PaymentHeader@1120005 : Record 10865;
+                                RecordCode@1120000 : Text;
+                                OperationCode@1120001 : Text;
+                                FromPaymentNo@1120002 : Text;
+                                PrintAmount@1120003 : Text;
+                                ExportedText@1120004 : Text;
+                              BEGIN
+                                RecordCode := '08';
+                                OperationCode := '02';
+                                FromPaymentNo := PADSTR("Payment Header"."National Issuer No.",6);
+                                PrintAmount := FormatAmount("Payment Header".Amount,16);
+                                ExportedText :=
+                                  RecordCode +
+                                  OperationCode +
+                                  PADSTR('',8) +
+                                  FromPaymentNo +
+                                  PADSTR('',84) +
+                                  PrintAmount;
+
+                                ExportFile.WRITE(PADSTR(ExportedText,160));
+
+                                PaymentHeader := "Payment Header";
+                                PaymentHeader."File Export Completed" := TRUE;
+                                PaymentHeader.MODIFY;
+                              END;
+
+               DataItemLink=No.=FIELD(No.) }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      GLSetup@1101100004 : Record 98;
+      CompanyInfo@1101100002 : Record 79;
+      ExportFile@1101100001 : File;
+      ExportFileName@1120000 : Text[260];
+      Text003@1120003 : TextConst 'ENU=Bank Account No. %1 is too long. Please verify before continuing.;FRA=Le nø de compte bancaire %1 est trop long. V‚rifiez-le avant de continuer.';
+      Text004@1120004 : TextConst 'ENU=The RIB of the company''s bank account %1 is incorrect. Please verify before continuing.;FRA=Le RIB du compte bancaire %1 de la soci‚t‚ est erron‚. V‚rifiez-le avant de continuer.';
+      Text006@1120006 : TextConst 'ENU=You can only use currency code %1.;FRA=Vous ne pouvez utiliser que le code devise %1.';
+      Text008@1120008 : TextConst 'ENU=The vendor''s bank account number %1 is too long. Please verify before continuing.;FRA=Le nø de compte bancaire %1 du fournisseur est trop long. V‚rifiez-le avant de continuer.';
+      Text009@1120009 : TextConst '@@@=%1 - bank account name, %2 - bank account no;ENU=The RIB of the vendor''s bank account %1 %2 is incorrect. Please verify before continuing.;FRA=Le RIB du compte bancaire %1 %2 du fournisseur est erron‚. V‚rifiez-le avant de continuer.';
+      Text010@1120010 : TextConst 'ENU=All transfers must refer to the same currency.;FRA=Tous les virements doivent ˆtre li‚s … la mˆme devise.';
+      Text011@1120011 : TextConst 'ENU=All transfers must have a document number.;FRA=Tous les virements doivent avoir un nø de document.';
+      Text012@1101100000 : TextConst 'ENU=default.txt;FRA=default.txt';
+      Text013@1101100003 : TextConst 'ENU=Text Files|*.txt|All Files|*.*;FRA=Fichiers texte|*.txt|Tous les fichiers|*.*';
+
+    LOCAL PROCEDURE GetCaption@1101100008() Result : Text[50];
+    VAR
+      AllObjWithCaption@1101100000 : Record 2000000058;
+      ID@1101100001 : Integer;
+    BEGIN
+      Result := '';
+
+      IF NOT EVALUATE(ID,DELCHR(CurrReport.OBJECTID(FALSE),'=',DELCHR(CurrReport.OBJECTID(FALSE),'=','0123456789'))) THEN
+        EXIT;
+
+      IF NOT AllObjWithCaption.GET(AllObjWithCaption."Object Type"::Report,ID) THEN
+        EXIT;
+
+      EXIT(COPYSTR(AllObjWithCaption."Object Caption",1,MAXSTRLEN(Result)));
+    END;
+
+    LOCAL PROCEDURE FormatAmount@1120055(Amount@1120000 : Decimal;Width@1120001 : Integer) : Text[50];
+    VAR
+      FormatAmount@1120002 : Text[50];
+    BEGIN
+      FormatAmount := CONVERTSTR(FORMAT(Amount,Width,'<Precision,2:2><Integer><Decimal><Comma,,>'),' ','0');
+      FormatAmount := '0' + COPYSTR(FormatAmount,1,Width - 3) + COPYSTR(FormatAmount,Width - 1,2);
+      EXIT(FormatAmount);
+    END;
+
+    LOCAL PROCEDURE PADSTR2@1120016(String@1120000 : Text[1024];Length@1120001 : Integer;FillCharacter@1120002 : Text[1]) : Text[1024];
+    VAR
+      PaddingLength@1120003 : Integer;
+    BEGIN
+      PaddingLength := Length - STRLEN(String);
+
+      CASE TRUE OF
+        PaddingLength <= 0:
+          EXIT(PADSTR(String,Length,FillCharacter));
+        PaddingLength > 0:
+          EXIT(PADSTR('',PaddingLength,FillCharacter) + String);
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

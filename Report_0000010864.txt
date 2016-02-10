@@ -1,0 +1,438 @@
+OBJECT Report 10864 Suggest Customer Payments
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=NAVFR9.00.00.43402;
+  }
+  PROPERTIES
+  {
+    Permissions=TableData 21=rm;
+    CaptionML=[ENU=Suggest Customer Payments;
+               FRA=Proposer rŠglements client];
+    ProcessingOnly=Yes;
+  }
+  DATASET
+  {
+    { 6836;    ;DataItem;                    ;
+               DataItemTable=Table18;
+               DataItemTableView=SORTING(No.);
+               OnPreDataItem=BEGIN
+                               IF LastDueDateToPayReq = 0D THEN
+                                 ERROR(Text000);
+                               IF PostingDate = 0D THEN
+                                 ERROR(Text001);
+
+                               GenPayLineInserted := FALSE;
+                               MessageText := '';
+
+                               IF UsePaymentDisc AND (LastDueDateToPayReq < WORKDATE) THEN
+                                 IF NOT
+                                    CONFIRM(
+                                      Text003 +
+                                      Text004,FALSE,
+                                      WORKDATE)
+                                 THEN
+                                   ERROR(Text005);
+
+                               Cust2.COPYFILTERS(Customer);
+                               Window.OPEN(Text006);
+
+                               NextEntryNo := 1;
+                             END;
+
+               OnAfterGetRecord=BEGIN
+                                  Window.UPDATE(1,"No.");
+                                  GetCustLedgEntries(TRUE,FALSE);
+                                  GetCustLedgEntries(FALSE,FALSE);
+                                  CheckAmounts(FALSE);
+                                END;
+
+               OnPostDataItem=BEGIN
+                                IF UsePaymentDisc THEN BEGIN
+                                  RESET;
+                                  COPYFILTERS(Cust2);
+                                  Window.OPEN(Text007);
+                                  IF FIND('-') THEN
+                                    REPEAT
+                                      Window.UPDATE(1,"No.");
+                                      PayableCustLedgEntry.SETRANGE("Vendor No.","No.");
+                                      GetCustLedgEntries(TRUE,TRUE);
+                                      GetCustLedgEntries(FALSE,TRUE);
+                                      CheckAmounts(TRUE);
+                                    UNTIL NEXT = 0;
+                                END;
+
+                                GenPayLine.LOCKTABLE;
+                                GenPayLine.SETRANGE("No.",GenPayLine."No.");
+                                IF GenPayLine.FINDLAST THEN BEGIN
+                                  LastLineNo := GenPayLine."Line No.";
+                                  GenPayLine.INIT;
+                                END;
+
+                                Window.OPEN(Text008);
+
+                                PayableCustLedgEntry.RESET;
+                                PayableCustLedgEntry.SETRANGE(Priority,1,2147483647);
+                                MakeGenPayLines;
+                                PayableCustLedgEntry.RESET;
+                                PayableCustLedgEntry.SETRANGE(Priority,0);
+                                MakeGenPayLines;
+                                PayableCustLedgEntry.RESET;
+                                PayableCustLedgEntry.DELETEALL;
+                                Window.CLOSE;
+
+                                IF GenPayLineInserted AND (Customer.GETFILTER("Partner Type") <> '') THEN BEGIN
+                                  GenPayHead."Partner Type" := Customer."Partner Type";
+                                  GenPayHead.MODIFY;
+                                END;
+                                ShowMessage(MessageText);
+                              END;
+
+               ReqFilterFields=No.,Payment Method Code }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+      SaveValues=No;
+      RefreshOnActivate=No;
+    }
+    CONTROLS
+    {
+      { 1900000001;0;Container;
+                  ContainerType=ContentArea }
+
+      { 1900000002;1;Group  ;
+                  CaptionML=[ENU=Options;
+                             FRA=Options] }
+
+      { 1120001;2;Field     ;
+                  Name=LastPaymentDate;
+                  CaptionML=[ENU=Last Payment Date;
+                             FRA=DerniŠre date ‚ch‚ance];
+                  SourceExpr=LastDueDateToPayReq }
+
+      { 1120002;2;Field     ;
+                  CaptionML=[ENU=Find Payment Discounts;
+                             FRA=Rechercher les escomptes];
+                  SourceExpr=UsePaymentDisc;
+                  MultiLine=Yes }
+
+      { 1120000;2;Field     ;
+                  Name=SummarizePer;
+                  CaptionML=[ENU=Summarize per;
+                             FRA=Totaliser par];
+                  OptionCaptionML=[ENU=" ,Customer,Due date";
+                                   FRA=" ,Client,Date d'‚ch‚ance"];
+                  SourceExpr=SummarizePer }
+
+      { 1120005;2;Field     ;
+                  Name=CurrencyFilter;
+                  CaptionML=[ENU=Currency Filter;
+                             FRA=Filtre devise];
+                  SourceExpr=CurrencyFilter;
+                  TableRelation=Currency;
+                  Editable=FALSE }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      Text000@1120000 : TextConst 'ENU=Please enter the last payment date.;FRA=Veuillez entrer la derniŠre date d''‚ch‚ance.';
+      Text001@1120001 : TextConst 'ENU=Please enter the posting date.;FRA=Veuillez entrer une date de comptabilisation.';
+      Text003@1120003 : TextConst 'ENU=The selected last due date is earlier than %1.\\;FRA=La date de derniŠre ‚ch‚ance s‚lectionn‚e est ant‚rieure au %1.\\';
+      Text004@1120004 : TextConst 'ENU=Do you still want to run the batch job?;FRA=Souhaitez-vous tout de mˆme ex‚cuter ce traitement par lots ?';
+      Text005@1120005 : TextConst 'ENU=The batch job was interrupted.;FRA=Le traitement par lots a ‚t‚ interrompu.';
+      Text006@1120006 : TextConst 'ENU=Processing customers     #1##########;FRA=Traitement des clients                  #1##########';
+      Text007@1120007 : TextConst 'ENU=Processing customers for payment discounts #1##########;FRA=Traitement des escomptes client         #1##########';
+      Text008@1120008 : TextConst 'ENU=Inserting payment journal lines #1##########;FRA=Insertion des lignes f. paiement        #1##########';
+      Text016@1120016 : TextConst 'ENU=" is already applied to %1 %2 for customer %3.";FRA=" est d‚j… lettr‚(e) avec %1 %2 pour le client %3."';
+      Cust2@1120023 : Record 18;
+      GenPayHead@1120024 : Record 10865;
+      GenPayLine@1120025 : Record 10866;
+      CustLedgEntry@1120026 : Record 21;
+      PayableCustLedgEntry@1120029 : TEMPORARY Record 317;
+      TempPaymentPostBuffer@1120030 : TEMPORARY Record 10864;
+      OldTempPaymentPostBuffer@1120031 : TEMPORARY Record 10864;
+      PaymentClass@1120002 : Record 10860;
+      NoSeriesMgt@1120032 : Codeunit 396;
+      Window@1120035 : Dialog;
+      UsePaymentDisc@1120036 : Boolean;
+      PostingDate@1120037 : Date;
+      LastDueDateToPayReq@1120038 : Date;
+      NextDocNo@1120039 : Code[20];
+      SummarizePer@1120040 : ' ,Customer,Due date';
+      LastLineNo@1120042 : Integer;
+      NextEntryNo@1120043 : Integer;
+      MessageText@1120044 : Text[250];
+      GenPayLineInserted@1120045 : Boolean;
+      CurrencyFilter@1120034 : Code[10];
+
+    PROCEDURE SetGenPayLine@1120005(NewGenPayLine@1120000 : Record 10865);
+    BEGIN
+      GenPayHead := NewGenPayLine;
+      GenPayLine."No." := NewGenPayLine."No.";
+      PaymentClass.GET(GenPayHead."Payment Class");
+      PostingDate := GenPayHead."Posting Date";
+      CurrencyFilter := GenPayHead."Currency Code";
+    END;
+
+    PROCEDURE GetCustLedgEntries@1120004(Positive@1120000 : Boolean;Future@1120001 : Boolean);
+    BEGIN
+      CustLedgEntry.RESET;
+      CustLedgEntry.SETCURRENTKEY("Customer No.",Open,Positive,"Due Date");
+      CustLedgEntry.SETRANGE("Customer No.",Customer."No.");
+      CustLedgEntry.SETRANGE(Open,TRUE);
+      CustLedgEntry.SETRANGE(Positive,Positive);
+      CustLedgEntry.SETRANGE("Currency Code",CurrencyFilter);
+      CustLedgEntry.SETRANGE("Applies-to ID",'');
+      IF Future THEN BEGIN
+        CustLedgEntry.SETRANGE("Due Date",LastDueDateToPayReq + 1,31129999D);
+        CustLedgEntry.SETRANGE("Pmt. Discount Date",PostingDate,LastDueDateToPayReq);
+        CustLedgEntry.SETFILTER("Original Pmt. Disc. Possible",'<0');
+      END ELSE
+        CustLedgEntry.SETRANGE("Due Date",0D,LastDueDateToPayReq);
+      CustLedgEntry.SETRANGE("On Hold",'');
+      IF CustLedgEntry.FIND('-') THEN
+        REPEAT
+          SaveAmount;
+        UNTIL CustLedgEntry.NEXT = 0;
+    END;
+
+    LOCAL PROCEDURE SaveAmount@1120003();
+    BEGIN
+      WITH GenPayLine DO BEGIN
+        "Account Type" := "Account Type"::Customer;
+        VALIDATE("Account No.",CustLedgEntry."Customer No.");
+        "Posting Date" := CustLedgEntry."Posting Date";
+        "Currency Factor" := CustLedgEntry."Adjusted Currency Factor";
+        IF "Currency Factor" = 0 THEN
+          "Currency Factor" := 1;
+        VALIDATE("Currency Code",CustLedgEntry."Currency Code");
+        CustLedgEntry.CALCFIELDS("Remaining Amount");
+        IF ((CustLedgEntry."Document Type" = CustLedgEntry."Document Type"::"Credit Memo") AND
+            (CustLedgEntry."Remaining Pmt. Disc. Possible" <> 0) OR
+            (CustLedgEntry."Document Type" = CustLedgEntry."Document Type"::Invoice)) AND
+           (PostingDate <= CustLedgEntry."Pmt. Discount Date") AND UsePaymentDisc
+        THEN
+          Amount := -(CustLedgEntry."Remaining Amount" - CustLedgEntry."Original Pmt. Disc. Possible")
+        ELSE
+          Amount := -CustLedgEntry."Remaining Amount";
+        VALIDATE(Amount);
+      END;
+
+      PayableCustLedgEntry."Vendor No." := CustLedgEntry."Customer No.";
+      PayableCustLedgEntry."Entry No." := NextEntryNo;
+      PayableCustLedgEntry."Vendor Ledg. Entry No." := CustLedgEntry."Entry No.";
+      PayableCustLedgEntry.Amount := GenPayLine.Amount;
+      PayableCustLedgEntry."Amount (LCY)" := GenPayLine."Amount (LCY)";
+      PayableCustLedgEntry.Positive := (PayableCustLedgEntry.Amount > 0);
+      PayableCustLedgEntry.Future := (CustLedgEntry."Due Date" > LastDueDateToPayReq);
+      PayableCustLedgEntry."Currency Code" := CustLedgEntry."Currency Code";
+      PayableCustLedgEntry."Due Date" := CustLedgEntry."Due Date";
+      PayableCustLedgEntry.INSERT;
+      NextEntryNo := NextEntryNo + 1;
+    END;
+
+    PROCEDURE CheckAmounts@1120002(Future@1120000 : Boolean);
+    VAR
+      CurrencyBalance@1120001 : Decimal;
+      PrevCurrency@1120002 : Code[10];
+    BEGIN
+      PayableCustLedgEntry.SETRANGE("Vendor No.",Customer."No.");
+      PayableCustLedgEntry.SETRANGE(Future,Future);
+      IF PayableCustLedgEntry.FIND('-') THEN BEGIN
+        PrevCurrency := PayableCustLedgEntry."Currency Code";
+        REPEAT
+          IF PayableCustLedgEntry."Currency Code" <> PrevCurrency THEN BEGIN
+            IF CurrencyBalance < 0 THEN BEGIN
+              PayableCustLedgEntry.SETRANGE("Currency Code",PrevCurrency);
+              PayableCustLedgEntry.DELETEALL;
+              PayableCustLedgEntry.SETRANGE("Currency Code");
+            END;
+            CurrencyBalance := 0;
+            PrevCurrency := PayableCustLedgEntry."Currency Code";
+          END;
+          CurrencyBalance := CurrencyBalance + PayableCustLedgEntry."Amount (LCY)"
+        UNTIL PayableCustLedgEntry.NEXT = 0;
+        IF CurrencyBalance > 0 THEN BEGIN
+          PayableCustLedgEntry.SETRANGE("Currency Code",PrevCurrency);
+          PayableCustLedgEntry.DELETEALL;
+          PayableCustLedgEntry.SETRANGE("Currency Code");
+        END;
+      END;
+      PayableCustLedgEntry.RESET;
+    END;
+
+    LOCAL PROCEDURE MakeGenPayLines@1120001();
+    VAR
+      SEPADirectDebitMandate@1120002 : Record 1230;
+      GenPayLine3@1120000 : Record 81;
+    BEGIN
+      TempPaymentPostBuffer.DELETEALL;
+
+      IF PayableCustLedgEntry.FIND('-') THEN
+        REPEAT
+          PayableCustLedgEntry.SETRANGE("Vendor No.",PayableCustLedgEntry."Vendor No.");
+          PayableCustLedgEntry.FIND('-');
+          REPEAT
+            CustLedgEntry.GET(PayableCustLedgEntry."Vendor Ledg. Entry No.");
+            TempPaymentPostBuffer."Account No." := CustLedgEntry."Customer No.";
+            TempPaymentPostBuffer."Currency Code" := CustLedgEntry."Currency Code";
+            IF SummarizePer = SummarizePer::"Due date" THEN
+              TempPaymentPostBuffer."Due Date" := CustLedgEntry."Due Date";
+
+            TempPaymentPostBuffer."Dimension Entry No." := 0;
+            TempPaymentPostBuffer."Global Dimension 1 Code" := '';
+            TempPaymentPostBuffer."Global Dimension 2 Code" := '';
+
+            IF SummarizePer IN [SummarizePer::Customer,SummarizePer::"Due date"] THEN BEGIN
+              TempPaymentPostBuffer."Auxiliary Entry No." := 0;
+              IF TempPaymentPostBuffer.FIND THEN BEGIN
+                TempPaymentPostBuffer.Amount := TempPaymentPostBuffer.Amount + PayableCustLedgEntry.Amount;
+                TempPaymentPostBuffer."Amount (LCY)" := TempPaymentPostBuffer."Amount (LCY)" + PayableCustLedgEntry."Amount (LCY)";
+                TempPaymentPostBuffer.MODIFY;
+              END ELSE BEGIN
+                LastLineNo := LastLineNo + 10000;
+                TempPaymentPostBuffer."Payment Line No." := LastLineNo;
+                IF PaymentClass."Line No. Series" = '' THEN
+                  NextDocNo := GenPayHead."No." + '/' + FORMAT(LastLineNo)
+                ELSE
+                  NextDocNo := NoSeriesMgt.GetNextNo(PaymentClass."Line No. Series",PostingDate,FALSE);
+                TempPaymentPostBuffer."Document No." := NextDocNo;
+                NextDocNo := INCSTR(NextDocNo);
+                TempPaymentPostBuffer.Amount := PayableCustLedgEntry.Amount;
+                TempPaymentPostBuffer."Amount (LCY)" := PayableCustLedgEntry."Amount (LCY)";
+                Window.UPDATE(1,CustLedgEntry."Customer No.");
+                TempPaymentPostBuffer.INSERT;
+              END;
+              CustLedgEntry."Applies-to ID" := TempPaymentPostBuffer."Document No.";
+              CODEUNIT.RUN(CODEUNIT::"Cust. Entry-Edit",CustLedgEntry)
+            END ELSE BEGIN
+              GenPayLine3.RESET;
+              GenPayLine3.SETCURRENTKEY(
+                "Account Type","Account No.","Applies-to Doc. Type","Applies-to Doc. No.");
+              GenPayLine3.SETRANGE("Account Type",GenPayLine3."Account Type"::Customer);
+              GenPayLine3.SETRANGE("Account No.",CustLedgEntry."Customer No.");
+              GenPayLine3.SETRANGE("Applies-to Doc. Type",CustLedgEntry."Document Type");
+              GenPayLine3.SETRANGE("Applies-to Doc. No.",CustLedgEntry."Document No.");
+              IF GenPayLine3.FINDFIRST THEN
+                GenPayLine3.FIELDERROR(
+                  "Applies-to Doc. No.",
+                  STRSUBSTNO(
+                    Text016,
+                    CustLedgEntry."Document Type",CustLedgEntry."Document No.",
+                    CustLedgEntry."Customer No."));
+
+              TempPaymentPostBuffer."Applies-to Doc. Type" := CustLedgEntry."Document Type";
+              TempPaymentPostBuffer."Applies-to Doc. No." := CustLedgEntry."Document No.";
+              TempPaymentPostBuffer."Currency Factor" := CustLedgEntry."Adjusted Currency Factor";
+              TempPaymentPostBuffer.Amount := PayableCustLedgEntry.Amount;
+              TempPaymentPostBuffer."Amount (LCY)" := PayableCustLedgEntry."Amount (LCY)";
+              TempPaymentPostBuffer."Global Dimension 1 Code" := CustLedgEntry."Global Dimension 1 Code";
+              TempPaymentPostBuffer."Global Dimension 2 Code" := CustLedgEntry."Global Dimension 2 Code";
+              TempPaymentPostBuffer."Auxiliary Entry No." := CustLedgEntry."Entry No.";
+              Window.UPDATE(1,CustLedgEntry."Customer No.");
+              TempPaymentPostBuffer.INSERT;
+            END;
+            CustLedgEntry.CALCFIELDS("Remaining Amount");
+            CustLedgEntry."Amount to Apply" := CustLedgEntry."Remaining Amount";
+            CODEUNIT.RUN(CODEUNIT::"Cust. Entry-Edit",CustLedgEntry)
+          UNTIL PayableCustLedgEntry.NEXT = 0;
+          PayableCustLedgEntry.SETFILTER("Vendor No.",'>%1',PayableCustLedgEntry."Vendor No.");
+        UNTIL NOT PayableCustLedgEntry.FIND('-');
+
+      CLEAR(OldTempPaymentPostBuffer);
+      TempPaymentPostBuffer.SETCURRENTKEY("Document No.");
+      IF TempPaymentPostBuffer.FINDSET THEN
+        REPEAT
+          WITH GenPayLine DO BEGIN
+            INIT;
+            Window.UPDATE(1,TempPaymentPostBuffer."Account No.");
+            IF SummarizePer = SummarizePer::" " THEN BEGIN
+              LastLineNo := LastLineNo + 10000;
+              "Line No." := LastLineNo;
+              IF PaymentClass."Line No. Series" = '' THEN
+                NextDocNo := GenPayHead."No." + '/' + FORMAT("Line No.")
+              ELSE
+                NextDocNo := NoSeriesMgt.GetNextNo(PaymentClass."Line No. Series",PostingDate,FALSE);
+            END ELSE BEGIN
+              "Line No." := TempPaymentPostBuffer."Payment Line No.";
+              NextDocNo := TempPaymentPostBuffer."Document No.";
+            END;
+            "Document No." := NextDocNo;
+            "Applies-to ID" := "Document No.";
+            OldTempPaymentPostBuffer := TempPaymentPostBuffer;
+            OldTempPaymentPostBuffer."Document No." := "Document No.";
+            IF SummarizePer = SummarizePer::" " THEN BEGIN
+              CustLedgEntry.GET(TempPaymentPostBuffer."Auxiliary Entry No.");
+              CustLedgEntry."Applies-to ID" := NextDocNo;
+              CustLedgEntry.MODIFY;
+            END;
+            "Account Type" := "Account Type"::Customer;
+            VALIDATE("Account No.",TempPaymentPostBuffer."Account No.");
+            "Currency Code" := TempPaymentPostBuffer."Currency Code";
+            Amount := TempPaymentPostBuffer.Amount;
+            IF Amount > 0 THEN
+              "Debit Amount" := Amount
+            ELSE
+              "Credit Amount" := -Amount;
+            "Amount (LCY)" := TempPaymentPostBuffer."Amount (LCY)";
+            "Currency Factor" := TempPaymentPostBuffer."Currency Factor";
+            IF ("Currency Factor" = 0) AND (Amount <> 0) THEN
+              "Currency Factor" := Amount / "Amount (LCY)";
+            Cust2.GET("Account No.");
+            VALIDATE("Bank Account Code",Cust2."Preferred Bank Account");
+            "Payment Class" := GenPayHead."Payment Class";
+            VALIDATE("Status No.");
+            "Posting Date" := PostingDate;
+            IF SummarizePer = SummarizePer::" " THEN BEGIN
+              "Applies-to Doc. Type" := CustLedgEntry."Document Type";
+              "Applies-to Doc. No." := CustLedgEntry."Document No.";
+              IF SEPADirectDebitMandate.GET(CustLedgEntry."Direct Debit Mandate ID") THEN
+                VALIDATE("Bank Account Code",SEPADirectDebitMandate."Customer Bank Account Code");
+              "Direct Debit Mandate ID" := CustLedgEntry."Direct Debit Mandate ID";
+            END;
+            CASE SummarizePer OF
+              SummarizePer::" ":
+                "Due Date" := CustLedgEntry."Due Date";
+              SummarizePer::Customer:
+                BEGIN
+                  PayableCustLedgEntry.SETCURRENTKEY("Vendor No.","Due Date");
+                  PayableCustLedgEntry.SETRANGE("Vendor No.",TempPaymentPostBuffer."Account No.");
+                  PayableCustLedgEntry.FIND('+');
+                  "Due Date" := PayableCustLedgEntry."Due Date";
+                  PayableCustLedgEntry.DELETEALL;
+                END;
+              SummarizePer::"Due date":
+                "Due Date" := TempPaymentPostBuffer."Due Date";
+            END;
+            "Dimension Set ID" := CustLedgEntry."Dimension Set ID";
+            IF Amount <> 0 THEN
+              INSERT;
+            GenPayLineInserted := TRUE;
+          END;
+        UNTIL TempPaymentPostBuffer.NEXT = 0;
+    END;
+
+    LOCAL PROCEDURE ShowMessage@1120000(Text@1120000 : Text);
+    BEGIN
+      IF (Text <> '') AND GenPayLineInserted THEN
+        MESSAGE(Text);
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

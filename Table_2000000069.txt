@@ -1,0 +1,47 @@
+OBJECT Table 2000000069 Add-in
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Add-in;
+               FRA=Macro compl‚mentaire];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Add-in Name         ;Text220       ;CaptionML=[ENU=Add-in Name;
+                                                              FRA=Nom macro compl‚mentaire] }
+    { 5   ;   ;Public Key Token    ;Text20        ;CaptionML=[ENU=Public Key Token;
+                                                              FRA=Jeton de cl‚ publique] }
+    { 8   ;   ;Version             ;Text25        ;CaptionML=[ENU=Version;
+                                                              FRA=Version] }
+    { 15  ;   ;Category            ;Option        ;CaptionML=[ENU=Category;
+                                                              FRA=Cat‚gorie];
+                                                   OptionCaptionML=[ENU=JavaScript Control Add-in,DotNet Control Add-in,DotNet Interoperability,Language Resource;
+                                                                    FRA=Macro compl‚mentaire de contr“le JavaScript,Macro compl‚mentaire de contr“le DotNet,Interop‚rabilit‚ DotNet,Ressource linguistique];
+                                                   OptionString=JavaScript Control Add-in,DotNet Control Add-in,DotNet Interoperability,Language Resource }
+    { 20  ;   ;Description         ;Text250       ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 25  ;   ;Resource            ;BLOB          ;CaptionML=[ENU=Resource;
+                                                              FRA=Ressource] }
+  }
+  KEYS
+  {
+    {    ;Add-in Name,Public Key Token,Version    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

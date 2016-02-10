@@ -1,0 +1,290 @@
+OBJECT Table 297 Issued Reminder Header
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    DataCaptionFields=No.,Name;
+    OnDelete=BEGIN
+               TESTFIELD("No. Printed");
+               LOCKTABLE;
+               ReminderIssue.DeleteIssuedReminderLines(Rec);
+
+               ReminderCommentLine.SETRANGE(Type,ReminderCommentLine.Type::"Issued Reminder");
+               ReminderCommentLine.SETRANGE("No.","No.");
+               ReminderCommentLine.DELETEALL;
+             END;
+
+    CaptionML=[ENU=Issued Reminder Header;
+               FRA=En-tˆte relance ‚mise];
+    LookupPageID=Page440;
+    DrillDownPageID=Page440;
+  }
+  FIELDS
+  {
+    { 1   ;   ;No.                 ;Code20        ;CaptionML=[ENU=No.;
+                                                              FRA=Nø];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Customer No.        ;Code20        ;TableRelation=Customer;
+                                                   CaptionML=[ENU=Customer No.;
+                                                              FRA=Nø client] }
+    { 3   ;   ;Name                ;Text50        ;CaptionML=[ENU=Name;
+                                                              FRA=Nom] }
+    { 4   ;   ;Name 2              ;Text50        ;CaptionML=[ENU=Name 2;
+                                                              FRA=Nom 2] }
+    { 5   ;   ;Address             ;Text50        ;CaptionML=[ENU=Address;
+                                                              FRA=Adresse] }
+    { 6   ;   ;Address 2           ;Text50        ;CaptionML=[ENU=Address 2;
+                                                              FRA=Adresse (2Šme ligne)] }
+    { 7   ;   ;Post Code           ;Code20        ;TableRelation="Post Code";
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Post Code;
+                                                              FRA=Code postal] }
+    { 8   ;   ;City                ;Text30        ;TableRelation="Post Code".City;
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=City;
+                                                              FRA=Ville] }
+    { 9   ;   ;County              ;Text30        ;CaptionML=[ENU=County;
+                                                              FRA=R‚gion] }
+    { 10  ;   ;Country/Region Code ;Code10        ;TableRelation=Country/Region;
+                                                   CaptionML=[ENU=Country/Region Code;
+                                                              FRA=Code pays/r‚gion] }
+    { 11  ;   ;Language Code       ;Code10        ;TableRelation=Language;
+                                                   CaptionML=[ENU=Language Code;
+                                                              FRA=Code langue] }
+    { 12  ;   ;Currency Code       ;Code10        ;TableRelation=Currency;
+                                                   CaptionML=[ENU=Currency Code;
+                                                              FRA=Code devise] }
+    { 13  ;   ;Contact             ;Text50        ;CaptionML=[ENU=Contact;
+                                                              FRA=Contact] }
+    { 14  ;   ;Your Reference      ;Text35        ;CaptionML=[ENU=Your Reference;
+                                                              FRA=Votre r‚f‚rence] }
+    { 15  ;   ;Shortcut Dimension 1 Code;Code20   ;TableRelation="Dimension Value".Code WHERE (Global Dimension No.=CONST(1));
+                                                   CaptionML=[ENU=Shortcut Dimension 1 Code;
+                                                              FRA=Code raccourci axe 1];
+                                                   CaptionClass='1,2,1' }
+    { 16  ;   ;Shortcut Dimension 2 Code;Code20   ;TableRelation="Dimension Value".Code WHERE (Global Dimension No.=CONST(2));
+                                                   CaptionML=[ENU=Shortcut Dimension 2 Code;
+                                                              FRA=Code raccourci axe 2];
+                                                   CaptionClass='1,2,2' }
+    { 17  ;   ;Customer Posting Group;Code10      ;TableRelation="Customer Posting Group";
+                                                   CaptionML=[ENU=Customer Posting Group;
+                                                              FRA=Groupe compta. client] }
+    { 18  ;   ;Gen. Bus. Posting Group;Code10     ;TableRelation="Gen. Business Posting Group";
+                                                   CaptionML=[ENU=Gen. Bus. Posting Group;
+                                                              FRA=Groupe compta. march‚] }
+    { 19  ;   ;VAT Registration No.;Text20        ;CaptionML=[ENU=VAT Registration No.;
+                                                              FRA=Nø identif. intracomm.] }
+    { 20  ;   ;Reason Code         ;Code10        ;TableRelation="Reason Code";
+                                                   CaptionML=[ENU=Reason Code;
+                                                              FRA=Code motif] }
+    { 21  ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              FRA=Date comptabilisation] }
+    { 22  ;   ;Document Date       ;Date          ;CaptionML=[ENU=Document Date;
+                                                              FRA=Date document] }
+    { 23  ;   ;Due Date            ;Date          ;CaptionML=[ENU=Due Date;
+                                                              FRA=Date d'‚ch‚ance] }
+    { 24  ;   ;Reminder Terms Code ;Code10        ;TableRelation="Reminder Terms";
+                                                   CaptionML=[ENU=Reminder Terms Code;
+                                                              FRA=Code condition relance] }
+    { 25  ;   ;Fin. Charge Terms Code;Code10      ;TableRelation="Finance Charge Terms";
+                                                   CaptionML=[ENU=Fin. Charge Terms Code;
+                                                              FRA=Code condition int‚rˆts] }
+    { 26  ;   ;Interest Posted     ;Boolean       ;CaptionML=[ENU=Interest Posted;
+                                                              FRA=Int‚rˆts calcul‚s] }
+    { 27  ;   ;Additional Fee Posted;Boolean      ;CaptionML=[ENU=Additional Fee Posted;
+                                                              FRA=Frais suppl‚mentaires calcul‚s] }
+    { 28  ;   ;Reminder Level      ;Integer       ;TableRelation="Reminder Level".No. WHERE (Reminder Terms Code=FIELD(Reminder Terms Code));
+                                                   CaptionML=[ENU=Reminder Level;
+                                                              FRA=Niveau relance] }
+    { 29  ;   ;Posting Description ;Text50        ;CaptionML=[ENU=Posting Description;
+                                                              FRA=Libell‚ ‚criture] }
+    { 30  ;   ;Comment             ;Boolean       ;FieldClass=FlowField;
+                                                   CalcFormula=Exist("Reminder Comment Line" WHERE (Type=CONST(Issued Reminder),
+                                                                                                    No.=FIELD(No.)));
+                                                   CaptionML=[ENU=Comment;
+                                                              FRA=Commentaires];
+                                                   Editable=No }
+    { 31  ;   ;Remaining Amount    ;Decimal       ;FieldClass=FlowField;
+                                                   CalcFormula=Sum("Issued Reminder Line"."Remaining Amount" WHERE (Reminder No.=FIELD(No.),
+                                                                                                                    Line Type=CONST(Reminder Line)));
+                                                   CaptionML=[ENU=Remaining Amount;
+                                                              FRA=Montant ouvert];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 32  ;   ;Interest Amount     ;Decimal       ;FieldClass=FlowField;
+                                                   CalcFormula=Sum("Issued Reminder Line".Amount WHERE (Reminder No.=FIELD(No.),
+                                                                                                        Type=CONST(Customer Ledger Entry),
+                                                                                                        Line Type=CONST(Reminder Line)));
+                                                   CaptionML=[ENU=Interest Amount;
+                                                              FRA=Montant int‚rˆts];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 33  ;   ;Additional Fee      ;Decimal       ;FieldClass=FlowField;
+                                                   CalcFormula=Sum("Issued Reminder Line".Amount WHERE (Reminder No.=FIELD(No.),
+                                                                                                        Type=CONST(G/L Account)));
+                                                   CaptionML=[ENU=Additional Fee;
+                                                              FRA=Frais suppl‚mentaires];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 34  ;   ;VAT Amount          ;Decimal       ;FieldClass=FlowField;
+                                                   CalcFormula=Sum("Issued Reminder Line"."VAT Amount" WHERE (Reminder No.=FIELD(No.)));
+                                                   CaptionML=[ENU=VAT Amount;
+                                                              FRA=Montant TVA];
+                                                   Editable=No;
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 35  ;   ;No. Printed         ;Integer       ;CaptionML=[ENU=No. Printed;
+                                                              FRA=Nbre impressions] }
+    { 36  ;   ;User ID             ;Code50        ;TableRelation=User."User Name";
+                                                   OnLookup=VAR
+                                                              UserMgt@1000 : Codeunit 418;
+                                                            BEGIN
+                                                              UserMgt.LookupUserID("User ID");
+                                                            END;
+
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=User ID;
+                                                              FRA=Code utilisateur] }
+    { 37  ;   ;No. Series          ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=No. Series;
+                                                              FRA=Souches de nø];
+                                                   Editable=No }
+    { 38  ;   ;Pre-Assigned No. Series;Code10     ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=Pre-Assigned No. Series;
+                                                              FRA=Souche de nø pr‚-attribu‚s] }
+    { 39  ;   ;Pre-Assigned No.    ;Code20        ;CaptionML=[ENU=Pre-Assigned No.;
+                                                              FRA=Nø pr‚-attribu‚s] }
+    { 40  ;   ;Source Code         ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Source Code;
+                                                              FRA=Code journal] }
+    { 41  ;   ;Tax Area Code       ;Code20        ;TableRelation="Tax Area";
+                                                   CaptionML=[ENU=Tax Area Code;
+                                                              FRA=Code zone recouvrement] }
+    { 42  ;   ;Tax Liable          ;Boolean       ;CaptionML=[ENU=Tax Liable;
+                                                              FRA=Soumis … recouvrement] }
+    { 43  ;   ;VAT Bus. Posting Group;Code10      ;TableRelation="VAT Business Posting Group";
+                                                   CaptionML=[ENU=VAT Bus. Posting Group;
+                                                              FRA=Groupe compta. march‚ TVA] }
+    { 44  ;   ;Add. Fee per Line   ;Decimal       ;FieldClass=FlowField;
+                                                   CalcFormula=Sum("Issued Reminder Line".Amount WHERE (Reminder No.=FIELD(No.),
+                                                                                                        Type=CONST(Line Fee)));
+                                                   CaptionML=[ENU=Add. Fee per Line;
+                                                              FRA=Frais suppl‚mentaires par ligne];
+                                                   AutoFormatExpr="Currency Code" }
+    { 480 ;   ;Dimension Set ID    ;Integer       ;TableRelation="Dimension Set Entry";
+                                                   OnLookup=BEGIN
+                                                              ShowDimensions;
+                                                            END;
+
+                                                   CaptionML=[ENU=Dimension Set ID;
+                                                              FRA=ID ensemble de dimensions];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;No.                                     ;Clustered=Yes }
+    {    ;Customer No.,Posting Date                }
+  }
+  FIELDGROUPS
+  {
+    { 1   ;DropDown            ;No.,Customer No.,Name,Posting Date       }
+  }
+  CODE
+  {
+    VAR
+      IssuedReminderHeader@1000 : Record 297;
+      ReminderCommentLine@1001 : Record 299;
+      ReminderIssue@1002 : Codeunit 393;
+      DimMgt@1003 : Codeunit 408;
+
+    PROCEDURE PrintRecords@1(ShowRequestForm@1000 : Boolean;SendAsEmail@1002 : Boolean);
+    VAR
+      ReportSelection@1001 : Record 77;
+    BEGIN
+      WITH IssuedReminderHeader DO BEGIN
+        COPY(Rec);
+        ReportSelection.SETRANGE(Usage,ReportSelection.Usage::Reminder);
+        ReportSelection.SETFILTER("Report ID",'<>0');
+        ReportSelection.FIND('-');
+        REPEAT
+          IF NOT SendAsEmail THEN
+            REPORT.RUNMODAL(ReportSelection."Report ID",ShowRequestForm,FALSE,IssuedReminderHeader)
+          ELSE
+            SendReport(ReportSelection."Report ID");
+        UNTIL ReportSelection.NEXT = 0;
+      END;
+    END;
+
+    PROCEDURE Navigate@2();
+    VAR
+      NavigateForm@1000 : Page 344;
+    BEGIN
+      NavigateForm.SetDoc("Posting Date","No.");
+      NavigateForm.RUN;
+    END;
+
+    PROCEDURE FormatAddr@30(VAR AddrLines@1000 : ARRAY [8] OF Text[50]);
+    VAR
+      Cust@1001 : Record 18;
+      FormatAddrCodeunit@1002 : Codeunit 365;
+    BEGIN
+      Cust.Contact := Contact;
+      Cust.Name := Name;
+      Cust."Name 2" := "Name 2";
+      Cust.Address := Address;
+      Cust."Address 2" := "Address 2";
+      Cust."Post Code" := "Post Code";
+      Cust.City := City;
+      Cust.County := County;
+      Cust."Country/Region Code" := "Country/Region Code";
+      FormatAddrCodeunit.Customer(AddrLines,Cust);
+    END;
+
+    PROCEDURE IncrNoPrinted@3();
+    BEGIN
+      ReminderIssue.IncrNoPrinted(Rec);
+    END;
+
+    PROCEDURE ShowDimensions@4();
+    BEGIN
+      DimMgt.ShowDimensionSet("Dimension Set ID",STRSUBSTNO('%1 %2',TABLECAPTION,"No."));
+    END;
+
+    PROCEDURE CalculateLineFeeVATAmount@1000() : Decimal;
+    VAR
+      IssuedReminderLine@1000 : Record 298;
+    BEGIN
+      IssuedReminderLine.SETCURRENTKEY("Reminder No.",Type,"Line Type");
+      IssuedReminderLine.SETRANGE("Reminder No.","No.");
+      IssuedReminderLine.SETRANGE(Type,IssuedReminderLine.Type::"Line Fee");
+      IssuedReminderLine.CALCSUMS("VAT Amount");
+      EXIT(IssuedReminderLine."VAT Amount");
+    END;
+
+    LOCAL PROCEDURE SendReport@8(ReportId@1002 : Integer);
+    VAR
+      DocumentMailing@1003 : Codeunit 260;
+      FileManagement@1001 : Codeunit 419;
+      ServerAttachmentFilePath@1004 : Text[250];
+    BEGIN
+      ServerAttachmentFilePath := COPYSTR(FileManagement.ServerTempFileName('pdf'),1,250);
+      REPORT.SAVEASPDF(ReportId,ServerAttachmentFilePath,IssuedReminderHeader);
+      COMMIT;
+      DocumentMailing.EmailFileFromIssuedReminder(IssuedReminderHeader,ServerAttachmentFilePath);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

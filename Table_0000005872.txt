@@ -1,0 +1,43 @@
+OBJECT Table 5872 Item Availability by Date
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Item Availability by Date;
+               FRA=Disponibilit‚ article par date];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Item No.            ;Code20        ;CaptionML=[ENU=Item No.;
+                                                              FRA=Nø article] }
+    { 2   ;   ;Date                ;Date          ;CaptionML=[ENU=Date;
+                                                              FRA=Date] }
+    { 3   ;   ;Available Qty       ;Decimal       ;CaptionML=[ENU=Available Qty;
+                                                              FRA=Qt‚ disponible] }
+    { 4   ;   ;Updated Available Qty;Decimal      ;CaptionML=[ENU=Updated Available Qty;
+                                                              FRA=Qt‚ disponible mise … jour] }
+    { 5   ;   ;Variant Code        ;Code10        ;CaptionML=[ENU=Variant Code;
+                                                              FRA=Code variante] }
+    { 6   ;   ;Location Code       ;Code10        ;CaptionML=[ENU=Location Code;
+                                                              FRA=Code magasin] }
+  }
+  KEYS
+  {
+    {    ;Item No.,Variant Code,Location Code,Date;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

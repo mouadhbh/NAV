@@ -1,0 +1,66 @@
+OBJECT Table 2000000111 Session Event
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Session Event;
+               FRA=êvÇnement de session];
+  }
+  FIELDS
+  {
+    { 1   ;   ;User SID            ;GUID          ;TableRelation=User."User Security ID";
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=User SID;
+                                                              FRA=SID utilisateur] }
+    { 2   ;   ;Server Instance ID  ;Integer       ;TableRelation="Server Instance"."Server Instance ID";
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Server Instance ID;
+                                                              FRA=ID instance de serveur] }
+    { 3   ;   ;Session ID          ;Integer       ;CaptionML=[ENU=Session ID;
+                                                              FRA=ID session] }
+    { 4   ;   ;Event Type          ;Option        ;CaptionML=[ENU=Event Type;
+                                                              FRA=Type d'ÇvÇnement];
+                                                   OptionCaptionML=[ENU=Logon,Logoff,Start,Stop,Close;
+                                                                    FRA=Se connecter,Quitter,DÇmarrer,Arràter,Fermer];
+                                                   OptionString=Logon,Logoff,Start,Stop,Close }
+    { 5   ;   ;Event Datetime      ;DateTime      ;CaptionML=[ENU=Event Datetime;
+                                                              FRA=Date et heure de l'ÇvÇnement] }
+    { 6   ;   ;Client Type         ;Option        ;CaptionML=[ENU=Client Type;
+                                                              FRA=Type de client];
+                                                   OptionCaptionML=[ENU=Windows Client,SharePoint Client,Web Service,Client Service,NAS,Background,Management Client,Web Client,Unknown,Tablet,Phone,Desktop;
+                                                                    FRA=Client Windows,Client SharePoint,Service Web,Service client,NAS,Arriäre-plan,Gestion client,Client web,Inconnu,Tablette,TÇlÇphone,Bureau];
+                                                   OptionString=Windows Client,SharePoint Client,Web Service,Client Service,NAS,Background,Management Client,Web Client,Unknown,Tablet,Phone,Desktop }
+    { 7   ;   ;Database Name       ;Text250       ;CaptionML=[ENU=Database Name;
+                                                              FRA=Nom de la base de donnÇes] }
+    { 8   ;   ;Client Computer Name;Text250       ;CaptionML=[ENU=Client Computer Name;
+                                                              FRA=Nom de l'ordinateur client] }
+    { 9   ;   ;User ID             ;Text132       ;CaptionML=[ENU=User ID;
+                                                              FRA=Code utilisateur] }
+    { 10  ;   ;Comment             ;Text132       ;CaptionML=[ENU=Comment;
+                                                              FRA=Commentaire] }
+  }
+  KEYS
+  {
+    {    ;User SID,Server Instance ID,Session ID,Event Datetime,Event Type;
+                                                   Clustered=Yes }
+    {    ;Event Datetime                           }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

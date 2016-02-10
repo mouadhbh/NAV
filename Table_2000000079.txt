@@ -1,0 +1,56 @@
+OBJECT Table 2000000079 Object Tracking
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=Object Tracking;
+               FRA=Suivi de l'objet];
+  }
+  FIELDS
+  {
+    { 3   ;   ;Object Type         ;Option        ;CaptionML=[ENU=Object Type;
+                                                              FRA=Type objet];
+                                                   OptionCaptionML=[ENU=TableData,Table,,Report,,Codeunit,XMLport,MenuSuite,Page,Query,System,FieldNumber;
+                                                                    FRA=TableData,Table,,Report,,Codeunit,XMLport,MenuSuite,Page,Query,System,FieldNumber];
+                                                   OptionString=TableData,Table,,Report,,Codeunit,XMLport,MenuSuite,Page,Query,System,FieldNumber }
+    { 6   ;   ;Object ID           ;Integer       ;TableRelation="Object Metadata"."Object ID" WHERE (Object Type=FIELD(Object Type));
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Object ID;
+                                                              FRA=ID objet] }
+    { 8   ;   ;Change Type         ;Option        ;CaptionML=[ENU=Change Type;
+                                                              FRA=Modifier le type];
+                                                   OptionCaptionML=[ENU=Metadata,Breakpoints,ClientAddIn;
+                                                                    FRA=M‚tadonn‚es,Points d'arrˆt,ClientAddIn];
+                                                   OptionString=Metadata,Breakpoints,ClientAddIn }
+    { 12  ;   ;Object Timestamp    ;BigInteger    ;Volatile=Yes;
+                                                   CaptionML=[ENU=Object Timestamp;
+                                                              FRA=Horodateur de l'objet] }
+    { 15  ;   ;App Package ID      ;GUID          ;CaptionML=[ENU=App Package ID;
+                                                              FRA=ID package appli] }
+    { 18  ;   ;Tenant ID           ;Text128       ;CaptionML=[ENU=Tenant ID;
+                                                              FRA=ID abonn‚] }
+  }
+  KEYS
+  {
+    {    ;Object Type,Object ID,Change Type,App Package ID,Tenant ID;
+                                                   Clustered=Yes }
+    {    ;Object Timestamp                         }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

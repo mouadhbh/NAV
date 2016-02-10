@@ -1,0 +1,63 @@
+OBJECT Page 5346 CRM Pricelevel List
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Microsoft Dynamics CRM Price List;
+               FRA=Liste des prix Microsoft Dynamics CRM];
+    SourceTable=Table5346;
+    PageType=List;
+    OnInit=BEGIN
+             CODEUNIT.RUN(CODEUNIT::"CRM Integration Management");
+           END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 3   ;2   ;Field     ;
+                CaptionML=[ENU=Name;
+                           FRA=Nom];
+                SourceExpr=Name }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=Status;
+                           FRA=Statut];
+                SourceExpr=StateCode }
+
+    { 5   ;2   ;Field     ;
+                CaptionML=[ENU=Status Reason;
+                           FRA=Motif statut];
+                SourceExpr=StatusCode }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Currency;
+                           FRA=Devise];
+                SourceExpr=TransactionCurrencyIdName }
+
+    { 7   ;2   ;Field     ;
+                CaptionML=[ENU=Exchange Rate;
+                           FRA=Taux de change];
+                SourceExpr=ExchangeRate }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

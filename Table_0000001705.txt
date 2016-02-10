@@ -1,0 +1,71 @@
+OBJECT Table 1705 Posted Deferral Line
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Posted Deferral Line;
+               FRA=Ligne ‚chelonnement valid‚];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Deferral Doc. Type  ;Option        ;TableRelation="Posted Deferral Header"."Deferral Doc. Type";
+                                                   CaptionML=[ENU=Deferral Doc. Type;
+                                                              FRA=Type doc. ‚chelonnement];
+                                                   OptionCaptionML=[ENU=Purchase,Sales,G/L;
+                                                                    FRA=Achats,Ventes,Comptabilit‚];
+                                                   OptionString=Purchase,Sales,G/L }
+    { 2   ;   ;Gen. Jnl. Document No.;Code20      ;TableRelation="Posted Deferral Header"."Gen. Jnl. Document No.";
+                                                   CaptionML=[ENU=Gen. Jnl. Document No.;
+                                                              FRA=Nø document feuille compta.] }
+    { 3   ;   ;Account No.         ;Code20        ;TableRelation="Posted Deferral Header"."Account No.";
+                                                   CaptionML=[ENU=Account No.;
+                                                              FRA=Nø compte] }
+    { 4   ;   ;Document Type       ;Integer       ;TableRelation="Posted Deferral Header"."Document Type";
+                                                   CaptionML=[ENU=Document Type;
+                                                              FRA=Type document] }
+    { 5   ;   ;Document No.        ;Code20        ;TableRelation="Posted Deferral Header"."Document No.";
+                                                   CaptionML=[ENU=Document No.;
+                                                              FRA=Nø document] }
+    { 6   ;   ;Line No.            ;Integer       ;TableRelation="Posted Deferral Header"."Line No.";
+                                                   CaptionML=[ENU=Line No.;
+                                                              FRA=Nø ligne] }
+    { 7   ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              FRA=Date comptabilisation] }
+    { 8   ;   ;Description         ;Text50        ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 9   ;   ;Amount              ;Decimal       ;CaptionML=[ENU=Amount;
+                                                              FRA=Montant];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 10  ;   ;Amount (LCY)        ;Decimal       ;CaptionML=[ENU=Amount (LCY);
+                                                              FRA=Montant DS];
+                                                   AutoFormatType=1 }
+    { 11  ;   ;Currency Code       ;Code10        ;CaptionML=[ENU=Currency Code;
+                                                              FRA=Code devise] }
+    { 12  ;   ;Deferral Account    ;Code20        ;TableRelation="G/L Account" WHERE (Account Type=CONST(Posting),
+                                                                                      Blocked=CONST(No));
+                                                   CaptionML=[ENU=Deferral Account;
+                                                              FRA=Compte ‚chelonnement];
+                                                   NotBlank=Yes }
+  }
+  KEYS
+  {
+    {    ;Deferral Doc. Type,Gen. Jnl. Document No.,Account No.,Document Type,Document No.,Line No.,Posting Date;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

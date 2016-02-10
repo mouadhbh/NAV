@@ -1,0 +1,50 @@
+OBJECT Table 7360 Reservation Entry Buffer
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Reservation Entry Buffer;
+               FRA=Tampon ‚criture r‚servation];
+  }
+  FIELDS
+  {
+    { 4   ;   ;Quantity (Base)     ;Decimal       ;CaptionML=[ENU=Quantity (Base);
+                                                              FRA=Quantit‚ (base)];
+                                                   DecimalPlaces=0:5 }
+    { 10  ;   ;Source Type         ;Integer       ;CaptionML=[ENU=Source Type;
+                                                              FRA=Type origine] }
+    { 11  ;   ;Source Subtype      ;Option        ;CaptionML=[ENU=Source Subtype;
+                                                              FRA=Sous-type origine];
+                                                   OptionCaptionML=[ENU=0,1,2,3,4,5,6,7,8,9,10;
+                                                                    FRA=0,1,2,3,4,5,6,7,8,9,10];
+                                                   OptionString=0,1,2,3,4,5,6,7,8,9,10 }
+    { 12  ;   ;Source ID           ;Code20        ;CaptionML=[ENU=Source ID;
+                                                              FRA=ID origine] }
+    { 13  ;   ;Source Batch Name   ;Code10        ;CaptionML=[ENU=Source Batch Name;
+                                                              FRA=Nom feuille origine] }
+    { 14  ;   ;Source Prod. Order Line;Integer    ;CaptionML=[ENU=Source Prod. Order Line;
+                                                              FRA=Ligne O.F. origine] }
+    { 15  ;   ;Source Ref. No.     ;Integer       ;CaptionML=[ENU=Source Ref. No.;
+                                                              FRA=Nø r‚f. origine] }
+  }
+  KEYS
+  {
+    {    ;Source Type,Source Subtype,Source ID,Source Batch Name,Source Prod. Order Line,Source Ref. No.;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,74 @@
+OBJECT Page 10871 Payment Line Modification
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVFR7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Payment Line Modification;
+               FRA=Modification ligne räglement];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table10866;
+    PageType=Card;
+    RefreshOnActivate=Yes;
+    OnInit=BEGIN
+             CurrPage.LOOKUPMODE := TRUE;
+           END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group      }
+
+    { 1120014;2;Field     ;
+                SourceExpr="External Document No." }
+
+    { 1120016;2;Field     ;
+                SourceExpr="Drawee Reference" }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Due Date" }
+
+    { 1120000;2;Field     ;
+                SourceExpr="Acceptation Code" }
+
+    { 1120002;2;Field     ;
+                SourceExpr="Bank Account Code" }
+
+    { 1120004;2;Field     ;
+                SourceExpr="Bank Branch No." }
+
+    { 1120008;2;Field     ;
+                SourceExpr="Agency Code" }
+
+    { 1120006;2;Field     ;
+                SourceExpr="Bank Account No." }
+
+    { 1120018;2;Field     ;
+                SourceExpr=IBAN }
+
+    { 1120020;2;Field     ;
+                SourceExpr="SWIFT Code" }
+
+    { 1120010;2;Field     ;
+                SourceExpr="RIB Key" }
+
+    { 1120012;2;Field     ;
+                SourceExpr="RIB Checked" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

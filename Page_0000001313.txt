@@ -1,0 +1,49 @@
+OBJECT Page 1313 Mini Standard Sales Codes
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Recurring Sales Lines;
+               FRA=Lignes vente r‚currentes];
+    SourceTable=Table170;
+    PageType=List;
+    CardPageID=Mini Standard Sales Code Card;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a code which identifies this standard sales code.;
+                           FRA=Indique un code qui identifie ce code vente standard.];
+                SourceExpr=Code }
+
+    { 4   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies a description of the standard sales code.;
+                           FRA=Sp‚cifie la d‚signation du code vente standard.];
+                SourceExpr=Description }
+
+    { 6   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the code for the currency of the amounts on the standard sales lines.;
+                           FRA=Indique le code de la devise des montants des lignes vente standard.];
+                SourceExpr="Currency Code";
+                Visible=FALSE }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

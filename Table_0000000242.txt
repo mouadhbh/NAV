@@ -1,0 +1,254 @@
+OBJECT Table 242 Source Code Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Source Code Setup;
+               FRA=Paramätres codes journaux];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Primary Key         ;Code10        ;CaptionML=[ENU=Primary Key;
+                                                              FRA=ClÇ primaire] }
+    { 2   ;   ;Sales               ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Sales;
+                                                              FRA=Ventes] }
+    { 3   ;   ;Purchases           ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Purchases;
+                                                              FRA=Ac&hats] }
+    { 4   ;   ;Inventory Post Cost ;Code10        ;TableRelation="Source Code";
+                                                   AccessByPermission=TableData 27=R;
+                                                   CaptionML=[ENU=Inventory Post Cost;
+                                                              FRA=Comptabilisation stock] }
+    { 5   ;   ;Exchange Rate Adjmt.;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Exchange Rate Adjmt.;
+                                                              FRA=Ajust. taux de change] }
+    { 6   ;   ;Post Recognition    ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Post Recognition;
+                                                              FRA=RÇception projet] }
+    { 7   ;   ;Post Value          ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Post Value;
+                                                              FRA=Valorisation projet] }
+    { 8   ;   ;Close Income Statement;Code10      ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Close Income Statement;
+                                                              FRA=Clìturer exercice comptable] }
+    { 9   ;   ;Consolidation       ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Consolidation;
+                                                              FRA=Consolidation] }
+    { 10  ;   ;General Journal     ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=General Journal;
+                                                              FRA=Feuille comptabilitÇ] }
+    { 11  ;   ;Sales Journal       ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Sales Journal;
+                                                              FRA=Feuille vente] }
+    { 12  ;   ;Purchase Journal    ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Purchase Journal;
+                                                              FRA=Feuille achat] }
+    { 13  ;   ;Cash Receipt Journal;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Cash Receipt Journal;
+                                                              FRA=Feuille räglement] }
+    { 14  ;   ;Payment Journal     ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Payment Journal;
+                                                              FRA=Feuille paiement] }
+    { 16  ;   ;Item Journal        ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Item Journal;
+                                                              FRA=Feuille article] }
+    { 19  ;   ;Resource Journal    ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Resource Journal;
+                                                              FRA=Feuille ressource] }
+    { 20  ;   ;Job Journal         ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Job Journal;
+                                                              FRA=Feuille projet] }
+    { 21  ;   ;Sales Entry Application;Code10     ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Sales Entry Application;
+                                                              FRA=Lettrage Çcritures vente] }
+    { 22  ;   ;Purchase Entry Application;Code10  ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Purchase Entry Application;
+                                                              FRA=Lettrage Çcritures achat] }
+    { 23  ;   ;VAT Settlement      ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=VAT Settlement;
+                                                              FRA=DÇclaration de TVA] }
+    { 24  ;   ;Compress G/L        ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress G/L;
+                                                              FRA=Compr. Çcritures comptables] }
+    { 25  ;   ;Compress VAT Entries;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress VAT Entries;
+                                                              FRA=Compr. Çcritures TVA] }
+    { 26  ;   ;Compress Cust. Ledger;Code10       ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Cust. Ledger;
+                                                              FRA=Compr. Çcritures client] }
+    { 27  ;   ;Compress Vend. Ledger;Code10       ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Vend. Ledger;
+                                                              FRA=Compr. Çcritures fournisseur] }
+    { 28  ;   ;Compress Item Ledger;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Item Ledger;
+                                                              FRA=Compr. Çcritures article] }
+    { 31  ;   ;Compress Res. Ledger;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Res. Ledger;
+                                                              FRA=Compr. Çcritures ressource] }
+    { 32  ;   ;Compress Job Ledger ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Job Ledger;
+                                                              FRA=Compr. Çcritures projet] }
+    { 33  ;   ;Item Reclass. Journal;Code10       ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Item Reclass. Journal;
+                                                              FRA=Feuille reclassement article] }
+    { 34  ;   ;Phys. Inventory Journal;Code10     ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Phys. Inventory Journal;
+                                                              FRA=Feuille inventaire] }
+    { 35  ;   ;Compress Bank Acc. Ledger;Code10   ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Bank Acc. Ledger;
+                                                              FRA=Compr. Çcritures banque] }
+    { 36  ;   ;Compress Check Ledger;Code10       ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Check Ledger;
+                                                              FRA=Compr. Çcritures chäque] }
+    { 37  ;   ;Financially Voided Check;Code10    ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Financially Voided Check;
+                                                              FRA=Chäque annulÇ financiärement] }
+    { 38  ;   ;Finance Charge Memo ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Finance Charge Memo;
+                                                              FRA=Facture d'intÇràts] }
+    { 39  ;   ;Reminder            ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Reminder;
+                                                              FRA=Relance] }
+    { 40  ;   ;Deleted Document    ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Deleted Document;
+                                                              FRA=Document supprimÇ] }
+    { 41  ;   ;Adjust Add. Reporting Currency;Code10;
+                                                   TableRelation="Source Code";
+                                                   CaptionML=[ENU=Adjust Add. Reporting Currency;
+                                                              FRA=Ajuster devise report] }
+    { 42  ;   ;Trans. Bank Rec. to Gen. Jnl.;Code10;
+                                                   TableRelation="Source Code";
+                                                   CaptionML=[ENU=Trans. Bank Rec. to Gen. Jnl.;
+                                                              FRA=Trans. rappr. banc. -> f. cpta] }
+    { 43  ;   ;IC General Journal  ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=IC General Journal;
+                                                              FRA=Feuille comptabilitÇ IC] }
+    { 45  ;   ;Unapplied Sales Entry Appln.;Code10;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Unapplied Sales Entry Appln.;
+                                                              FRA=Lettrage Çcr vente non lettrÇ] }
+    { 46  ;   ;Unapplied Purch. Entry Appln.;Code10;
+                                                   TableRelation="Source Code";
+                                                   CaptionML=[ENU=Unapplied Purch. Entry Appln.;
+                                                              FRA=Lettrage Çcritures achat non appliquÇ] }
+    { 47  ;   ;Reversal            ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Reversal;
+                                                              FRA=Contrepassation] }
+    { 49  ;   ;Payment Reconciliation Journal;Code10;
+                                                   CaptionML=[ENU=Payment Reconciliation Journal;
+                                                              FRA=Feuille rapprochement paiement] }
+    { 840 ;   ;Cash Flow Worksheet ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Cash Flow Worksheet;
+                                                              FRA=Feuille trÇsorerie] }
+    { 900 ;   ;Assembly            ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Assembly;
+                                                              FRA=Assemblage] }
+    { 1000;   ;Job G/L Journal     ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Job G/L Journal;
+                                                              FRA=Feuille compta. projet] }
+    { 1001;   ;Job G/L WIP         ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Job G/L WIP;
+                                                              FRA=TEC compta. projet] }
+    { 1100;   ;G/L Entry to CA     ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=G/L Entry to CA;
+                                                              FRA=êcriture comptable vers CA] }
+    { 1102;   ;Cost Journal        ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Cost Journal;
+                                                              FRA=Feuille de coñts] }
+    { 1104;   ;Cost Allocation     ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Cost Allocation;
+                                                              FRA=Affectation des coñts] }
+    { 1105;   ;Transfer Budget to Actual;Code10   ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Transfer Budget to Actual;
+                                                              FRA=TransfÇrer le budget vers RÇel] }
+    { 5400;   ;Consumption Journal ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Consumption Journal;
+                                                              FRA=Feuille consommation] }
+    { 5402;   ;Output Journal      ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Output Journal;
+                                                              FRA=Feuille de production] }
+    { 5403;   ;Flushing            ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Flushing;
+                                                              FRA=Calcul consommation] }
+    { 5404;   ;Capacity Journal    ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Capacity Journal;
+                                                              FRA=Feuille capacitÇ] }
+    { 5500;   ;Production Journal  ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Production Journal;
+                                                              FRA=Feuille production] }
+    { 5600;   ;Fixed Asset Journal ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Fixed Asset Journal;
+                                                              FRA=Feuille immobilisation] }
+    { 5601;   ;Fixed Asset G/L Journal;Code10     ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Fixed Asset G/L Journal;
+                                                              FRA=Feuille compta. immo.] }
+    { 5602;   ;Insurance Journal   ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Insurance Journal;
+                                                              FRA=Feuille assurance] }
+    { 5603;   ;Compress FA Ledger  ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress FA Ledger;
+                                                              FRA=Compr. Çcritures immo.] }
+    { 5604;   ;Compress Maintenance Ledger;Code10 ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Maintenance Ledger;
+                                                              FRA=Compr. Çcritures maintenance] }
+    { 5605;   ;Compress Insurance Ledger;Code10   ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Insurance Ledger;
+                                                              FRA=Compr. Çcritures assurance] }
+    { 5700;   ;Transfer            ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Transfer;
+                                                              FRA=Ordre de transfert] }
+    { 5800;   ;Revaluation Journal ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Revaluation Journal;
+                                                              FRA=Feuille rÇÇvaluation] }
+    { 5801;   ;Adjust Cost         ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Adjust Cost;
+                                                              FRA=Ajustement des coñts] }
+    { 5900;   ;Service Management  ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Service Management;
+                                                              FRA=Gestion des services] }
+    { 7139;   ;Compress Item Budget;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Item Budget;
+                                                              FRA=Compresser le budget d'article] }
+    { 7300;   ;Whse. Item Journal  ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Whse. Item Journal;
+                                                              FRA=Feuille article entrep.] }
+    { 7302;   ;Whse. Phys. Invt. Journal;Code10   ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Whse. Phys. Invt. Journal;
+                                                              FRA=Feuille inventaire entrepìt] }
+    { 7303;   ;Whse. Reclassification Journal;Code10;
+                                                   TableRelation="Source Code";
+                                                   CaptionML=[ENU=Whse. Reclassification Journal;
+                                                              FRA=Feuille reclassement entrepìt] }
+    { 7304;   ;Whse. Put-away      ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Whse. Put-away;
+                                                              FRA=Rangement entrepìt] }
+    { 7305;   ;Whse. Pick          ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Whse. Pick;
+                                                              FRA=PrÇlävement entrepìt] }
+    { 7306;   ;Whse. Movement      ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Whse. Movement;
+                                                              FRA=Mouvement entrepìt] }
+    { 7307;   ;Compress Whse. Entries;Code10      ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Compress Whse. Entries;
+                                                              FRA=Compresser Çcritures entrepìt] }
+  }
+  KEYS
+  {
+    {    ;Primary Key                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

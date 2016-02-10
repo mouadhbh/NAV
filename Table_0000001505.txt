@@ -1,0 +1,68 @@
+OBJECT Table 1505 Workflow - Table Relation
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Workflow - Table Relation;
+               FRA=Flux de travail - Relation de table];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Table ID            ;Integer       ;TableRelation=AllObjWithCaption."Object ID" WHERE (Object Type=CONST(Table));
+                                                   CaptionML=[ENU=Table ID;
+                                                              FRA=ID table] }
+    { 2   ;   ;Field ID            ;Integer       ;TableRelation=Field.No. WHERE (TableNo=FIELD(Table ID));
+                                                   CaptionML=[ENU=Field ID;
+                                                              FRA=ID champ] }
+    { 3   ;   ;Related Table ID    ;Integer       ;TableRelation=AllObjWithCaption."Object ID" WHERE (Object Type=CONST(Table));
+                                                   CaptionML=[ENU=Related Table ID;
+                                                              FRA=ID table associ‚e] }
+    { 4   ;   ;Related Field ID    ;Integer       ;TableRelation=Field.No. WHERE (TableNo=FIELD(Related Table ID));
+                                                   CaptionML=[ENU=Related Field ID;
+                                                              FRA=ID champ associ‚] }
+    { 5   ;   ;Table Caption       ;Text250       ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(AllObjWithCaption."Object Caption" WHERE (Object Type=CONST(Table),
+                                                                                                                Object ID=FIELD(Table ID)));
+                                                   CaptionML=[ENU=Table Caption;
+                                                              FRA=L‚gende table];
+                                                   Editable=No }
+    { 6   ;   ;Field Caption       ;Text250       ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(Field."Field Caption" WHERE (TableNo=FIELD(Table ID),
+                                                                                                   No.=FIELD(Field ID)));
+                                                   CaptionML=[ENU=Field Caption;
+                                                              FRA=L‚gende champ];
+                                                   Editable=No }
+    { 7   ;   ;Related Table Caption;Text250      ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(AllObjWithCaption."Object Caption" WHERE (Object Type=CONST(Table),
+                                                                                                                Object ID=FIELD(Related Table ID)));
+                                                   CaptionML=[ENU=Related Table Caption;
+                                                              FRA=Libell‚ de la table associ‚e];
+                                                   Editable=No }
+    { 8   ;   ;Related Field Caption;Text250      ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(Field."Field Caption" WHERE (TableNo=FIELD(Related Table ID),
+                                                                                                   No.=FIELD(Related Field ID)));
+                                                   CaptionML=[ENU=Related Field Caption;
+                                                              FRA=L‚gende du champ associ‚];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Table ID,Field ID,Related Table ID,Related Field ID;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

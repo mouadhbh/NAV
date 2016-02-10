@@ -1,0 +1,308 @@
+OBJECT Page 9012 Shop Supervisor Role Center
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Role Center;
+               FRA=Tableau de bord];
+    PageType=RoleCenter;
+    ActionList=ACTIONS
+    {
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 46      ;1   ;Action    ;
+                      CaptionML=[ENU=Routing &Sheet;
+                                 FRA=Gam&me];
+                      RunObject=Report 99000787;
+                      Image=Report }
+      { 51      ;1   ;Separator  }
+      { 54      ;1   ;Action    ;
+                      CaptionML=[ENU=Inventory - &Availability Plan;
+                                 FRA=Stocks : êchÇ&ancier des dispo.];
+                      RunObject=Report 707;
+                      Image=ItemAvailability }
+      { 53      ;1   ;Separator  }
+      { 52      ;1   ;Action    ;
+                      CaptionML=[ENU=Capacity Tas&k List;
+                                 FRA=L&iste des tÉches par capacitÇ];
+                      RunObject=Report 99000780;
+                      Image=Report }
+      { 45      ;1   ;Action    ;
+                      CaptionML=[ENU=Subcontractor - Dis&patch List;
+                                 FRA=&S/traitant - Liste expÇdition];
+                      RunObject=Report 99000789;
+                      Image=Report }
+      { 42      ;1   ;Separator  }
+      { 47      ;1   ;Action    ;
+                      CaptionML=[ENU=Production Order Ca&lculation;
+                                 FRA=O.F. - Ca&lcul];
+                      RunObject=Report 99000767;
+                      Image=Report }
+      { 48      ;1   ;Action    ;
+                      CaptionML=[ENU=S&tatus;
+                                 FRA=S&tatut];
+                      RunObject=Report 706;
+                      Image=Report }
+      { 1900000011;0 ;ActionContainer;
+                      ActionContainerType=HomeItems }
+      { 31      ;1   ;Action    ;
+                      CaptionML=[ENU=Simulated Production Orders;
+                                 FRA=O.F. simulÇs];
+                      RunObject=Page 9323 }
+      { 32      ;1   ;Action    ;
+                      CaptionML=[ENU=Planned Production Orders;
+                                 FRA=O.F. planifiÇs];
+                      RunObject=Page 9324 }
+      { 33      ;1   ;Action    ;
+                      CaptionML=[ENU=Firm Planned Production Orders;
+                                 FRA=O.F. planifiÇs fermes];
+                      RunObject=Page 9325 }
+      { 34      ;1   ;Action    ;
+                      CaptionML=[ENU=Released Production Orders;
+                                 FRA=O.F. lancÇs];
+                      RunObject=Page 9326 }
+      { 35      ;1   ;Action    ;
+                      CaptionML=[ENU=Finished Production Orders;
+                                 FRA=O.F. terminÇs];
+                      RunObject=Page 9327 }
+      { 2       ;1   ;Action    ;
+                      CaptionML=[ENU=Routings;
+                                 FRA=Gammes];
+                      RunObject=Page 99000764 }
+      { 10      ;1   ;Action    ;
+                      CaptionML=[ENU=Registered Absence;
+                                 FRA=IndisponibilitÇ enregistrÇe];
+                      RunObject=Page 99000920 }
+      { 12      ;1   ;Action    ;
+                      CaptionML=[ENU=Items;
+                                 FRA=Articles];
+                      RunObject=Page 31;
+                      Image=Item }
+      { 37      ;1   ;Action    ;
+                      CaptionML=[ENU=Produced;
+                                 FRA=Produit];
+                      RunObject=Page 31;
+                      RunPageView=WHERE(Replenishment System=CONST(Prod. Order)) }
+      { 94      ;1   ;Action    ;
+                      CaptionML=[ENU=Raw Materials;
+                                 FRA=Matiäres premiäres];
+                      RunObject=Page 31;
+                      RunPageView=WHERE(Low-Level Code=FILTER(>0),
+                                        Replenishment System=CONST(Purchase),
+                                        Production BOM No.=FILTER(='')) }
+      { 95      ;1   ;Action    ;
+                      CaptionML=[ENU=Stockkeeping Units;
+                                 FRA=Points de stock];
+                      RunObject=Page 5701;
+                      Image=SKU }
+      { 14      ;1   ;Action    ;
+                      CaptionML=[ENU=Sales Orders;
+                                 FRA=Commandes vente];
+                      RunObject=Page 9305;
+                      Image=Order }
+      { 6       ;1   ;Action    ;
+                      CaptionML=[ENU=Purchase Orders;
+                                 FRA=Commandes achat];
+                      RunObject=Page 9307 }
+      { 106     ;1   ;Action    ;
+                      CaptionML=[ENU=Transfer Orders;
+                                 FRA=Ordres de transfert];
+                      RunObject=Page 5742;
+                      Image=Document }
+      { 97      ;1   ;Action    ;
+                      CaptionML=[ENU=Work Centers;
+                                 FRA=Centres de charge];
+                      RunObject=Page 99000755 }
+      { 11      ;1   ;Action    ;
+                      CaptionML=[ENU=Machine Centers;
+                                 FRA=Postes de charge];
+                      RunObject=Page 99000761 }
+      { 38      ;1   ;Action    ;
+                      CaptionML=[ENU=Inventory Put-aways;
+                                 FRA=Rangements stock];
+                      RunObject=Page 9315 }
+      { 41      ;1   ;Action    ;
+                      CaptionML=[ENU=Inventory Picks;
+                                 FRA=PrÇlävements stock];
+                      RunObject=Page 9316 }
+      { 7       ;1   ;Action    ;
+                      CaptionML=[ENU=Requisition Worksheets;
+                                 FRA=Demandes achat];
+                      RunObject=Page 295;
+                      RunPageView=WHERE(Template Type=CONST(Req.),
+                                        Recurring=CONST(No)) }
+      { 8       ;1   ;Action    ;
+                      CaptionML=[ENU=Subcontracting Worksheets;
+                                 FRA=Propositions sous-traitance];
+                      RunObject=Page 295;
+                      RunPageView=WHERE(Template Type=CONST(For. Labor),
+                                        Recurring=CONST(No)) }
+      { 1900000012;0 ;ActionContainer;
+                      ActionContainerType=ActivityButtons }
+      { 43      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Journals;
+                                 FRA=Feuilles];
+                      Image=Journals }
+      { 56      ;2   ;Action    ;
+                      CaptionML=[ENU=Consumption Journals;
+                                 FRA=Feuilles consommation];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Consumption),
+                                        Recurring=CONST(No)) }
+      { 57      ;2   ;Action    ;
+                      CaptionML=[ENU=Output Journals;
+                                 FRA=Feuilles production];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Output),
+                                        Recurring=CONST(No)) }
+      { 60      ;2   ;Action    ;
+                      CaptionML=[ENU=Capacity Journals;
+                                 FRA=Feuilles temps non productif];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Capacity),
+                                        Recurring=CONST(No)) }
+      { 61      ;2   ;Action    ;
+                      CaptionML=[ENU=Recurring Capacity Journals;
+                                 FRA=Feuille abonnement temps non productif];
+                      RunObject=Page 262;
+                      RunPageView=WHERE(Template Type=CONST(Capacity),
+                                        Recurring=CONST(Yes)) }
+      { 5       ;1   ;ActionGroup;
+                      CaptionML=[ENU=Administration;
+                                 FRA=Administration];
+                      Image=Administration }
+      { 23      ;2   ;Action    ;
+                      CaptionML=[ENU=Work Shifts;
+                                 FRA=êquipes];
+                      RunObject=Page 99000750 }
+      { 24      ;2   ;Action    ;
+                      CaptionML=[ENU=Shop Calendars;
+                                 FRA=Calendriers usine];
+                      RunObject=Page 99000751 }
+      { 20      ;2   ;Action    ;
+                      CaptionML=[ENU=Capacity Constrained Resources;
+                                 FRA=CapacitÇs critiques];
+                      RunObject=Page 99000866 }
+      { 22      ;2   ;Action    ;
+                      CaptionML=[ENU=Work Center Groups;
+                                 FRA=Groupes centres de charge];
+                      RunObject=Page 99000758 }
+      { 9       ;2   ;Action    ;
+                      CaptionML=[ENU=Stop Codes;
+                                 FRA=Codes arràt];
+                      RunObject=Page 99000779 }
+      { 13      ;2   ;Action    ;
+                      CaptionML=[ENU=Scrap Codes;
+                                 FRA=Codes rebut];
+                      RunObject=Page 99000780 }
+      { 16      ;2   ;Action    ;
+                      CaptionML=[ENU=Standard Tasks;
+                                 FRA=TÉches standard];
+                      RunObject=Page 99000799 }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 67      ;1   ;Separator ;
+                      CaptionML=[ENU=Tasks;
+                                 FRA=TÉches];
+                      IsHeader=Yes }
+      { 15      ;1   ;Action    ;
+                      CaptionML=[ENU=Consumptio&n Journal;
+                                 FRA=Feuille co&nsommation];
+                      RunObject=Page 99000846;
+                      Image=ConsumptionJournal }
+      { 19      ;1   ;Action    ;
+                      CaptionML=[ENU=Output &Journal;
+                                 FRA=F&euille production];
+                      RunObject=Page 99000823;
+                      Image=OutputJournal }
+      { 29      ;1   ;Action    ;
+                      CaptionML=[ENU=&Capacity Journal;
+                                 FRA=Feuille &capacitÇ];
+                      RunObject=Page 99000773;
+                      Image=CapacityJournal }
+      { 27      ;1   ;Separator  }
+      { 28      ;1   ;Action    ;
+                      CaptionML=[ENU=Change &Production Order Status;
+                                 FRA=C&hanger statut O.F.];
+                      RunObject=Page 99000914;
+                      Image=ChangeStatus }
+      { 55      ;1   ;Separator  }
+      { 49      ;1   ;Action    ;
+                      CaptionML=[ENU=Update &Unit Cost;
+                                 FRA=Mise Ö jo&ur coñt unitaire];
+                      RunObject=Report 99001014;
+                      Image=UpdateUnitCost }
+      { 84      ;1   ;Separator ;
+                      CaptionML=[ENU=Administration;
+                                 FRA=Administration];
+                      IsHeader=Yes }
+      { 125     ;1   ;Action    ;
+                      CaptionML=[ENU=&Manufacturing Setup;
+                                 FRA=Para&mätres production];
+                      RunObject=Page 99000768;
+                      Image=ProductionSetup }
+      { 89      ;1   ;Separator ;
+                      CaptionML=[ENU=History;
+                                 FRA=Historique];
+                      IsHeader=Yes }
+      { 126     ;1   ;Action    ;
+                      CaptionML=[ENU=Item &Tracing;
+                                 FRA=&TraáabilitÇ];
+                      RunObject=Page 6520;
+                      Image=ItemTracing }
+      { 90      ;1   ;Action    ;
+                      CaptionML=[ENU=Navi&gate;
+                                 FRA=Navi&guer];
+                      RunObject=Page 344;
+                      Image=Navigate }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000008;0;Container;
+                ContainerType=RoleCenterArea }
+
+    { 1900724808;1;Group   }
+
+    { 1905423708;2;Part   ;
+                PagePartID=Page9041;
+                PartType=Page }
+
+    { 1905989608;2;Part   ;
+                PagePartID=Page9152;
+                PartType=Page }
+
+    { 1900724708;1;Group   }
+
+    { 1   ;2   ;Part      ;
+                PagePartID=Page675;
+                Visible=false;
+                PartType=Page }
+
+    { 3   ;2   ;Part      ;
+                PagePartID=Page681;
+                PartType=Page }
+
+    { 1903012608;2;Part   ;
+                PagePartID=Page9175;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1901377608;2;Part   ;
+                PartType=System;
+                SystemPartID=MyNotes }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

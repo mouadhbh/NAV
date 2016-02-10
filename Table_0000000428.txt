@@ -1,0 +1,131 @@
+OBJECT Table 428 IC Outbox Purchase Header
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/09/13;
+    Time=12:00:00;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    OnDelete=VAR
+               ICOutboxPurchLine@1002 : Record 429;
+               ICDocDim@1001 : Record 442;
+               DimMgt@1000 : Codeunit 408;
+             BEGIN
+               ICOutboxPurchLine.SETRANGE("IC Partner Code","IC Partner Code");
+               ICOutboxPurchLine.SETRANGE("IC Transaction No.","IC Transaction No.");
+               ICOutboxPurchLine.SETRANGE("Transaction Source","Transaction Source");
+               IF ICOutboxPurchLine.FINDFIRST THEN
+                 ICOutboxPurchLine.DELETEALL(TRUE);
+               ICDocDim.LOCKTABLE;
+               DimMgt.DeleteICDocDim(
+                 DATABASE::"IC Outbox Purchase Header","IC Transaction No.","IC Partner Code","Transaction Source",0);
+             END;
+
+    CaptionML=[ENU=IC Outbox Purchase Header;
+               FRA=En-tˆte achat de la boŒte d'envoi IC];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Document Type       ;Option        ;CaptionML=[ENU=Document Type;
+                                                              FRA=Type document];
+                                                   OptionCaptionML=[ENU=" ,Order,Invoice,Credit Memo,,Return Order";
+                                                                    FRA=" ,Commande,Facture,Avoir,,Retour"];
+                                                   OptionString=[ ,Order,Invoice,Credit Memo,,Return Order];
+                                                   Editable=No }
+    { 2   ;   ;Buy-from Vendor No. ;Code20        ;TableRelation=Vendor;
+                                                   CaptionML=[ENU=Buy-from Vendor No.;
+                                                              FRA=Nø fournisseur];
+                                                   Editable=No }
+    { 3   ;   ;No.                 ;Code20        ;CaptionML=[ENU=No.;
+                                                              FRA=Nø];
+                                                   Editable=No }
+    { 4   ;   ;Pay-to Vendor No.   ;Code20        ;TableRelation=Vendor;
+                                                   CaptionML=[ENU=Pay-to Vendor No.;
+                                                              FRA=Nø fournisseur … payer];
+                                                   Editable=No }
+    { 11  ;   ;Your Reference      ;Text35        ;CaptionML=[ENU=Your Reference;
+                                                              FRA=Votre r‚f‚rence] }
+    { 13  ;   ;Ship-to Name        ;Text50        ;CaptionML=[ENU=Ship-to Name;
+                                                              FRA=Nom du destinataire];
+                                                   Editable=No }
+    { 15  ;   ;Ship-to Address     ;Text50        ;CaptionML=[ENU=Ship-to Address;
+                                                              FRA=Adresse destinataire];
+                                                   Editable=No }
+    { 16  ;   ;Ship-to Address 2   ;Text50        ;CaptionML=[ENU=Ship-to Address 2;
+                                                              FRA=Adresse destinataire 2];
+                                                   Editable=No }
+    { 17  ;   ;Ship-to City        ;Text30        ;CaptionML=[ENU=Ship-to City;
+                                                              FRA=Ville destinataire];
+                                                   Editable=No }
+    { 20  ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              FRA=Date comptabilisation] }
+    { 21  ;   ;Expected Receipt Date;Date         ;CaptionML=[ENU=Expected Receipt Date;
+                                                              FRA=Date r‚ception pr‚vue];
+                                                   Editable=No }
+    { 24  ;   ;Due Date            ;Date          ;CaptionML=[ENU=Due Date;
+                                                              FRA=Date d'‚ch‚ance] }
+    { 25  ;   ;Payment Discount %  ;Decimal       ;CaptionML=[ENU=Payment Discount %;
+                                                              FRA=% escompte];
+                                                   Editable=No }
+    { 26  ;   ;Pmt. Discount Date  ;Date          ;CaptionML=[ENU=Pmt. Discount Date;
+                                                              FRA=Date d'escompte];
+                                                   Editable=No }
+    { 32  ;   ;Currency Code       ;Code10        ;TableRelation=Currency;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Currency Code;
+                                                              FRA=Code devise];
+                                                   Editable=No }
+    { 35  ;   ;Prices Including VAT;Boolean       ;CaptionML=[ENU=Prices Including VAT;
+                                                              FRA=Prix TTC] }
+    { 68  ;   ;Vendor Invoice No.  ;Code35        ;CaptionML=[ENU=Vendor Invoice No.;
+                                                              FRA=Nø facture fournisseur];
+                                                   Editable=No }
+    { 69  ;   ;Vendor Cr. Memo No. ;Code35        ;CaptionML=[ENU=Vendor Cr. Memo No.;
+                                                              FRA=Nø avoir fournisseur];
+                                                   Editable=No }
+    { 72  ;   ;Sell-to Customer No.;Code20        ;CaptionML=[ENU=Sell-to Customer No.;
+                                                              FRA=Nø donneur d'ordre];
+                                                   Editable=No }
+    { 91  ;   ;Ship-to Post Code   ;Code20        ;CaptionML=[ENU=Ship-to Post Code;
+                                                              FRA=Code postal destinataire];
+                                                   Editable=No }
+    { 99  ;   ;Document Date       ;Date          ;CaptionML=[ENU=Document Date;
+                                                              FRA=Date document] }
+    { 125 ;   ;IC Partner Code     ;Code20        ;TableRelation="IC Partner";
+                                                   CaptionML=[ENU=IC Partner Code;
+                                                              FRA=Code du partenaire IC];
+                                                   Editable=No }
+    { 201 ;   ;IC Transaction No.  ;Integer       ;CaptionML=[ENU=IC Transaction No.;
+                                                              FRA=Nø transaction IC];
+                                                   Editable=No }
+    { 202 ;   ;Transaction Source  ;Option        ;CaptionML=[ENU=Transaction Source;
+                                                              FRA=Source de la transaction];
+                                                   OptionCaptionML=[ENU=Rejected by Current Company,Created by Current Company;
+                                                                    FRA=Rejet‚ par soci‚t‚ en cours,Cr‚‚ par soci‚t‚ en cours];
+                                                   OptionString=Rejected by Current Company,Created by Current Company;
+                                                   Editable=No }
+    { 5790;   ;Requested Receipt Date;Date        ;CaptionML=[ENU=Requested Receipt Date;
+                                                              FRA=Date r‚ception demand‚e];
+                                                   Editable=No }
+    { 5791;   ;Promised Receipt Date;Date         ;CaptionML=[ENU=Promised Receipt Date;
+                                                              FRA=Date r‚ception confirm‚e];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;IC Transaction No.,IC Partner Code,Transaction Source;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

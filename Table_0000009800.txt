@@ -1,0 +1,42 @@
+OBJECT Table 9800 Table Permission Buffer
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Table Permission Buffer;
+               FRA=Tampon autorisation table];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Table ID            ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=Table ID;
+                                                              FRA=ID table] }
+    { 2   ;   ;Session ID          ;Integer       ;CaptionML=[ENU=Session ID;
+                                                              FRA=ID session] }
+    { 3   ;   ;Insert Permission   ;Boolean       ;CaptionML=[ENU=Insert Permission;
+                                                              FRA=Insertion] }
+    { 4   ;   ;Modify Permission   ;Boolean       ;CaptionML=[ENU=Modify Permission;
+                                                              FRA=Modification] }
+    { 5   ;   ;Delete Permission   ;Boolean       ;CaptionML=[ENU=Delete Permission;
+                                                              FRA=Suppression] }
+  }
+  KEYS
+  {
+    {    ;Table ID,Session ID                     ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

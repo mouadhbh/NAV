@@ -1,0 +1,45 @@
+OBJECT Table 983 Document Search Result
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/09/13;
+    Time=12:00:00;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    DataCaptionFields=Doc. No.,Description;
+    CaptionML=[ENU=Document Search Result;
+               FRA=R‚sultat de la recherche de documents];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Doc. Type           ;Integer       ;CaptionML=[ENU=Doc. Type;
+                                                              FRA=Type doc.] }
+    { 2   ;   ;Doc. No.            ;Code20        ;CaptionML=[ENU=Doc. No.;
+                                                              FRA=Nø doc.] }
+    { 3   ;   ;Amount              ;Decimal       ;CaptionML=[ENU=Amount;
+                                                              FRA=Montant] }
+    { 4   ;   ;Table ID            ;Integer       ;CaptionML=[ENU=Table ID;
+                                                              FRA=ID table] }
+    { 5   ;   ;Description         ;Text50        ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+  }
+  KEYS
+  {
+    {    ;Doc. Type,Doc. No.,Table ID             ;Clustered=Yes }
+    {    ;Amount                                   }
+    {    ;Description                              }
+    {    ;Doc. No.                                 }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,54 @@
+OBJECT Page 90010 Course Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=26/01/16;
+    Time=17:01:00;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    CaptionML=ENU=Course Card;
+    SourceTable=Table90010;
+  }
+  CONTROLS
+  {
+    { 1000000000;;Container;
+                CaptionML=ENU=Course Card;
+                ContainerType=ContentArea }
+
+    { 1000000001;1;Group  ;
+                CaptionML=ENU=General;
+                GroupType=Group }
+
+    { 1000000002;2;Field  ;
+                SourceExpr=Code }
+
+    { 1000000003;2;Field  ;
+                SourceExpr=Name }
+
+    { 1000000004;2;Field  ;
+                SourceExpr=Description }
+
+    { 1000000005;2;Field  ;
+                SourceExpr=Type }
+
+    { 1000000006;2;Field  ;
+                SourceExpr=Duration }
+
+    { 1000000007;2;Field  ;
+                SourceExpr=Price }
+
+    { 1000000008;2;Field  ;
+                SourceExpr=Active }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

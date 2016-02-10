@@ -1,0 +1,68 @@
+OBJECT Table 9 Country/Region
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00,NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    OnDelete=VAR
+               VATRegNoFormat@1000 : Record 381;
+             BEGIN
+               VATRegNoFormat.SETFILTER("Country/Region Code",Code);
+               VATRegNoFormat.DELETEALL;
+             END;
+
+    CaptionML=[ENU=Country/Region;
+               FRA=Pays/r‚gion];
+    LookupPageID=Page10;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Code                ;Code10        ;CaptionML=[ENU=Code;
+                                                              FRA=Code];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Name                ;Text50        ;CaptionML=[ENU=Name;
+                                                              FRA=Nom] }
+    { 6   ;   ;EU Country/Region Code;Code10      ;CaptionML=[ENU=EU Country/Region Code;
+                                                              FRA=Code pays/r‚gion Union Europ‚enne] }
+    { 7   ;   ;Intrastat Code      ;Code10        ;CaptionML=[ENU=Intrastat Code;
+                                                              FRA=Code intracommunautaire] }
+    { 8   ;   ;Address Format      ;Option        ;InitValue=City+Post Code;
+                                                   CaptionML=[ENU=Address Format;
+                                                              FRA=Format adresse];
+                                                   OptionCaptionML=[ENU=Post Code+City,City+Post Code,City+County+Post Code,Blank Line+Post Code+City,Post Code+City/County,County/Post Code+City;
+                                                                    FRA=CP + Ville,Ville + CP,Ville + R‚gion + CP,Ligne blanche + CP + Ville,CP + Ville/R‚gion,R‚gion/CP + Ville];
+                                                   OptionString=Post Code+City,City+Post Code,City+County+Post Code,Blank Line+Post Code+City,Post Code+City/County,County/Post Code+City }
+    { 9   ;   ;Contact Address Format;Option      ;InitValue=After Company Name;
+                                                   CaptionML=[ENU=Contact Address Format;
+                                                              FRA=Format adresse contact];
+                                                   OptionCaptionML=[ENU=First,After Company Name,Last;
+                                                                    FRA=D‚but,AprŠs nom soci‚t‚,Fin];
+                                                   OptionString=First,After Company Name,Last }
+    { 10  ;   ;VAT Scheme          ;Code10        ;CaptionML=[ENU=VAT Scheme;
+                                                              FRA=R‚gime de TVA] }
+    { 10800;  ;SEPA Allowed        ;Boolean       ;CaptionML=[ENU=SEPA Allowed;
+                                                              FRA=SEPA autoris‚] }
+  }
+  KEYS
+  {
+    {    ;Code                                    ;Clustered=Yes }
+    {    ;EU Country/Region Code                   }
+    {    ;Intrastat Code                           }
+    {    ;Name                                     }
+  }
+  FIELDGROUPS
+  {
+    { 1   ;Brick               ;Code,Name,VAT Scheme                     }
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

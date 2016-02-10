@@ -1,0 +1,42 @@
+OBJECT Table 123456700 Seminar
+{
+  OBJECT-PROPERTIES
+  {
+    Date=08/02/16;
+    Time=13:54:30;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    CaptionML=FRA=Seminar;
+    LookupPageID=Page123456700;
+  }
+  FIELDS
+  {
+    { 1   ;   ;No.                 ;Code20         }
+    { 2   ;   ;Name                ;Text50         }
+    { 3   ;   ;Seminar Duration    ;Decimal       ;DecimalPlaces=0:1 }
+    { 4   ;   ;Minimum Participants;Integer        }
+    { 5   ;   ;Maximum Participants;Integer        }
+    { 6   ;   ;Search Name         ;Code50         }
+    { 7   ;   ;Blocked             ;Boolean        }
+    { 8   ;   ;Last Date Modified  ;Date          ;Editable=No }
+    { 9   ;   ;Comment             ;Boolean       ;Editable=No }
+    { 10  ;   ;Seminar Price       ;Decimal        }
+  }
+  KEYS
+  {
+    {    ;No.                                     ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

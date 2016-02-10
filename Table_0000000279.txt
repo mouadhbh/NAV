@@ -1,0 +1,301 @@
+OBJECT Table 279 Extended Text Header
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    DataCaptionFields=No.,Language Code,Text No.;
+    OnInsert=BEGIN
+               SetUniqueTextNo;
+
+               IF "Table Name" = "Table Name"::Resource THEN BEGIN
+                 "Purchase Quote" := FALSE;
+                 "Purchase Invoice" := FALSE;
+                 "Purchase Blanket Order" := FALSE;
+                 "Purchase Order" := FALSE;
+                 "Purchase Credit Memo" := FALSE;
+               END;
+             END;
+
+    OnDelete=VAR
+               ExtTextLine@1000 : Record 280;
+             BEGIN
+               ExtTextLine.SETRANGE("Table Name","Table Name");
+               ExtTextLine.SETRANGE("No.","No.");
+               ExtTextLine.SETRANGE("Language Code","Language Code");
+               ExtTextLine.SETRANGE("Text No.","Text No.");
+               ExtTextLine.DELETEALL(TRUE);
+             END;
+
+    OnRename=BEGIN
+               IF ("Table Name" <> xRec."Table Name") OR ("No." <> xRec."No.") THEN
+                 ERROR(STRSUBSTNO(RenameRecordErr,FIELDCAPTION("Table Name"),FIELDCAPTION("No.")));
+
+               SetUniqueTextNo;
+
+               RecreateTextLines;
+             END;
+
+    CaptionML=[ENU=Extended Text Header;
+               FRA=En-tˆte texte ‚tendu];
+    LookupPageID=Page391;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Table Name          ;Option        ;CaptionML=[ENU=Table Name;
+                                                              FRA=Nom de la table];
+                                                   OptionCaptionML=[ENU=Standard Text,G/L Account,Item,Resource;
+                                                                    FRA=Texte standard,Compte g‚n‚ral,Article,Ressource];
+                                                   OptionString=Standard Text,G/L Account,Item,Resource }
+    { 2   ;   ;No.                 ;Code20        ;TableRelation=IF (Table Name=CONST(Standard Text)) "Standard Text"
+                                                                 ELSE IF (Table Name=CONST(G/L Account)) "G/L Account"
+                                                                 ELSE IF (Table Name=CONST(Item)) Item
+                                                                 ELSE IF (Table Name=CONST(Resource)) Resource;
+                                                   CaptionML=[ENU=No.;
+                                                              FRA=Nø] }
+    { 3   ;   ;Language Code       ;Code10        ;TableRelation=Language;
+                                                   OnValidate=BEGIN
+                                                                "All Language Codes" := "Language Code" = '';
+                                                              END;
+
+                                                   CaptionML=[ENU=Language Code;
+                                                              FRA=Code langue] }
+    { 4   ;   ;Text No.            ;Integer       ;CaptionML=[ENU=Text No.;
+                                                              FRA=Nø texte];
+                                                   Editable=No }
+    { 5   ;   ;Starting Date       ;Date          ;CaptionML=[ENU=Starting Date;
+                                                              FRA=Date d‚but] }
+    { 6   ;   ;Ending Date         ;Date          ;CaptionML=[ENU=Ending Date;
+                                                              FRA=Date fin] }
+    { 7   ;   ;All Language Codes  ;Boolean       ;InitValue=Yes;
+                                                   OnValidate=BEGIN
+                                                                IF "All Language Codes" THEN
+                                                                  "Language Code" := ''
+                                                                ELSE
+                                                                  TESTFIELD("Language Code");
+                                                              END;
+
+                                                   CaptionML=[ENU=All Language Codes;
+                                                              FRA=Commun toutes langues] }
+    { 8   ;   ;Description         ;Text30        ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 11  ;   ;Sales Quote         ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 36=R;
+                                                   CaptionML=[ENU=Sales Quote;
+                                                              FRA=Devis] }
+    { 12  ;   ;Sales Invoice       ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 36=R;
+                                                   CaptionML=[ENU=Sales Invoice;
+                                                              FRA=Facture vente] }
+    { 13  ;   ;Sales Order         ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 110=R;
+                                                   CaptionML=[ENU=Sales Order;
+                                                              FRA=Commande vente] }
+    { 14  ;   ;Sales Credit Memo   ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 36=R;
+                                                   CaptionML=[ENU=Sales Credit Memo;
+                                                              FRA=Avoir vente] }
+    { 15  ;   ;Purchase Quote      ;Boolean       ;InitValue=Yes;
+                                                   OnValidate=BEGIN
+                                                                IF "Purchase Quote" THEN
+                                                                  NoResourcePurch;
+                                                              END;
+
+                                                   AccessByPermission=TableData 38=R;
+                                                   CaptionML=[ENU=Purchase Quote;
+                                                              FRA=Demande de prix] }
+    { 16  ;   ;Purchase Invoice    ;Boolean       ;InitValue=Yes;
+                                                   OnValidate=BEGIN
+                                                                IF "Purchase Invoice" THEN
+                                                                  NoResourcePurch;
+                                                              END;
+
+                                                   AccessByPermission=TableData 38=R;
+                                                   CaptionML=[ENU=Purchase Invoice;
+                                                              FRA=Facture achat] }
+    { 17  ;   ;Purchase Order      ;Boolean       ;InitValue=Yes;
+                                                   OnValidate=BEGIN
+                                                                IF "Purchase Order" THEN
+                                                                  NoResourcePurch;
+                                                              END;
+
+                                                   AccessByPermission=TableData 120=R;
+                                                   CaptionML=[ENU=Purchase Order;
+                                                              FRA=Commande achat] }
+    { 18  ;   ;Purchase Credit Memo;Boolean       ;InitValue=Yes;
+                                                   OnValidate=BEGIN
+                                                                IF "Purchase Credit Memo" THEN
+                                                                  NoResourcePurch;
+                                                              END;
+
+                                                   AccessByPermission=TableData 38=R;
+                                                   CaptionML=[ENU=Purchase Credit Memo;
+                                                              FRA=Avoir achat] }
+    { 19  ;   ;Reminder            ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 18=R;
+                                                   CaptionML=[ENU=Reminder;
+                                                              FRA=Relance] }
+    { 20  ;   ;Finance Charge Memo ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 18=R;
+                                                   CaptionML=[ENU=Finance Charge Memo;
+                                                              FRA=Facture d'int‚rˆts] }
+    { 21  ;   ;Sales Blanket Order ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 110=R;
+                                                   CaptionML=[ENU=Sales Blanket Order;
+                                                              FRA=Commande ouverte vente] }
+    { 22  ;   ;Purchase Blanket Order;Boolean     ;InitValue=Yes;
+                                                   OnValidate=BEGIN
+                                                                IF "Purchase Blanket Order" THEN
+                                                                  NoResourcePurch;
+                                                              END;
+
+                                                   AccessByPermission=TableData 120=R;
+                                                   CaptionML=[ENU=Purchase Blanket Order;
+                                                              FRA=Commande ouverte achat] }
+    { 23  ;   ;Prepmt. Sales Invoice;Boolean      ;InitValue=Yes;
+                                                   AccessByPermission=TableData 36=R;
+                                                   CaptionML=[ENU=Prepmt. Sales Invoice;
+                                                              FRA=Facture vente acompte] }
+    { 24  ;   ;Prepmt. Sales Credit Memo;Boolean  ;InitValue=Yes;
+                                                   AccessByPermission=TableData 36=R;
+                                                   CaptionML=[ENU=Prepmt. Sales Credit Memo;
+                                                              FRA=Avoir vente acompte] }
+    { 25  ;   ;Prepmt. Purchase Invoice;Boolean   ;InitValue=Yes;
+                                                   AccessByPermission=TableData 38=R;
+                                                   CaptionML=[ENU=Prepmt. Purchase Invoice;
+                                                              FRA=Facture achat acompte] }
+    { 26  ;   ;Prepmt. Purchase Credit Memo;Boolean;
+                                                   InitValue=Yes;
+                                                   AccessByPermission=TableData 38=R;
+                                                   CaptionML=[ENU=Prepmt. Purchase Credit Memo;
+                                                              FRA=Avoirs achat acompte] }
+    { 5900;   ;Service Order       ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 5900=R;
+                                                   CaptionML=[ENU=Service Order;
+                                                              FRA=Commande service] }
+    { 5901;   ;Service Quote       ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 5900=R;
+                                                   CaptionML=[ENU=Service Quote;
+                                                              FRA=Devis service] }
+    { 5902;   ;Service Invoice     ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 5900=R;
+                                                   CaptionML=[ENU=Service Invoice;
+                                                              FRA=Facture service] }
+    { 5903;   ;Service Credit Memo ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 5900=R;
+                                                   CaptionML=[ENU=Service Credit Memo;
+                                                              FRA=Avoir service] }
+    { 6600;   ;Sales Return Order  ;Boolean       ;InitValue=Yes;
+                                                   AccessByPermission=TableData 6660=R;
+                                                   CaptionML=[ENU=Sales Return Order;
+                                                              FRA=Retour vente] }
+    { 6605;   ;Purchase Return Order;Boolean      ;InitValue=Yes;
+                                                   AccessByPermission=TableData 6650=R;
+                                                   CaptionML=[ENU=Purchase Return Order;
+                                                              FRA=Retour achat] }
+  }
+  KEYS
+  {
+    {    ;Table Name,No.,Language Code,Text No.   ;Clustered=Yes }
+    {    ;Table Name,No.,Language Code,All Language Codes,Starting Date,Ending Date }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      UntitledMsg@1002 : TextConst 'ENU=untitled;FRA=sans titre';
+      Text001@1001 : TextConst 'ENU=You cannot purchase resources.;FRA=Vous ne pouvez pas acheter de ressources.';
+      RenameRecordErr@1000 : TextConst '@@@=%1 is TableName Field %2 is No.Table Field;ENU=You cannot rename %1 or %2.;FRA=Vous ne pouvez pas renommer %1 ou %2.';
+
+    LOCAL PROCEDURE NoResourcePurch@1();
+    BEGIN
+      IF "Table Name" = "Table Name"::Resource THEN
+        ERROR(Text001);
+    END;
+
+    LOCAL PROCEDURE SetUniqueTextNo@5();
+    VAR
+      ExtTextHeader@1000 : Record 279;
+    BEGIN
+      ExtTextHeader.SETRANGE("Table Name","Table Name");
+      ExtTextHeader.SETRANGE("No.","No.");
+      ExtTextHeader.SETRANGE("Language Code","Language Code");
+
+      IF ExtTextHeader.FINDLAST THEN
+        "Text No." := ExtTextHeader."Text No." + 1
+      ELSE
+        "Text No." := 1;
+    END;
+
+    LOCAL PROCEDURE RecreateTextLines@2();
+    VAR
+      ExtTextLine@1000 : Record 280;
+      TmpExtTextLine@1001 : Record 280;
+    BEGIN
+      ExtTextLine.SETRANGE("Table Name","Table Name");
+      ExtTextLine.SETRANGE("No.","No.");
+      ExtTextLine.SETRANGE("Language Code",xRec."Language Code");
+      ExtTextLine.SETRANGE("Text No.",xRec."Text No.");
+
+      IF ExtTextLine.FIND('-') THEN
+        REPEAT
+          TmpExtTextLine := ExtTextLine;
+          TmpExtTextLine."Text No." := "Text No.";
+          TmpExtTextLine."Language Code" := "Language Code";
+          TmpExtTextLine.INSERT;
+        UNTIL ExtTextLine.NEXT = 0;
+
+      ExtTextLine.DELETEALL;
+    END;
+
+    PROCEDURE GetCaption@3() : Text[80];
+    VAR
+      GLAcc@1000 : Record 15;
+      Item@1001 : Record 27;
+      Res@1002 : Record 156;
+      StandardText@1003 : Record 7;
+      Descr@1004 : Text[50];
+    BEGIN
+      IF "Text No." <> 0 THEN BEGIN
+        CASE "Table Name" OF
+          "Table Name"::"Standard Text":
+            BEGIN
+              IF StandardText.Code <> "No." THEN
+                StandardText.GET("No.");
+              Descr := StandardText.Description;
+            END;
+          "Table Name"::"G/L Account":
+            BEGIN
+              IF GLAcc."No." <> "No." THEN
+                GLAcc.GET("No.");
+              Descr := GLAcc.Name;
+            END;
+          "Table Name"::Item:
+            BEGIN
+              IF Item."No." <> "No." THEN
+                Item.GET("No.");
+              Descr := Item.Description;
+            END;
+          "Table Name"::Resource:
+            BEGIN
+              IF Res."No." <> "No." THEN
+                Res.GET("No.");
+              Descr := Res.Name;
+            END;
+        END;
+        EXIT(STRSUBSTNO('%1 %2 %3 %4',"No.",Descr,"Language Code",FORMAT("Text No.")));
+      END;
+      EXIT(UntitledMsg);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

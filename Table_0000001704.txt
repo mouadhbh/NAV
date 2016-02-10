@@ -1,0 +1,121 @@
+OBJECT Table 1704 Posted Deferral Header
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    OnDelete=BEGIN
+               DeleteLines("Deferral Doc. Type","Gen. Jnl. Document No.","Account No.","Document Type","Document No.","Line No.");
+             END;
+
+    CaptionML=[ENU=Posted Deferral Header;
+               FRA=En-tàte Çchelonnement validÇ];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Deferral Doc. Type  ;Option        ;CaptionML=[ENU=Deferral Doc. Type;
+                                                              FRA=Type doc. Çchelonnement];
+                                                   OptionCaptionML=[ENU=Purchase,Sales,G/L;
+                                                                    FRA=Achats,Ventes,ComptabilitÇ];
+                                                   OptionString=Purchase,Sales,G/L }
+    { 2   ;   ;Gen. Jnl. Document No.;Code20      ;CaptionML=[ENU=Gen. Jnl. Document No.;
+                                                              FRA=N¯ document feuille compta.] }
+    { 3   ;   ;Account No.         ;Code20        ;TableRelation="G/L Account" WHERE (Blocked=CONST(No));
+                                                   CaptionML=[ENU=Account No.;
+                                                              FRA=N¯ compte] }
+    { 4   ;   ;Document Type       ;Integer       ;CaptionML=[ENU=Document Type;
+                                                              FRA=Type document] }
+    { 5   ;   ;Document No.        ;Code20        ;CaptionML=[ENU=Document No.;
+                                                              FRA=N¯ document] }
+    { 6   ;   ;Line No.            ;Integer       ;CaptionML=[ENU=Line No.;
+                                                              FRA=N¯ ligne] }
+    { 7   ;   ;Deferral Code       ;Code10        ;CaptionML=[ENU=Deferral Code;
+                                                              FRA=Code Çchelonnement];
+                                                   NotBlank=Yes }
+    { 8   ;   ;Amount to Defer     ;Decimal       ;CaptionML=[ENU=Amount to Defer;
+                                                              FRA=Montant Ö Çchelonner];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr="Currency Code" }
+    { 9   ;   ;Amount to Defer (LCY);Decimal      ;CaptionML=[ENU=Amount to Defer (LCY);
+                                                              FRA=Montant Ö Çchelonner DS];
+                                                   AutoFormatType=1 }
+    { 10  ;   ;Calc. Method        ;Option        ;CaptionML=[ENU=Calc. Method;
+                                                              FRA=MÇthode de calcul];
+                                                   OptionCaptionML=[ENU=Straight-Line,Equal per Period,Days per Period,User-Defined;
+                                                                    FRA=LinÇaire,êgal par pÇriode,Jours par pÇriode,DÇfinie par l'utilisateur];
+                                                   OptionString=Straight-Line,Equal per Period,Days per Period,User-Defined }
+    { 11  ;   ;Start Date          ;Date          ;CaptionML=[ENU=Start Date;
+                                                              FRA=Date dÇbut] }
+    { 12  ;   ;No. of Periods      ;Integer       ;CaptionML=[ENU=No. of Periods;
+                                                              FRA=Nombre de pÇriodes];
+                                                   NotBlank=Yes;
+                                                   BlankZero=Yes }
+    { 13  ;   ;Schedule Description;Text50        ;CaptionML=[ENU=Schedule Description;
+                                                              FRA=Description tableau] }
+    { 15  ;   ;Currency Code       ;Code10        ;TableRelation=Currency.Code;
+                                                   CaptionML=[ENU=Currency Code;
+                                                              FRA=Code devise] }
+    { 16  ;   ;Deferral Account    ;Code20        ;TableRelation="G/L Account" WHERE (Account Type=CONST(Posting),
+                                                                                      Blocked=CONST(No));
+                                                   CaptionML=[ENU=Deferral Account;
+                                                              FRA=Compte Çchelonnement];
+                                                   NotBlank=Yes }
+    { 17  ;   ;CustVendorNo        ;Code20        ;CaptionML=[ENU=CustVendorNo;
+                                                              FRA=N¯ fourniss clt] }
+    { 18  ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              FRA=Date comptabilisation] }
+    { 19  ;   ;Entry No.           ;Integer       ;CaptionML=[ENU=Entry No.;
+                                                              FRA=N¯ sÇquence] }
+  }
+  KEYS
+  {
+    {    ;Deferral Doc. Type,Gen. Jnl. Document No.,Account No.,Document Type,Document No.,Line No.;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE DeleteHeader@1(DeferralDocType@1000 : Integer;GenJnlDocNo@1005 : Code[20];AccountNo@1004 : Code[20];DocumentType@1003 : Integer;DocumentNo@1001 : Code[20];LineNo@1002 : Integer);
+    BEGIN
+      IF LineNo <> 0 THEN
+        IF GET(DeferralDocType,GenJnlDocNo,AccountNo,DocumentType,DocumentNo,LineNo) THEN BEGIN
+          DELETE;
+          DeleteLines(DeferralDocType,GenJnlDocNo,AccountNo,DocumentType,DocumentNo,LineNo);
+        END;
+    END;
+
+    LOCAL PROCEDURE DeleteLines@2(DeferralDocType@1006 : Integer;GenJnlDocNo@1005 : Code[20];AccountNo@1003 : Code[20];DocumentType@1002 : Integer;DocumentNo@1001 : Code[20];LineNo@1000 : Integer);
+    VAR
+      PostedDeferralLine@1004 : Record 1705;
+    BEGIN
+      PostedDeferralLine.SETRANGE("Deferral Doc. Type",DeferralDocType);
+      PostedDeferralLine.SETRANGE("Gen. Jnl. Document No.",GenJnlDocNo);
+      PostedDeferralLine.SETRANGE("Account No.",AccountNo);
+      PostedDeferralLine.SETRANGE("Document Type",DocumentType);
+      PostedDeferralLine.SETRANGE("Document No.",DocumentNo);
+      PostedDeferralLine.SETRANGE("Line No.",LineNo);
+      PostedDeferralLine.DELETEALL;
+    END;
+
+    PROCEDURE DeleteForDoc@3(DeferralDocType@1005 : Integer;GenJnlDocNo@1004 : Code[20];AccountNo@1003 : Code[20];DocumentType@1002 : Integer;DocumentNo@1001 : Code[20]);
+    BEGIN
+      SETRANGE("Deferral Doc. Type",DeferralDocType);
+      SETRANGE("Gen. Jnl. Document No.",GenJnlDocNo);
+      SETRANGE("Account No.",AccountNo);
+      SETRANGE("Document Type",DocumentType);
+      SETRANGE("Document No.",DocumentNo);
+      DELETEALL(TRUE);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

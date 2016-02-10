@@ -1,0 +1,51 @@
+OBJECT Page 10819 Allowed Posting Range
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/09/13;
+    Time=12:00:00;
+    Version List=NAVFR7.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Allowed Posting Range;
+               FRA=Plage de validation autoris‚e];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table98;
+    PageType=Card;
+    OnAfterGetRecord=BEGIN
+                       CALCFIELDS("Posting Allowed To");
+                     END;
+
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group      }
+
+    { 2   ;2   ;Field     ;
+                DrillDown=No;
+                CaptionML=[ENU=Posting Allowed From;
+                           FRA=D‚but validation autoris‚e];
+                SourceExpr="Posting Allowed From";
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                Name=PostingAllowedTo;
+                CaptionML=[ENU=Posting Allowed To;
+                           FRA=Fin validation autoris‚e];
+                SourceExpr=CALCDATE('<-1D>',"Posting Allowed To");
+                Editable=FALSE }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

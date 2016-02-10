@@ -1,0 +1,43 @@
+OBJECT Table 5066 Job Responsibility
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    DataCaptionFields=Code,Description;
+    CaptionML=[ENU=Job Responsibility;
+               FRA=Responsabilit‚];
+    LookupPageID=Page5080;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Code                ;Code10        ;CaptionML=[ENU=Code;
+                                                              FRA=Code];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Description         ;Text50        ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 3   ;   ;No. of Contacts     ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Contact Job Responsibility" WHERE (Job Responsibility Code=FIELD(Code)));
+                                                   CaptionML=[ENU=No. of Contacts;
+                                                              FRA=Nbre contacts];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Code                                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

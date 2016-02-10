@@ -1,0 +1,42 @@
+OBJECT Table 342 Acc. Sched. Cell Value
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Acc. Sched. Cell Value;
+               FRA=Valeur cellule tableau analyse];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Row No.             ;Integer       ;CaptionML=[ENU=Row No.;
+                                                              FRA=Nø ligne totalisation] }
+    { 2   ;   ;Column No.          ;Integer       ;CaptionML=[ENU=Column No.;
+                                                              FRA=Nø colonne] }
+    { 3   ;   ;Value               ;Decimal       ;CaptionML=[ENU=Value;
+                                                              FRA=Valeur];
+                                                   AutoFormatType=1 }
+    { 4   ;   ;Has Error           ;Boolean       ;CaptionML=[ENU=Has Error;
+                                                              FRA=Contient une erreur] }
+    { 5   ;   ;Period Error        ;Boolean       ;CaptionML=[ENU=Period Error;
+                                                              FRA=Erreur p‚riode] }
+  }
+  KEYS
+  {
+    {    ;Row No.,Column No.                      ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

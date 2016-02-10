@@ -1,0 +1,37 @@
+OBJECT Table 90000 Vehicle
+{
+  OBJECT-PROPERTIES
+  {
+    Date=21/01/16;
+    Time=10:13:15;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+  }
+  FIELDS
+  {
+    { 10  ;   ;Model               ;Code20         }
+    { 20  ;   ;Serial No.          ;Integer        }
+    { 30  ;   ;Description         ;Text50         }
+    { 40  ;   ;Transmission        ;Option        ;OptionString=Automatic,4-Speed,5-Speed }
+    { 50  ;   ;List Price          ;Decimal        }
+    { 60  ;   ;Date of Manufacturing;Date          }
+  }
+  KEYS
+  {
+    {    ;Model,Serial No.                        ;Clustered=Yes }
+    {    ;Date of Manufacturing,Transmission       }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

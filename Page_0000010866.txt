@@ -1,0 +1,39 @@
+OBJECT Page 10866 Payment Steps
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVFR7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Payment Step;
+               FRA=Etape räglement];
+    SourceTable=Table10862;
+    DelayedInsert=Yes;
+    DataCaptionFields=Payment Class;
+    PageType=List;
+    CardPageID=Payment Step Card;
+    AutoSplitKey=Yes;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Name }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

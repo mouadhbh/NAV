@@ -1,0 +1,53 @@
+OBJECT Table 10825 Shipment Invoiced
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVFR7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Shipment Invoiced;
+               FRA=Exp‚dition factur‚e];
+    LookupPageID=Page10837;
+    DrillDownPageID=Page10837;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Invoice No.         ;Code20        ;CaptionML=[ENU=Invoice No.;
+                                                              FRA=Nø facture] }
+    { 2   ;   ;Invoice Line No.    ;Integer       ;CaptionML=[ENU=Invoice Line No.;
+                                                              FRA=Nø ligne facture] }
+    { 3   ;   ;Shipment No.        ;Code20        ;CaptionML=[ENU=Shipment No.;
+                                                              FRA=Nø livraison] }
+    { 4   ;   ;Shipment Line No.   ;Integer       ;CaptionML=[ENU=Shipment Line No.;
+                                                              FRA=Nø ligne livraison] }
+    { 10  ;   ;Qty. to Invoice     ;Decimal       ;CaptionML=[ENU=Qty. to Invoice;
+                                                              FRA=Qt‚ … facturer];
+                                                   DecimalPlaces=0:5 }
+    { 11  ;   ;Qty. to Ship        ;Decimal       ;CaptionML=[ENU=Qty. to Ship;
+                                                              FRA=Qt‚ … exp‚dier];
+                                                   DecimalPlaces=0:5 }
+    { 12  ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              FRA=Date comptabilisation] }
+    { 20  ;   ;User ID             ;Code50        ;CaptionML=[ENU=User ID;
+                                                              FRA=Code utilisateur] }
+  }
+  KEYS
+  {
+    {    ;Invoice No.,Invoice Line No.,Shipment No.,Shipment Line No.;
+                                                   Clustered=Yes }
+    {    ;Shipment No.,Shipment Line No.           }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

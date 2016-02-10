@@ -1,0 +1,105 @@
+OBJECT Table 477 Report Inbox
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Report Inbox;
+               FRA=BoŒte de r‚ception ‚tat];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Entry No.           ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=Entry No.;
+                                                              FRA=Nø s‚quence] }
+    { 2   ;   ;User ID             ;Text65        ;CaptionML=[ENU=User ID;
+                                                              FRA=Code utilisateur];
+                                                   Editable=No }
+    { 3   ;   ;Report Output       ;BLOB          ;CaptionML=[ENU=Report Output;
+                                                              FRA=Sortie ‚tat] }
+    { 4   ;   ;Created Date-Time   ;DateTime      ;CaptionML=[ENU=Created Date-Time;
+                                                              FRA=Date/heure cr‚ation];
+                                                   Editable=No }
+    { 5   ;   ;Job Queue Log Entry ID;GUID        ;CaptionML=[ENU=Job Queue Log Entry ID;
+                                                              FRA=ID ‚criture journal file d'attente des travaux];
+                                                   Editable=No }
+    { 6   ;   ;Output Type         ;Option        ;CaptionML=[ENU=Output Type;
+                                                              FRA=Type sortie];
+                                                   OptionCaptionML=[ENU=PDF,Word,Excel;
+                                                                    FRA=PDF,Word,Excel];
+                                                   OptionString=PDF,Word,Excel;
+                                                   Editable=No }
+    { 7   ;   ;Description         ;Text250       ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation];
+                                                   Editable=No }
+    { 8   ;   ;Report ID           ;Integer       ;CaptionML=[ENU=Report ID;
+                                                              FRA=ID ‚tat];
+                                                   Editable=No }
+    { 9   ;   ;Report Name         ;Text250       ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(AllObjWithCaption."Object Caption" WHERE (Object Type=CONST(Report),
+                                                                                                                Object ID=FIELD(Report ID)));
+                                                   CaptionML=[ENU=Report Name;
+                                                              FRA=Nom ‚tat];
+                                                   Editable=No }
+    { 10  ;   ;Read                ;Boolean       ;CaptionML=[ENU=Read;
+                                                              FRA=Lire] }
+  }
+  KEYS
+  {
+    {    ;Entry No.                               ;Clustered=Yes }
+    {    ;User ID,Created Date-Time                }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      FileDownLoadTxt@1000 : TextConst 'ENU=Export;FRA=Exporter';
+      ReportIsEmptyMsg@1001 : TextConst 'ENU=The report is empty.;FRA=L''‚tat est vide.';
+
+    PROCEDURE ShowReport@1();
+    VAR
+      Instr@1003 : InStream;
+      Downloaded@1002 : Boolean;
+      FileName@1004 : Text;
+    BEGIN
+      CALCFIELDS("Report Output","Report Name");
+      IF NOT "Report Output".HASVALUE THEN BEGIN
+        Read := TRUE;
+        MODIFY;
+        COMMIT;
+        MESSAGE(ReportIsEmptyMsg);
+        EXIT;
+      END;
+      FileName := DELCHR("Report Name",'=','\/:*?"<>|') + Suffix;
+      "Report Output".CREATEINSTREAM(Instr);
+      Downloaded := DOWNLOADFROMSTREAM(Instr,FileDownLoadTxt,'','',FileName);
+
+      IF NOT Read AND Downloaded THEN BEGIN
+        Read := TRUE;
+        MODIFY;
+      END;
+    END;
+
+    LOCAL PROCEDURE Suffix@5() : Text;
+    BEGIN
+      CASE "Output Type" OF
+        "Output Type"::PDF:
+          EXIT('.pdf');
+        "Output Type"::Word:
+          EXIT('.docx');
+        "Output Type"::Excel:
+          EXIT('.xlsx');
+      END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

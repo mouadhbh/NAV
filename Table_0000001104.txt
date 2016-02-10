@@ -1,0 +1,134 @@
+OBJECT Table 1104 Cost Entry
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Cost Entry;
+               FRA=êcriture de coñts];
+    LookupPageID=Page1103;
+    DrillDownPageID=Page1103;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Entry No.           ;Integer       ;CaptionML=[ENU=Entry No.;
+                                                              FRA=N¯ sÇquence] }
+    { 4   ;   ;Cost Type No.       ;Code20        ;TableRelation="Cost Type";
+                                                   CaptionML=[ENU=Cost Type No.;
+                                                              FRA=N¯ type coñt] }
+    { 5   ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              FRA=Date comptabilisation];
+                                                   ClosingDates=Yes }
+    { 7   ;   ;Document No.        ;Code20        ;CaptionML=[ENU=Document No.;
+                                                              FRA=N¯ document] }
+    { 8   ;   ;Description         ;Text80        ;CaptionML=[ENU=Description;
+                                                              FRA=DÇsignation] }
+    { 16  ;   ;Amount              ;Decimal       ;CaptionML=[ENU=Amount;
+                                                              FRA=Montant];
+                                                   BlankZero=Yes }
+    { 17  ;   ;Debit Amount        ;Decimal       ;CaptionML=[ENU=Debit Amount;
+                                                              FRA=Montant dÇbit];
+                                                   BlankZero=Yes }
+    { 18  ;   ;Credit Amount       ;Decimal       ;CaptionML=[ENU=Credit Amount;
+                                                              FRA=Montant crÇdit];
+                                                   BlankZero=Yes }
+    { 20  ;   ;Cost Center Code    ;Code20        ;TableRelation="Cost Center";
+                                                   CaptionML=[ENU=Cost Center Code;
+                                                              FRA=Code centre de coñts] }
+    { 21  ;   ;Cost Object Code    ;Code20        ;TableRelation="Cost Object";
+                                                   CaptionML=[ENU=Cost Object Code;
+                                                              FRA=Code coñts associÇs] }
+    { 27  ;   ;Reason Code         ;Code10        ;TableRelation="Reason Code";
+                                                   CaptionML=[ENU=Reason Code;
+                                                              FRA=Code motif] }
+    { 28  ;   ;G/L Account         ;Code20        ;TableRelation="G/L Account";
+                                                   CaptionML=[ENU=G/L Account;
+                                                              FRA=Compte gÇnÇral] }
+    { 29  ;   ;G/L Entry No.       ;Integer       ;TableRelation="G/L Entry";
+                                                   CaptionML=[ENU=G/L Entry No.;
+                                                              FRA=N¯ sÇquence compta.];
+                                                   Editable=No }
+    { 30  ;   ;Source Code         ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Source Code;
+                                                              FRA=Code journal] }
+    { 31  ;   ;System-Created Entry;Boolean       ;CaptionML=[ENU=System-Created Entry;
+                                                              FRA=êcriture systäme];
+                                                   Editable=No }
+    { 32  ;   ;Allocated           ;Boolean       ;CaptionML=[ENU=Allocated;
+                                                              FRA=VentilÇ] }
+    { 33  ;   ;Allocated with Journal No.;Integer ;CaptionML=[ENU=Allocated with Journal No.;
+                                                              FRA=VentilÇ avec n¯ feuille] }
+    { 40  ;   ;User ID             ;Code50        ;TableRelation=User."User Name";
+                                                   OnLookup=VAR
+                                                              UserMgt@1000 : Codeunit 418;
+                                                            BEGIN
+                                                              UserMgt.LookupUserID("User ID");
+                                                            END;
+
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=User ID;
+                                                              FRA=Code utilisateur];
+                                                   Editable=No }
+    { 41  ;   ;Batch Name          ;Code10        ;TableRelation="Gen. Journal Batch";
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Batch Name;
+                                                              FRA=Nom de la feuille] }
+    { 50  ;   ;Allocation Description;Text80      ;CaptionML=[ENU=Allocation Description;
+                                                              FRA=Description ventilation] }
+    { 51  ;   ;Allocation ID       ;Code10        ;TableRelation="Cost Allocation Source";
+                                                   CaptionML=[ENU=Allocation ID;
+                                                              FRA=ID ventilation] }
+    { 68  ;   ;Additional-Currency Amount;Decimal ;AccessByPermission=TableData 4=R;
+                                                   CaptionML=[ENU=Additional-Currency Amount;
+                                                              FRA=Montant DR];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 69  ;   ;Add.-Currency Debit Amount;Decimal ;CaptionML=[ENU=Add.-Currency Debit Amount;
+                                                              FRA=Montant dÇbit DR];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 70  ;   ;Add.-Currency Credit Amount;Decimal;CaptionML=[ENU=Add.-Currency Credit Amount;
+                                                              FRA=Montant crÇdit DR];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+  }
+  KEYS
+  {
+    {    ;Entry No.                               ;Clustered=Yes }
+    {    ;Cost Type No.,Posting Date              ;SumIndexFields=Amount,Debit Amount,Credit Amount,Additional-Currency Amount,Add.-Currency Debit Amount,Add.-Currency Credit Amount }
+    {    ;Cost Type No.,Cost Center Code,Cost Object Code,Allocated,Posting Date;
+                                                   SumIndexFields=Amount,Debit Amount,Credit Amount,Additional-Currency Amount,Add.-Currency Debit Amount,Add.-Currency Credit Amount }
+    {    ;Cost Center Code,Cost Type No.,Allocated,Posting Date;
+                                                   SumIndexFields=Amount }
+    {    ;Cost Object Code,Cost Type No.,Allocated,Posting Date;
+                                                   SumIndexFields=Amount }
+    {    ;Allocation ID,Posting Date               }
+    {    ;Document No.,Posting Date                }
+    {    ;Allocated with Journal No.               }
+    {    ;Cost Type No.,Posting Date,Cost Center Code,Cost Object Code;
+                                                   SumIndexFields=Amount,Debit Amount,Credit Amount }
+  }
+  FIELDGROUPS
+  {
+    { 1   ;DropDown            ;Entry No.,Description,Posting Date,Amount }
+  }
+  CODE
+  {
+
+    PROCEDURE GetCurrencyCode@1() : Code[10];
+    VAR
+      GLSetup@1000 : Record 98;
+    BEGIN
+      GLSetup.GET;
+      EXIT(GLSetup."Additional Reporting Currency");
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

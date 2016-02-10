@@ -1,0 +1,58 @@
+OBJECT Table 2000000150 NAV App Object Metadata
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/10/15;
+    Time=12:00:00;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    DataPerCompany=No;
+    CaptionML=[ENU=NAV App Object Metadata;
+               FRA=MÇtadonnÇes objet appli NAV];
+  }
+  FIELDS
+  {
+    { 1   ;   ;App Package ID      ;GUID          ;CaptionML=[ENU=App Package ID;
+                                                              FRA=ID package appli] }
+    { 2   ;   ;Object Type         ;Option        ;CaptionML=[ENU=Object Type;
+                                                              FRA=Type objet];
+                                                   OptionCaptionML=[ENU=,Table,,Report,,Codeunit,XMLport,MenuSuite,Page,Query;
+                                                                    FRA=,Table,,êtat,,Codeunit,XMLport,MenuSuite,Page,Requàte];
+                                                   OptionString=,Table,,Report,,Codeunit,XMLport,MenuSuite,Page,Query }
+    { 3   ;   ;Object ID           ;Integer       ;CaptionML=[ENU=Object ID;
+                                                              FRA=ID objet] }
+    { 4   ;   ;Metadata Format     ;Option        ;CaptionML=[ENU=Metadata Format;
+                                                              FRA=Format mÇtadonnÇes];
+                                                   OptionCaptionML=[ENU=Full,Delta;
+                                                                    FRA=Complet,Delta];
+                                                   OptionString=Full,Delta }
+    { 5   ;   ;Metadata            ;BLOB          ;CaptionML=[ENU=Metadata;
+                                                              FRA=MÇtadonnÇes] }
+    { 6   ;   ;User Code           ;BLOB          ;CaptionML=[ENU=User Code;
+                                                              FRA=Code utilisateur] }
+    { 7   ;   ;User AL Code        ;BLOB          ;CaptionML=[ENU=User AL Code;
+                                                              FRA=Code AL utilisateur] }
+    { 8   ;   ;Metadata Version    ;Integer       ;CaptionML=[ENU=Metadata Version;
+                                                              FRA=Version des mÇtadonnÇes] }
+    { 9   ;   ;Object Subtype      ;Text30        ;CaptionML=[ENU=Object Subtype;
+                                                              FRA=Sous-type objet] }
+    { 10  ;   ;Object Name         ;Text30        ;CaptionML=[ENU=Object Name;
+                                                              FRA=Nom objet] }
+  }
+  KEYS
+  {
+    {    ;App Package ID,Object Type,Object ID    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

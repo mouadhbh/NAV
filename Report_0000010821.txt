@@ -1,0 +1,110 @@
+OBJECT Report 10821 Export DEB DTI
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Export DEB DTI;
+               FRA=Exporter DEB DTI];
+    ProcessingOnly=Yes;
+    OnInitReport=BEGIN
+                   ObligationLevel := 1;
+                 END;
+
+    OnPreReport=BEGIN
+                  IF FileName = '' THEN
+                    ERROR(Text004);
+                END;
+
+  }
+  DATASET
+  {
+    { 2880;    ;DataItem;                    ;
+               DataItemTable=Table262;
+               DataItemTableView=SORTING(Journal Template Name,Name);
+               OnAfterGetRecord=BEGIN
+                                  ExportToXML("Intrastat Jnl. Batch");
+                                END;
+                                 }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+      SaveValues=Yes;
+    }
+    CONTROLS
+    {
+      { 1900000001;0;Container;
+                  ContainerType=ContentArea }
+
+      { 1900000002;1;Group  ;
+                  CaptionML=[ENU=Options;
+                             FRA=Options] }
+
+      { 1   ;2   ;Field     ;
+                  Name=FileName;
+                  CaptionML=[ENU=File Name;
+                             FRA=Nom du fichier];
+                  SourceExpr=FileName;
+                  OnAssistEdit=VAR
+                                 FileMgt@1120000 : Codeunit 419;
+                               BEGIN
+                                 IF FileName = '' THEN
+                                   FileName := '.xml';
+                                 FileName := FileMgt.SaveFileDialog(Text002,FileName,'');
+                               END;
+                                }
+
+      { 1120003;2;Field     ;
+                  Name=Obligation Level;
+                  CaptionML=[ENU=Obligation Level;
+                             FRA=Niveau d'obligation];
+                  OptionCaptionML=[ENU=,1,2,3,4;
+                                   FRA=,1,2,3,4];
+                  SourceExpr=ObligationLevel }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      FileName@1120000 : Text;
+      Text001@1120001 : TextConst 'ENU=The journal lines were successfully exported.;FRA=Les lignes de la feuille ont ‚t‚ valid‚es avec succŠs.';
+      ObligationLevel@1120002 : ',1,2,3,4';
+      Text002@1120004 : TextConst 'ENU=Export DEB DTI+ to XML.;FRA=Exporter DEB DTI+ vers XML.';
+      Text004@1120005 : TextConst 'ENU=A destination file must be specified.;FRA=Un fichier de destination doit ˆtre sp‚cifi‚.';
+
+    PROCEDURE InitializeRequest@1120000(NewFileName@1120000 : Text);
+    BEGIN
+      FileName := NewFileName;
+    END;
+
+    LOCAL PROCEDURE ExportToXML@1120001(IntrastatJnlBatch@1120000 : Record 262);
+    VAR
+      IntrastatJnlLine@1120001 : Record 263;
+      ExportDEBDTI@1120002 : Codeunit 10821;
+    BEGIN
+      IntrastatJnlLine.SETCURRENTKEY(Type,"Country/Region Code","Tariff No.","Transaction Type","Transport Method");
+      IntrastatJnlLine.SETRANGE("Journal Template Name",IntrastatJnlBatch."Journal Template Name");
+      IntrastatJnlLine.SETRANGE("Journal Batch Name",IntrastatJnlBatch.Name);
+      IF ExportDEBDTI.ExportToXML(IntrastatJnlLine,ObligationLevel,FileName) THEN
+        MESSAGE(Text001);
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+  }
+}
+

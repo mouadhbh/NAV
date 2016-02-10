@@ -1,0 +1,137 @@
+OBJECT Page 9025 Small Business Report Catalog
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Report Catalog;
+               FRA=Catalogue Çtat];
+    PageType=CardPart;
+  }
+  CONTROLS
+  {
+    { 10  ;    ;Container ;
+                Name=Reports Contet Area;
+                ContainerType=ContentArea }
+
+    { 11  ;1   ;Group     ;
+                Name=AgedAccountsReports;
+                CaptionML=[ENU=Aged Accounts Reports;
+                           FRA=êtats comptabilitÇ ÉgÇe];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 3       ;    ;Action    ;
+                                  Name=AgedAccountsReceivable;
+                                  CaptionML=[ENU=Aged Accounts Receivable;
+                                             FRA=ComptabilitÇ client ÉgÇe];
+                                  ToolTipML=[ENU=Amounts owed by customers and the length of time outstanding;
+                                             FRA=Montants dus par des clients et durÇe restante];
+                                  Image=TileReport;
+                                  RunPageMode=Create;
+                                  OnAction=BEGIN
+                                             SmallBusinessReportCatalogCU.RunAgedAccountsReceivableReport(FALSE);
+                                           END;
+                                            }
+                  { 2       ;    ;Action    ;
+                                  Name=AgedAccountsPayable;
+                                  CaptionML=[ENU=Aged Accounts Payable;
+                                             FRA=ComptabilitÇ fournisseur ÉgÇe];
+                                  ToolTipML=[ENU=Amounts owed to creditors and the length of time outstanding;
+                                             FRA=Montants dus Ö des crÇditeurs et durÇe restante];
+                                  Image=TileReport;
+                                  RunPageMode=Create;
+                                  OnAction=BEGIN
+                                             SmallBusinessReportCatalogCU.RunAgedAccountsPayableReport(FALSE);
+                                           END;
+                                            }
+                }
+                 }
+
+    { 12  ;1   ;Group     ;
+                Name=CustomersAndVendors;
+                CaptionML=[ENU=Customers and Vendors;
+                           FRA=Clients et fournisseurs];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 6       ;    ;Action    ;
+                                  Name=CustomerTop10List;
+                                  CaptionML=[ENU=Customer Top 10 List;
+                                             FRA=Clients - Palmaräs];
+                                  ToolTipML=[ENU=Information on customers' purchases and balances;
+                                             FRA=Informations sur les achats et les soldes des clients];
+                                  OnAction=BEGIN
+                                             SmallBusinessReportCatalogCU.RunCustomerTop10ListReport(FALSE);
+                                           END;
+                                            }
+                  { 7       ;    ;Action    ;
+                                  Name=VendorTop10List;
+                                  CaptionML=[ENU=Vendor Top 10 List;
+                                             FRA=Palmaräs fournisseurs];
+                                  ToolTipML=[ENU=Information on purchases from vendors;
+                                             FRA=Informations sur les achats aux fournisseurs];
+                                  OnAction=BEGIN
+                                             SmallBusinessReportCatalogCU.RunVendorTop10ListReport(FALSE);
+                                           END;
+                                            }
+                  { 8       ;    ;Action    ;
+                                  Name=CustomerStatement;
+                                  CaptionML=[ENU=Customer Statement;
+                                             FRA=RelevÇ client];
+                                  ToolTipML=[ENU=A list of customer statements;
+                                             FRA=Liste des relevÇs client];
+                                  OnAction=BEGIN
+                                             SmallBusinessReportCatalogCU.RunCustomerStatementReport(FALSE);
+                                           END;
+                                            }
+                }
+                 }
+
+    { 13  ;1   ;Group     ;
+                Name=OtherReports;
+                CaptionML=[ENU=Other Reports;
+                           FRA=Autres Çtats];
+                GroupType=CueGroup;
+                ActionList=ACTIONS
+                {
+                  { 9       ;    ;Action    ;
+                                  Name=Trial Balance;
+                                  CaptionML=[ENU=Trial Balance;
+                                             FRA=Balance];
+                                  ToolTipML=[ENU=The chart of accounts that have balances and net changes;
+                                             FRA=Plan comptable avec soldes et soldes pÇriodes];
+                                  Image=TileCurrency;
+                                  OnAction=BEGIN
+                                             SmallBusinessReportCatalogCU.RunTrialBalanceReport(FALSE);
+                                           END;
+                                            }
+                  { 1       ;    ;Action    ;
+                                  Name=Detail Trial Balance;
+                                  CaptionML=[ENU=Detail Trial Balance;
+                                             FRA=Grand livre];
+                                  ToolTipML=[ENU=General ledger account balances and activities;
+                                             FRA=Soldes et activitÇs comptes gÇnÇraux];
+                                  Image=TileCurrency;
+                                  OnAction=BEGIN
+                                             SmallBusinessReportCatalogCU.RunDetailTrialBalanceReport(FALSE);
+                                           END;
+                                            }
+                }
+                 }
+
+  }
+  CODE
+  {
+    VAR
+      SmallBusinessReportCatalogCU@1000 : Codeunit 9025;
+
+    BEGIN
+    END.
+  }
+}
+

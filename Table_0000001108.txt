@@ -1,0 +1,84 @@
+OBJECT Table 1108 Cost Accounting Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Cost Accounting Setup;
+               FRA=ParamŠtres comptabilit‚ analytique];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Primary Key         ;Code10        ;CaptionML=[ENU=Primary Key;
+                                                              FRA=Cl‚ primaire] }
+    { 2   ;   ;Starting Date for G/L Transfer;Date;OnValidate=BEGIN
+                                                                CostRegister.SETRANGE(Source,CostRegister.Source::"Transfer from G/L");
+                                                                IF CostRegister.FINDFIRST THEN
+                                                                  ERROR(Text001,CostRegister."No.");
+                                                              END;
+
+                                                   CaptionML=[ENU=Starting Date for G/L Transfer;
+                                                              FRA=Date d‚but pour transfert comptabilit‚] }
+    { 3   ;   ;Align G/L Account   ;Option        ;CaptionML=[ENU=Align G/L Account;
+                                                              FRA=Aligner compte g‚n‚ral];
+                                                   OptionCaptionML=[ENU=No Alignment,Automatic,Prompt;
+                                                                    FRA=Pas d'alignement,Automatique,Invite];
+                                                   OptionString=No Alignment,Automatic,Prompt }
+    { 4   ;   ;Align Cost Center Dimension;Option ;CaptionML=[ENU=Align Cost Center Dimension;
+                                                              FRA=Aligner axe centre de co–ts];
+                                                   OptionCaptionML=[ENU=No Alignment,Automatic,Prompt;
+                                                                    FRA=Pas d'alignement,Automatique,Invite];
+                                                   OptionString=No Alignment,Automatic,Prompt }
+    { 5   ;   ;Align Cost Object Dimension;Option ;CaptionML=[ENU=Align Cost Object Dimension;
+                                                              FRA=Aligner axe co–ts associ‚s];
+                                                   OptionCaptionML=[ENU=No Alignment,Automatic,Prompt;
+                                                                    FRA=Pas d'alignement,Automatique,Invite];
+                                                   OptionString=No Alignment,Automatic,Prompt }
+    { 20  ;   ;Last Allocation ID  ;Code10        ;InitValue=001;
+                                                   CaptionML=[ENU=Last Allocation ID;
+                                                              FRA=ID derniŠre ventilation] }
+    { 30  ;   ;Last Allocation Doc. No.;Code20    ;InitValue=AL0001;
+                                                   CaptionML=[ENU=Last Allocation Doc. No.;
+                                                              FRA=Nø doc. derniŠre ventilation] }
+    { 100 ;   ;Auto Transfer from G/L;Boolean     ;OnValidate=VAR
+                                                                TransferGlEntriesToCA@1000 : Codeunit 1105;
+                                                              BEGIN
+                                                                IF "Auto Transfer from G/L" THEN BEGIN
+                                                                  MODIFY;
+                                                                  TransferGlEntriesToCA.GetGLEntries;
+                                                                END;
+                                                              END;
+
+                                                   CaptionML=[ENU=Auto Transfer from G/L;
+                                                              FRA=Transf‚rer automatiquement … partir de la compta] }
+    { 120 ;   ;Check G/L Postings  ;Boolean       ;CaptionML=[ENU=Check G/L Postings;
+                                                              FRA=V‚rifier validations compta] }
+    { 205 ;   ;Cost Center Dimension;Code20       ;TableRelation=Dimension;
+                                                   CaptionML=[ENU=Cost Center Dimension;
+                                                              FRA=Axe centre de co–ts] }
+    { 206 ;   ;Cost Object Dimension;Code20       ;TableRelation=Dimension;
+                                                   CaptionML=[ENU=Cost Object Dimension;
+                                                              FRA=Axe co–ts associ‚s] }
+  }
+  KEYS
+  {
+    {    ;Primary Key                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      CostRegister@1000 : Record 1105;
+      Text001@1001 : TextConst 'ENU=The starting date can no longer be defined. According to Register No. %1, general ledger entries have already been transferred to Cost Accounting.;FRA=La date d‚but ne peut plus ˆtre d‚finie. En fonction du nø hist. transaction %1, les ‚critures comptables ont d‚j… ‚t‚ transf‚r‚es vers la comptabilit‚ analytique.';
+
+    BEGIN
+    END.
+  }
+}
+

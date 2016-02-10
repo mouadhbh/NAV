@@ -1,0 +1,136 @@
+OBJECT Table 10860 Payment Class
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVFR8.00;
+  }
+  PROPERTIES
+  {
+    OnDelete=VAR
+               Status@1120000 : Record 10861;
+               Step@1120001 : Record 10862;
+               StepLedger@1120004 : Record 10863;
+               PaymentHeader@1120002 : Record 10865;
+               PaymentLine@1120003 : Record 10866;
+             BEGIN
+               PaymentHeader.SETRANGE("Payment Class",Code);
+               PaymentLine.SETRANGE("Payment Class",Code);
+               IF PaymentHeader.FINDFIRST THEN
+                 ERROR(Text001);
+               IF PaymentLine.FINDFIRST THEN
+                 ERROR(Text001);
+               Status.SETRANGE("Payment Class",Code);
+               Status.DELETEALL;
+               Step.SETRANGE("Payment Class",Code);
+               Step.DELETEALL;
+               StepLedger.SETRANGE("Payment Class",Code);
+               StepLedger.DELETEALL;
+             END;
+
+    CaptionML=[ENU=Payment Class;
+               FRA=Type de rŠglement];
+    LookupPageID=Page10860;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Code                ;Text30        ;OnValidate=BEGIN
+                                                                IF Name = '' THEN
+                                                                  Name := Code;
+                                                              END;
+
+                                                   CaptionML=[ENU=Code;
+                                                              FRA=Code];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Name                ;Text50        ;CaptionML=[ENU=Name;
+                                                              FRA=Nom] }
+    { 3   ;   ;Header No. Series   ;Code10        ;TableRelation="No. Series";
+                                                   OnValidate=VAR
+                                                                NoSeriesLine@1120000 : Record 309;
+                                                              BEGIN
+                                                                IF "Header No. Series" <> '' THEN BEGIN
+                                                                  NoSeriesLine.SETRANGE("Series Code","Header No. Series");
+                                                                  IF NoSeriesLine.FINDLAST THEN
+                                                                    IF (STRLEN(NoSeriesLine."Starting No.") > 10) OR (STRLEN(NoSeriesLine."Ending No.") > 10) THEN
+                                                                      ERROR(Text002);
+                                                                END;
+                                                              END;
+
+                                                   CaptionML=[ENU=Header No. Series;
+                                                              FRA=Nø de souche en-tˆte] }
+    { 4   ;   ;Enable              ;Boolean       ;InitValue=Yes;
+                                                   CaptionML=[ENU=Enable;
+                                                              FRA=Activer] }
+    { 5   ;   ;Line No. Series     ;Code10        ;TableRelation="No. Series";
+                                                   OnValidate=VAR
+                                                                NoSeriesLine@1120000 : Record 309;
+                                                              BEGIN
+                                                                IF "Line No. Series" <> '' THEN BEGIN
+                                                                  NoSeriesLine.SETRANGE("Series Code","Line No. Series");
+                                                                  IF NoSeriesLine.FINDLAST THEN
+                                                                    IF (STRLEN(NoSeriesLine."Starting No.") > 10) OR (STRLEN(NoSeriesLine."Ending No.") > 10) THEN
+                                                                      ERROR(Text002);
+                                                                END;
+                                                              END;
+
+                                                   CaptionML=[ENU=Line No. Series;
+                                                              FRA=Nø de souche lignes] }
+    { 6   ;   ;Suggestions         ;Option        ;CaptionML=[ENU=Suggestions;
+                                                              FRA=Propositions];
+                                                   OptionCaptionML=[ENU=None,Customer,Vendor;
+                                                                    FRA=Aucune,Client,Fournisseur];
+                                                   OptionString=None,Customer,Vendor }
+    { 10  ;   ;Is Create Document  ;Boolean       ;FieldClass=FlowField;
+                                                   CalcFormula=Exist("Payment Step" WHERE (Payment Class=FIELD(Code),
+                                                                                           Action Type=CONST(Create New Document)));
+                                                   CaptionML=[ENU=Is Create Document;
+                                                              FRA=Cr‚ation de document];
+                                                   Editable=No }
+    { 11  ;   ;Unrealized VAT Reversal;Option     ;OnValidate=BEGIN
+                                                                IF "Unrealized VAT Reversal" = "Unrealized VAT Reversal"::Delayed THEN BEGIN
+                                                                  GLSetup.GET;
+                                                                  GLSetup.TESTFIELD("Unrealized VAT",TRUE);
+                                                                END ELSE BEGIN
+                                                                  PaymentStep.SETRANGE("Payment Class",Code);
+                                                                  PaymentStep.SETRANGE("Realize VAT",TRUE);
+                                                                  IF PaymentStep.FINDFIRST THEN
+                                                                    ERROR(
+                                                                      Text003,TABLECAPTION,Code,
+                                                                      PaymentStep.TABLECAPTION,PaymentStep.FIELDCAPTION("Realize VAT"));
+                                                                END;
+                                                              END;
+
+                                                   CaptionML=[ENU=Unrealized VAT Reversal;
+                                                              FRA=Contrepassation de TVA sur encaissement];
+                                                   OptionCaptionML=[ENU=Application,Delayed;
+                                                                    FRA=Lettrage,Diff‚r‚];
+                                                   OptionString=Application,Delayed }
+    { 12  ;   ;SEPA Transfer Type  ;Option        ;CaptionML=[ENU=SEPA Transfer Type;
+                                                              FRA=Type transfert SEPA];
+                                                   OptionCaptionML=[ENU=" ,Credit Transfer,Direct Debit";
+                                                                    FRA=" ,Virement,Pr‚lŠvement"];
+                                                   OptionString=[ ,Credit Transfer,Direct Debit] }
+  }
+  KEYS
+  {
+    {    ;Code                                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+    { 1   ;DropDown            ;Code,Name                                }
+  }
+  CODE
+  {
+    VAR
+      Text001@1120003 : TextConst 'ENU=You cannot delete this Payment Class because it is already in use.;FRA=Vous ne pouvez pas supprimer ce type de rŠglement car il est d‚j… utilis‚.';
+      PaymentStep@1120002 : Record 10862;
+      Text002@1120001 : TextConst 'ENU=You cannot assign numbers longer than 10 characters.;FRA=Vous ne pouvez pas affecter des nombres de plus de 10 caractŠres.';
+      GLSetup@1120004 : Record 98;
+      Text003@1120005 : TextConst 'ENU=%1 %2 has at least one %3 for which %4 is checked.;FRA=%1 %2 a au moins un %3 pour lequel %4 est contr“l‚.';
+
+    BEGIN
+    END.
+  }
+}
+

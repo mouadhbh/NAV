@@ -1,0 +1,63 @@
+OBJECT Table 230 Source Code
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00,NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    OnDelete=BEGIN
+               IF Simulation THEN
+                 CheckSimulationEntries;
+             END;
+
+    CaptionML=[ENU=Source Code;
+               FRA=Code journal];
+    LookupPageID=Page257;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Code                ;Code10        ;CaptionML=[ENU=Code;
+                                                              FRA=Code];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Description         ;Text50        ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 10810;  ;Simulation          ;Boolean       ;OnValidate=BEGIN
+                                                                IF (Simulation <> xRec.Simulation) THEN
+                                                                  CheckSimulationEntries;
+                                                              END;
+
+                                                   CaptionML=[ENU=Simulation;
+                                                              FRA=Simulation] }
+  }
+  KEYS
+  {
+    {    ;Code                                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+    { 1   ;Brick               ;Code,Description                         }
+    { 2   ;DropDown            ;Code,Description,Simulation              }
+  }
+  CODE
+  {
+    VAR
+      Text10800@1120000 : TextConst 'ENU="This source code is used on posted entries. ";FRA="Ce code source est utilis‚ dans les ‚critures enregistr‚es. "';
+      GenJnlLine@1120001 : Record 81;
+      GLEntry@1120002 : Record 17;
+
+    PROCEDURE CheckSimulationEntries@1120000();
+    BEGIN
+      GenJnlLine.SETRANGE(GenJnlLine."Source Code",Code);
+      GLEntry.SETRANGE(GLEntry."Source Code",Code);
+      IF GenJnlLine.FIND('-') OR GLEntry.FIND('-') THEN
+        ERROR(Text10800);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

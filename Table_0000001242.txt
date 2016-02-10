@@ -1,0 +1,73 @@
+OBJECT Table 1242 Positive Pay Footer
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Positive Pay Footer;
+               FRA=Pied de page Positive Pay];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Data Exch. Entry No.;Integer       ;TableRelation="Data Exch."."Entry No.";
+                                                   CaptionML=[ENU=Data Exch. Entry No.;
+                                                              FRA=Nø ‚criture ‚chge donn‚es] }
+    { 2   ;   ;Data Exch. Detail Entry No.;Integer;TableRelation="Positive Pay Detail"."Data Exch. Entry No.";
+                                                   CaptionML=[ENU=Data Exch. Detail Entry No.;
+                                                              FRA=Nø ‚criture d‚tail ‚chge donn‚es] }
+    { 3   ;   ;Account Number      ;Text30        ;CaptionML=[ENU=Account Number;
+                                                              FRA=Num‚ro de compte] }
+    { 4   ;   ;Check Count         ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Positive Pay Detail" WHERE (Void Check Indicator=CONST(),
+                                                                                                  Data Exch. Entry No.=FIELD(Data Exch. Detail Entry No.)));
+                                                   CaptionML=[ENU=Check Count;
+                                                              FRA=Nombre de chŠques];
+                                                   BlankZero=Yes }
+    { 5   ;   ;Check Total         ;Decimal       ;FieldClass=FlowField;
+                                                   CalcFormula=Sum("Positive Pay Detail".Amount WHERE (Void Check Indicator=CONST(),
+                                                                                                       Data Exch. Entry No.=FIELD(Data Exch. Detail Entry No.)));
+                                                   CaptionML=[ENU=Check Total;
+                                                              FRA=Total chŠques];
+                                                   BlankZero=Yes }
+    { 6   ;   ;Void Count          ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Positive Pay Detail" WHERE (Void Check Indicator=CONST(V),
+                                                                                                  Data Exch. Entry No.=FIELD(Data Exch. Detail Entry No.)));
+                                                   CaptionML=[ENU=Void Count;
+                                                              FRA=Nombre annul‚];
+                                                   BlankZero=Yes }
+    { 7   ;   ;Void Total          ;Decimal       ;FieldClass=FlowField;
+                                                   CalcFormula=Sum("Positive Pay Detail".Amount WHERE (Void Check Indicator=CONST(V),
+                                                                                                       Data Exch. Entry No.=FIELD(Data Exch. Detail Entry No.)));
+                                                   CaptionML=[ENU=Void Total;
+                                                              FRA=Total annul‚];
+                                                   BlankZero=Yes }
+    { 8   ;   ;Total Count         ;Integer       ;FieldClass=FlowField;
+                                                   CalcFormula=Count("Positive Pay Detail" WHERE (Data Exch. Entry No.=FIELD(Data Exch. Detail Entry No.)));
+                                                   CaptionML=[ENU=Total Count;
+                                                              FRA=Nombre total];
+                                                   BlankZero=Yes }
+    { 9   ;   ;Grand Total         ;Decimal       ;FieldClass=FlowField;
+                                                   CalcFormula=Sum("Positive Pay Detail".Amount WHERE (Data Exch. Entry No.=FIELD(Data Exch. Detail Entry No.)));
+                                                   CaptionML=[ENU=Grand Total;
+                                                              FRA=Total g‚n‚ral];
+                                                   BlankZero=Yes }
+  }
+  KEYS
+  {
+    {    ;Data Exch. Entry No.                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

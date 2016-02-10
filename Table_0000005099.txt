@@ -1,0 +1,88 @@
+OBJECT Table 5099 Saved Segment Criteria Line
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/09/13;
+    Time=12:00:00;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Saved Segment Criteria Line;
+               FRA=Ligne critŠre segment enreg.];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Segment Criteria Code;Code10       ;TableRelation="Saved Segment Criteria";
+                                                   CaptionML=[ENU=Segment Criteria Code;
+                                                              FRA=Code critŠre segment] }
+    { 2   ;   ;Line No.            ;Integer       ;CaptionML=[ENU=Line No.;
+                                                              FRA=Nø ligne] }
+    { 3   ;   ;Type                ;Option        ;CaptionML=[ENU=Type;
+                                                              FRA=Type];
+                                                   OptionCaptionML=[ENU=Action,Filter;
+                                                                    FRA=Action,Filtre];
+                                                   OptionString=Action,Filter }
+    { 4   ;   ;Action              ;Option        ;CaptionML=[ENU=Action;
+                                                              FRA=Action];
+                                                   OptionCaptionML=[ENU=" ,Add Contacts,Remove Contacts (Reduce),Remove Contacts (Refine)";
+                                                                    FRA=" ,Ajouter des contacts,R‚duire les contacts,Red‚finir les contacts"];
+                                                   OptionString=[ ,Add Contacts,Remove Contacts (Reduce),Remove Contacts (Refine)] }
+    { 5   ;   ;Table No.           ;Integer       ;CaptionML=[ENU=Table No.;
+                                                              FRA=Nø table] }
+    { 7   ;   ;View                ;Text250       ;CaptionML=[ENU=View;
+                                                              FRA=Formule] }
+    { 8   ;   ;Allow Existing Contacts;Boolean    ;CaptionML=[ENU=Allow Existing Contacts;
+                                                              FRA=Conserver contacts existants] }
+    { 9   ;   ;Expand Contact      ;Boolean       ;CaptionML=[ENU=Expand Contact;
+                                                              FRA=Contact rajout‚] }
+    { 10  ;   ;Allow Company with Persons;Boolean ;CaptionML=[ENU=Allow Company with Persons;
+                                                              FRA=Contient les personnes et les soci‚t‚s] }
+    { 11  ;   ;Ignore Exclusion    ;Boolean       ;CaptionML=[ENU=Ignore Exclusion;
+                                                              FRA=Ignorer contacts exclus] }
+    { 12  ;   ;Entire Companies    ;Boolean       ;CaptionML=[ENU=Entire Companies;
+                                                              FRA=Tous les employ‚s] }
+    { 13  ;   ;Table Caption       ;Text250       ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(AllObjWithCaption."Object Caption" WHERE (Object Type=CONST(Table),
+                                                                                                                Object ID=FIELD(Table No.)));
+                                                   CaptionML=[ENU=Table Caption;
+                                                              FRA=L‚gende table];
+                                                   Editable=No }
+    { 14  ;   ;No. of Filters      ;Integer       ;CaptionML=[ENU=No. of Filters;
+                                                              FRA=Nombre de filtres] }
+  }
+  KEYS
+  {
+    {    ;Segment Criteria Code,Line No.,Action   ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    PROCEDURE ActionTable@1() : Text[250];
+    BEGIN
+      CASE Type OF
+        Type::Action:
+          EXIT(FORMAT(Action));
+        Type::Filter:
+          BEGIN
+            CALCFIELDS("Table Caption");
+            EXIT("Table Caption");
+          END;
+      END;
+    END;
+
+    PROCEDURE Filter@2() : Text[250];
+    VAR
+      SegCriteriaManagement@1000 : Codeunit 5062;
+    BEGIN
+      EXIT(SegCriteriaManagement.SegCriteriaFilter("Table No.",View));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

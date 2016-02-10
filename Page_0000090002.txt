@@ -1,0 +1,89 @@
+OBJECT Page 90002 Vendor Card - New
+{
+  OBJECT-PROPERTIES
+  {
+    Date=26/01/16;
+    Time=15:23:17;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    SourceTable=Table23;
+    PageType=Card;
+  }
+  CONTROLS
+  {
+    { 1000000000;0;Container;
+                ContainerType=ContentArea }
+
+    { 1000000001;1;Group  ;
+                Name=General;
+                GroupType=Group }
+
+    { 1000000002;2;Field  ;
+                SourceExpr="No." }
+
+    { 1000000003;2;Field  ;
+                SourceExpr=Name }
+
+    { 1000000004;2;Field  ;
+                SourceExpr=Address }
+
+    { 1000000005;2;Field  ;
+                SourceExpr=City }
+
+    { 1000000006;2;Field  ;
+                SourceExpr="Country/Region Code" }
+
+    { 1000000007;2;Field  ;
+                SourceExpr="Purchaser Code" }
+
+    { 1000000008;1;Group  ;
+                Name=Invoicing;
+                GroupType=Group }
+
+    { 1000000009;2;Field  ;
+                SourceExpr="Budgeted Amount" }
+
+    { 1000000010;2;Field  ;
+                SourceExpr="Invoice Disc. Code" }
+
+    { 1000000011;2;Field  ;
+                SourceExpr="Balance (LCY)" }
+
+    { 1000000012;2;Field  ;
+                SourceExpr="Purchases (LCY)" }
+
+    { 1000000013;2;Field  ;
+                SourceExpr="Inv. Discounts (LCY)" }
+
+    { 1000000014;2;Field  ;
+                SourceExpr="Amt. Rcd. Not Invoiced (LCY)" }
+
+    { 1000000015;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1000000016;1;Part   ;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page9093;
+                PartType=Page }
+
+    { 1000000017;1;Part   ;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page9094;
+                PartType=Page }
+
+    { 1000000018;1;Part   ;
+                PartType=Chart;
+                ChartPartID=T38-05 }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

@@ -1,0 +1,216 @@
+OBJECT Page 10867 Payment Step Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVFR8.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Payment Step Card;
+               FRA=Fiche Çtape räglement];
+    InsertAllowed=No;
+    DeleteAllowed=No;
+    SourceTable=Table10862;
+    PageType=Card;
+    RefreshOnActivate=Yes;
+    OnInit=BEGIN
+             CorrectionEnable := TRUE;
+             HeaderNosSeriesEnable := TRUE;
+             SourceCodeEnable := TRUE;
+             ReasonCodeEnable := TRUE;
+             ExportNoEnable := TRUE;
+             ExportTypeEnable := TRUE;
+             ReportNoEnable := TRUE;
+           END;
+
+    OnAfterGetRecord=BEGIN
+                       DisableFields;
+                     END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 1120024 ;1   ;ActionGroup;
+                      CaptionML=[ENU=Payment Step;
+                                 FRA=êtape räglement];
+                      Image=Installments }
+      { 1120025 ;2   ;Action    ;
+                      CaptionML=[ENU=Ledger;
+                                 FRA=ComptabilitÇ];
+                      RunObject=Page 10882;
+                      RunPageLink=Payment Class=FIELD(Payment Class),
+                                  Line=FIELD(Line);
+                      Image=Ledger }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group      }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="Payment Class";
+                Editable=FALSE }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Line;
+                Editable=FALSE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Name }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Previous Status";
+                OnValidate=BEGIN
+                             CALCFIELDS("Previous Status Name");
+                           END;
+                            }
+
+    { 39  ;2   ;Field     ;
+                DrillDown=No;
+                SourceExpr="Previous Status Name";
+                Editable=FALSE }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr="Next Status";
+                OnValidate=BEGIN
+                             CALCFIELDS("Next Status Name");
+                           END;
+                            }
+
+    { 41  ;2   ;Field     ;
+                DrillDown=No;
+                SourceExpr="Next Status Name";
+                Editable=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Action Type";
+                OnValidate=BEGIN
+                             DisableFields;
+                           END;
+                            }
+
+    { 1120000;2;Field     ;
+                SourceExpr="Report No.";
+                Enabled=ReportNoEnable }
+
+    { 1120018;2;Field     ;
+                SourceExpr="Export Type";
+                Enabled=ExportTypeEnable }
+
+    { 1120002;2;Field     ;
+                SourceExpr="Export No.";
+                Enabled=ExportNoEnable }
+
+    { 1120004;2;Field     ;
+                SourceExpr="Verify Lines RIB" }
+
+    { 1120019;2;Field     ;
+                SourceExpr="Verify Due Date" }
+
+    { 1120006;2;Field     ;
+                SourceExpr="Source Code";
+                Enabled=SourceCodeEnable }
+
+    { 1120008;2;Field     ;
+                SourceExpr="Reason Code";
+                Enabled=ReasonCodeEnable }
+
+    { 1120012;2;Field     ;
+                SourceExpr="Header Nos. Series";
+                Enabled=HeaderNosSeriesEnable }
+
+    { 1120014;2;Field     ;
+                SourceExpr=Correction;
+                Enabled=CorrectionEnable }
+
+    { 1120021;2;Field     ;
+                SourceExpr="Realize VAT";
+                Enabled=RealizeVATEnable }
+
+    { 1120016;2;Field     ;
+                SourceExpr="Verify Header RIB" }
+
+    { 1120010;2;Field     ;
+                SourceExpr="Acceptation Code<>No" }
+
+  }
+  CODE
+  {
+    VAR
+      PaymentClass@1120000 : Record 10860;
+      ReportNoEnable@19031555 : Boolean INDATASET;
+      ExportTypeEnable@19032302 : Boolean INDATASET;
+      ExportNoEnable@19060582 : Boolean INDATASET;
+      ReasonCodeEnable@19076386 : Boolean INDATASET;
+      SourceCodeEnable@19028994 : Boolean INDATASET;
+      HeaderNosSeriesEnable@19046319 : Boolean INDATASET;
+      CorrectionEnable@19049491 : Boolean INDATASET;
+      RealizeVATEnable@19059004 : Boolean INDATASET;
+
+    PROCEDURE DisableFields@1120000();
+    BEGIN
+      IF "Action Type" = "Action Type"::None THEN BEGIN
+        ReportNoEnable := FALSE;
+        ExportTypeEnable := FALSE;
+        ExportNoEnable := FALSE;
+        ReasonCodeEnable := FALSE;
+        SourceCodeEnable := FALSE;
+        HeaderNosSeriesEnable := FALSE;
+        CorrectionEnable := FALSE;
+        RealizeVATEnable := FALSE;
+      END ELSE
+        IF "Action Type" = "Action Type"::Ledger THEN BEGIN
+          ReportNoEnable := FALSE;
+          ExportTypeEnable := FALSE;
+          ExportNoEnable := FALSE;
+          ReasonCodeEnable := TRUE;
+          SourceCodeEnable := TRUE;
+          HeaderNosSeriesEnable := FALSE;
+          CorrectionEnable := TRUE;
+          PaymentClass.GET("Payment Class");
+          RealizeVATEnable :=
+            (PaymentClass."Unrealized VAT Reversal" = PaymentClass."Unrealized VAT Reversal"::Delayed);
+        END ELSE
+          IF "Action Type" = "Action Type"::Report THEN BEGIN
+            ReportNoEnable := TRUE;
+            ExportTypeEnable := FALSE;
+            ExportNoEnable := FALSE;
+            ReasonCodeEnable := FALSE;
+            SourceCodeEnable := FALSE;
+            HeaderNosSeriesEnable := FALSE;
+            CorrectionEnable := FALSE;
+            RealizeVATEnable := FALSE;
+          END ELSE
+            IF "Action Type" = "Action Type"::File THEN BEGIN
+              ReportNoEnable := FALSE;
+              ExportTypeEnable := TRUE;
+              ExportNoEnable := TRUE;
+              ReasonCodeEnable := FALSE;
+              SourceCodeEnable := FALSE;
+              HeaderNosSeriesEnable := FALSE;
+              CorrectionEnable := FALSE;
+              RealizeVATEnable := FALSE;
+            END ELSE
+              IF "Action Type" = "Action Type"::"Create New Document" THEN BEGIN
+                ReportNoEnable := FALSE;
+                ExportTypeEnable := FALSE;
+                ExportNoEnable := FALSE;
+                ReasonCodeEnable := FALSE;
+                SourceCodeEnable := FALSE;
+                HeaderNosSeriesEnable := TRUE;
+                CorrectionEnable := FALSE;
+                RealizeVATEnable := FALSE;
+              END;
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

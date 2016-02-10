@@ -1,0 +1,76 @@
+OBJECT Table 10 Shipment Method
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00,NAVFR7.00;
+  }
+  PROPERTIES
+  {
+    DataCaptionFields=Code,Description;
+    OnDelete=VAR
+               ShipmentTermsTranslation@1000 : Record 463;
+             BEGIN
+               WITH ShipmentTermsTranslation DO BEGIN
+                 SETRANGE("Shipment Method",Code);
+                 DELETEALL
+               END;
+             END;
+
+    CaptionML=[ENU=Shipment Method;
+               FRA=Conditions de livraison];
+    LookupPageID=Page11;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Code                ;Code10        ;OnValidate=BEGIN
+                                                                IF ValidateShipmentMethod THEN
+                                                                  MESSAGE(Text10800);
+                                                              END;
+
+                                                   CaptionML=[ENU=Code;
+                                                              FRA=Code];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Description         ;Text50        ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+  }
+  KEYS
+  {
+    {    ;Code                                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      Text10800@1120000 : TextConst 'ENU=The French Intrastat feature requires a Shipment Method Code of 3 letters and 1 number.;FRA=La fonction des ‚tats D.E.B. fran‡ais n‚cessite un code condition livraison de 3 lettres et 1 chiffre.';
+
+    PROCEDURE TranslateDescription@1(VAR ShipmentMethod@1000 : Record 10;Language@1001 : Code[10]);
+    VAR
+      ShipmentMethodTranslation@1002 : Record 463;
+    BEGIN
+      IF ShipmentMethodTranslation.GET(ShipmentMethod.Code,Language) THEN
+        ShipmentMethod.Description := ShipmentMethodTranslation.Description;
+    END;
+
+    PROCEDURE ValidateShipmentMethod@1120000() : Boolean;
+    VAR
+      I@1120000 : Integer;
+    BEGIN
+      IF STRLEN(Code) <> 4 THEN
+        EXIT(TRUE);
+      FOR I := 1 TO 3 DO
+        IF Code[I] IN ['a'..'z','A'..'Z'] = FALSE THEN
+          EXIT(TRUE);
+      IF Code[4] IN ['0'..'9'] = FALSE THEN
+        EXIT(TRUE);
+      EXIT(FALSE);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

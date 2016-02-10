@@ -1,0 +1,46 @@
+OBJECT Table 800 Online Map Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Online Map Setup;
+               FRA=Configuration Online Map];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Primary Key         ;Code10        ;CaptionML=[ENU=Primary Key;
+                                                              FRA=Cl‚ primaire] }
+    { 2   ;   ;Map Parameter Setup Code;Code10    ;TableRelation="Online Map Parameter Setup";
+                                                   CaptionML=[ENU=Map Parameter Setup Code;
+                                                              FRA=Code configuration paramŠtre carte] }
+    { 3   ;   ;Distance In         ;Option        ;CaptionML=[ENU=Distance In;
+                                                              FRA=Distance en];
+                                                   OptionCaptionML=[ENU=Miles,Kilometers;
+                                                                    FRA=Miles,KilomŠtres];
+                                                   OptionString=Miles,Kilometers }
+    { 4   ;   ;Route               ;Option        ;CaptionML=[ENU=Route;
+                                                              FRA=Itin‚raire];
+                                                   OptionCaptionML=[ENU=Quickest,Shortest;
+                                                                    FRA=Le plus rapide,Le plus court];
+                                                   OptionString=Quickest,Shortest }
+  }
+  KEYS
+  {
+    {    ;Primary Key                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

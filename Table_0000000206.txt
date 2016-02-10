@@ -1,0 +1,138 @@
+OBJECT Table 206 Res. Journal Template
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    OnInsert=BEGIN
+               VALIDATE("Page ID");
+             END;
+
+    OnDelete=BEGIN
+               ResJnlLine.SETRANGE("Journal Template Name",Name);
+               ResJnlLine.DELETEALL(TRUE);
+               ResJnlBatch.SETRANGE("Journal Template Name",Name);
+               ResJnlBatch.DELETEALL;
+             END;
+
+    CaptionML=[ENU=Res. Journal Template;
+               FRA=ModŠle feuille ressource];
+    LookupPageID=Page271;
+    DrillDownPageID=Page271;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Name                ;Code10        ;CaptionML=[ENU=Name;
+                                                              FRA=Nom];
+                                                   NotBlank=Yes }
+    { 2   ;   ;Description         ;Text80        ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 5   ;   ;Test Report ID      ;Integer       ;TableRelation=AllObj."Object ID" WHERE (Object Type=CONST(Report));
+                                                   CaptionML=[ENU=Test Report ID;
+                                                              FRA=ID impression test] }
+    { 6   ;   ;Page ID             ;Integer       ;TableRelation=AllObj."Object ID" WHERE (Object Type=CONST(Page));
+                                                   OnValidate=BEGIN
+                                                                IF "Page ID" = 0 THEN
+                                                                  VALIDATE(Recurring);
+                                                              END;
+
+                                                   CaptionML=[ENU=Page ID;
+                                                              FRA=ID page] }
+    { 7   ;   ;Posting Report ID   ;Integer       ;TableRelation=AllObj."Object ID" WHERE (Object Type=CONST(Report));
+                                                   CaptionML=[ENU=Posting Report ID;
+                                                              FRA=ID rapport validation] }
+    { 8   ;   ;Force Posting Report;Boolean       ;CaptionML=[ENU=Force Posting Report;
+                                                              FRA=Forcer rapport validation] }
+    { 10  ;   ;Source Code         ;Code10        ;TableRelation="Source Code";
+                                                   OnValidate=BEGIN
+                                                                ResJnlLine.SETRANGE("Journal Template Name",Name);
+                                                                ResJnlLine.MODIFYALL("Source Code","Source Code");
+                                                                MODIFY;
+                                                              END;
+
+                                                   CaptionML=[ENU=Source Code;
+                                                              FRA=Code journal] }
+    { 11  ;   ;Reason Code         ;Code10        ;TableRelation="Reason Code";
+                                                   CaptionML=[ENU=Reason Code;
+                                                              FRA=Code motif] }
+    { 12  ;   ;Recurring           ;Boolean       ;OnValidate=BEGIN
+                                                                IF Recurring THEN
+                                                                  "Page ID" := PAGE::"Recurring Resource Jnl."
+                                                                ELSE
+                                                                  "Page ID" := PAGE::"Resource Journal";
+                                                                "Test Report ID" := REPORT::"Resource Journal - Test";
+                                                                "Posting Report ID" := REPORT::"Resource Register";
+                                                                SourceCodeSetup.GET;
+                                                                "Source Code" := SourceCodeSetup."Resource Journal";
+                                                                IF Recurring THEN
+                                                                  TESTFIELD("No. Series",'');
+                                                              END;
+
+                                                   CaptionML=[ENU=Recurring;
+                                                              FRA=Abonnement] }
+    { 13  ;   ;Test Report Caption ;Text250       ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(AllObjWithCaption."Object Caption" WHERE (Object Type=CONST(Report),
+                                                                                                                Object ID=FIELD(Test Report ID)));
+                                                   CaptionML=[ENU=Test Report Caption;
+                                                              FRA=L‚gende de l'impression test];
+                                                   Editable=No }
+    { 14  ;   ;Page Caption        ;Text250       ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(AllObjWithCaption."Object Caption" WHERE (Object Type=CONST(Page),
+                                                                                                                Object ID=FIELD(Page ID)));
+                                                   CaptionML=[ENU=Page Caption;
+                                                              FRA=L‚gende de la page];
+                                                   Editable=No }
+    { 15  ;   ;Posting Report Caption;Text250     ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup(AllObjWithCaption."Object Caption" WHERE (Object Type=CONST(Report),
+                                                                                                                Object ID=FIELD(Posting Report ID)));
+                                                   CaptionML=[ENU=Posting Report Caption;
+                                                              FRA=L‚gende du rapport de validation];
+                                                   Editable=No }
+    { 16  ;   ;No. Series          ;Code10        ;TableRelation="No. Series";
+                                                   OnValidate=BEGIN
+                                                                IF "No. Series" <> '' THEN BEGIN
+                                                                  IF Recurring THEN
+                                                                    ERROR(
+                                                                      Text000,
+                                                                      FIELDCAPTION("Posting No. Series"));
+                                                                  IF "No. Series" = "Posting No. Series" THEN
+                                                                    "Posting No. Series" := '';
+                                                                END;
+                                                              END;
+
+                                                   CaptionML=[ENU=No. Series;
+                                                              FRA=Souches de nø] }
+    { 17  ;   ;Posting No. Series  ;Code10        ;TableRelation="No. Series";
+                                                   OnValidate=BEGIN
+                                                                IF ("Posting No. Series" = "No. Series") AND ("Posting No. Series" <> '') THEN
+                                                                  FIELDERROR("Posting No. Series",STRSUBSTNO(Text001,"Posting No. Series"));
+                                                              END;
+
+                                                   CaptionML=[ENU=Posting No. Series;
+                                                              FRA=Souches de nø validation] }
+  }
+  KEYS
+  {
+    {    ;Name                                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      Text000@1000 : TextConst 'ENU=Only the %1 field can be filled in on recurring journals.;FRA=Seul le champ %1 est … renseigner dans les feuilles abonnement.';
+      Text001@1001 : TextConst 'ENU=must not be %1;FRA=ne doit pas ˆtre %1';
+      ResJnlBatch@1002 : Record 236;
+      ResJnlLine@1003 : Record 207;
+      SourceCodeSetup@1004 : Record 242;
+
+    BEGIN
+    END.
+  }
+}
+

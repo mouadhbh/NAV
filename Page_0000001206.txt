@@ -1,0 +1,116 @@
+OBJECT Page 1206 Credit Transfer Reg. Entries
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Credit Transfer Reg. Entries;
+               FRA=êcritures reg. virement];
+    SourceTable=Table1206;
+    PageType=List;
+  }
+  CONTROLS
+  {
+    { 1   ;0   ;Container ;
+                ContainerType=ContentArea }
+
+    { 2   ;1   ;Group     ;
+                Name=Group;
+                GroupType=Repeater }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Entry No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr="Account Type" }
+
+    { 21  ;2   ;Field     ;
+                SourceExpr="Account No." }
+
+    { 5   ;2   ;Field     ;
+                SourceExpr="Applies-to Entry No." }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Transfer Date" }
+
+    { 7   ;2   ;Field     ;
+                SourceExpr="Currency Code" }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Transfer Amount" }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr=Canceled }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr="Transaction ID" }
+
+    { 14  ;2   ;Field     ;
+                CaptionML=[ENU=Recipient Name;
+                           FRA=Nom destinataire];
+                SourceExpr=CreditorName }
+
+    { 10  ;2   ;Field     ;
+                Name=RecipientIBAN;
+                CaptionML=[ENU=Recipient IBAN;
+                           FRA=IBAN destinataire];
+                SourceExpr=GetRecipientIBANOrBankAccNo(TRUE) }
+
+    { 13  ;2   ;Field     ;
+                CaptionML=[ENU=Recipient Bank Acc. No.;
+                           FRA=N¯ cpte bancaire destinataire];
+                SourceExpr=GetRecipientIBANOrBankAccNo(FALSE) }
+
+    { 11  ;2   ;Field     ;
+                CaptionML=[ENU=Message to Recipient;
+                           FRA=Message au destinataire];
+                SourceExpr="Message to Recipient" }
+
+    { 15  ;2   ;Field     ;
+                CaptionML=[ENU=Applies-to Entry Document No.;
+                           FRA=N¯ document Çcriture lettrage];
+                SourceExpr=AppliesToEntryDocumentNo }
+
+    { 17  ;2   ;Field     ;
+                CaptionML=[ENU=Applies-to Entry Posting Date;
+                           FRA=Date comptabilisation Çcriture lettrage];
+                SourceExpr=AppliesToEntryPostingDate }
+
+    { 16  ;2   ;Field     ;
+                CaptionML=[ENU=Applies-to Entry Description;
+                           FRA=Description Çcriture lettrage];
+                SourceExpr=AppliesToEntryDescription }
+
+    { 18  ;2   ;Field     ;
+                CaptionML=[ENU=Applies-to Entry Currency Code;
+                           FRA=Code devise Çcriture lettrage];
+                SourceExpr=AppliesToEntryCurrencyCode }
+
+    { 19  ;2   ;Field     ;
+                CaptionML=[ENU=Applies-to Entry Amount;
+                           FRA=Montant Çcriture lettrage];
+                SourceExpr=AppliesToEntryAmount }
+
+    { 20  ;2   ;Field     ;
+                CaptionML=[ENU=Applies-to Entry Remaining Amount;
+                           FRA=Montant ouvert Çcriture lettrage];
+                SourceExpr=AppliesToEntryRemainingAmount }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Credit Transfer Register No.";
+                Visible=FALSE }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

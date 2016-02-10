@@ -1,0 +1,1175 @@
+OBJECT Page 21 Customer Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=04/02/16;
+    Time=15:44:12;
+    Modified=Yes;
+    Version List=NAVW19.00,NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Customer Card;
+               FRA=Fiche client];
+    SourceTable=Table18;
+    PageType=Card;
+    RefreshOnActivate=Yes;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Approve,Request Approval;
+                                FRA=Nouveau,Traitement,êtat,Approuver,Approbation demande achat];
+    OnInit=BEGIN
+             ContactEditable := TRUE;
+             MapPointVisible := TRUE;
+           END;
+
+    OnOpenPage=VAR
+                 MapMgt@1000 : Codeunit 802;
+                 CRMIntegrationManagement@1001 : Codeunit 5330;
+               BEGIN
+                 ActivateFields;
+
+                 IF NOT MapMgt.TestSetup THEN
+                   MapPointVisible := FALSE;
+
+                 CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       ActivateFields;
+                       StyleTxt := SetStyle;
+                     END;
+
+    OnAfterGetCurrRecord=VAR
+                           CRMCouplingManagement@1001 : Codeunit 5331;
+                         BEGIN
+                           ActivateFields;
+                           StyleTxt := SetStyle;
+                           ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(RECORDID);
+                           CRMIsCoupledToRecord := CRMIntegrationEnabled AND CRMCouplingManagement.IsRecordCoupledToCRM(RECORDID);
+                           OpenApprovalEntriesExistCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RECORDID);
+                           OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RECORDID);
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 74      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Customer;
+                                 FRA=&Client];
+                      Image=Customer }
+      { 84      ;2   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(18),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 99      ;2   ;Action    ;
+                      CaptionML=[ENU=Bank Accounts;
+                                 FRA=Comptes bancaires];
+                      RunObject=Page 424;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=BankAccount }
+      { 19      ;2   ;Action    ;
+                      CaptionML=[ENU=Direct Debit Mandates;
+                                 FRA=Mandats de prÇlävement];
+                      RunObject=Page 1230;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=MakeAgreement }
+      { 81      ;2   ;Action    ;
+                      CaptionML=[ENU=Ship-&to Addresses;
+                                 FRA=&Adresses destinataire];
+                      RunObject=Page 301;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=ShipAddress }
+      { 14      ;2   ;Action    ;
+                      AccessByPermission=TableData 5050=R;
+                      CaptionML=[ENU=C&ontact;
+                                 FRA=C&ontact];
+                      Image=ContactPerson;
+                      OnAction=BEGIN
+                                 ShowContact;
+                               END;
+                                }
+      { 1120002 ;2   ;Action    ;
+                      CaptionML=[ENU=&Payment Addresses;
+                                 FRA=Adresses de rä&glement];
+                      RunObject=Page 10875;
+                      RunPageLink=Account Type=CONST(Customer),
+                                  Account No.=FIELD(No.);
+                      Image=Addresses }
+      { 94      ;2   ;Action    ;
+                      CaptionML=[ENU=Cross Re&ferences;
+                                 FRA=&RÇfÇrences externes];
+                      RunObject=Page 5723;
+                      RunPageView=SORTING(Cross-Reference Type,Cross-Reference Type No.);
+                      RunPageLink=Cross-Reference Type=CONST(Customer),
+                                  Cross-Reference Type No.=FIELD(No.);
+                      Image=Change }
+      { 78      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 FRA=Co&mmentaires];
+                      RunObject=Page 124;
+                      RunPageLink=Table Name=CONST(Customer),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 59      ;2   ;Action    ;
+                      Name=ApprovalEntries;
+                      CaptionML=[ENU=Approvals;
+                                 FRA=Approbations];
+                      Image=Approvals;
+                      OnAction=BEGIN
+                                 ApprovalsMgmt.OpenApprovalEntriesPage(RECORDID);
+                               END;
+                                }
+      { 118     ;2   ;Action    ;
+                      CaptionML=[ENU=Online Map;
+                                 FRA=Online Map];
+                      Image=Map;
+                      OnAction=BEGIN
+                                 DisplayMap;
+                               END;
+                                }
+      { 243     ;2   ;Action    ;
+                      Name=CustomerReportSelections;
+                      CaptionML=[ENU=Document Layouts;
+                                 FRA=PrÇsentations document];
+                      Image=Quote;
+                      OnAction=VAR
+                                 CustomReportSelection@1000 : Record 9657;
+                               BEGIN
+                                 CustomReportSelection.SETRANGE("Source Type",DATABASE::Customer);
+                                 CustomReportSelection.SETRANGE("Source No.","No.");
+                                 PAGE.RUNMODAL(PAGE::"Customer Report Selections",CustomReportSelection);
+                               END;
+                                }
+      { 31      ;1   ;ActionGroup;
+                      Name=ActionGroupCRM;
+                      CaptionML=[ENU=Dynamics CRM;
+                                 FRA=Dynamics CRM];
+                      Visible=CRMIntegrationEnabled }
+      { 33      ;2   ;Action    ;
+                      Name=CRMGotoAccount;
+                      CaptionML=[ENU=Account;
+                                 FRA=Compte];
+                      ToolTipML=[ENU=Open the coupled Microsoft Dynamics CRM account.;
+                                 FRA=Ouvrez le compte Microsoft Dynamics CRM couplÇ.];
+                      Image=CoupledCustomer;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.ShowCRMEntityFromRecordID(RECORDID);
+                               END;
+                                }
+      { 53      ;2   ;Action    ;
+                      Name=CRMSynchronizeNow;
+                      AccessByPermission=TableData 5331=IM;
+                      CaptionML=[ENU=Synchronize Now;
+                                 FRA=Synchroniser maintenant];
+                      ToolTipML=[ENU=Send or get updated data to or from Microsoft Dynamics CRM.;
+                                 FRA=Envoyez/recevez des donnÇes mises Ö jour Ö/de Microsoft Dynamics CRM.];
+                      Image=Refresh;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1001 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.UpdateOneNow(RECORDID);
+                               END;
+                                }
+      { 43      ;2   ;Action    ;
+                      Name=UpdateStatisticsInCRM;
+                      CaptionML=[ENU=Update Account Statistics;
+                                 FRA=Mettre Ö jour les statistiques compte];
+                      ToolTipML=[ENU=Send Customer Statistics data to Microsoft Dynamics CRM to update the Account Statistics factbox;
+                                 FRA=Envoyer les donnÇes Statistiques client Ö Microsoft Dynamics CRM pour mettre Ö jour le rÇcapitulatif Statistiques compte];
+                      Enabled=CRMIsCoupledToRecord;
+                      Image=UpdateXML;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.CreateOrUpdateCRMAccountStatistics(Rec);
+                               END;
+                                }
+      { 51      ;2   ;ActionGroup;
+                      Name=Coupling;
+                      CaptionML=[@@@=Coupling is a noun;
+                                 ENU=Coupling;
+                                 FRA=Couplage];
+                      ToolTipML=[ENU=Create, change, or delete a coupling between the Microsoft Dynamics NAV record and a Microsoft Dynamics CRM record.;
+                                 FRA=CrÇez, modifiez ou supprimez un couplage entre l'enregistrement Microsoft Dynamics NAV et un enregistrement Microsoft Dynamics CRM.];
+                      Image=LinkAccount }
+      { 47      ;3   ;Action    ;
+                      Name=ManageCRMCoupling;
+                      AccessByPermission=TableData 5331=IM;
+                      CaptionML=[ENU=Set Up Coupling;
+                                 FRA=Configurer le couplage];
+                      ToolTipML=[ENU=Create or modify the coupling to a Microsoft Dynamics CRM account.;
+                                 FRA=CrÇez ou modifiez le couplage avec un compte Microsoft Dynamics CRM.];
+                      Image=LinkAccount;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.CreateOrUpdateCoupling(RECORDID);
+                               END;
+                                }
+      { 49      ;3   ;Action    ;
+                      Name=DeleteCRMCoupling;
+                      AccessByPermission=TableData 5331=IM;
+                      CaptionML=[ENU=Delete Coupling;
+                                 FRA=Supprimer le couplage];
+                      ToolTipML=[ENU=Delete the coupling to a Microsoft Dynamics CRM account.;
+                                 FRA=Supprimez le couplage avec un compte Microsoft Dynamics CRM.];
+                      Enabled=CRMIsCoupledToRecord;
+                      Image=UnLinkAccount;
+                      OnAction=VAR
+                                 CRMCouplingManagement@1000 : Codeunit 5331;
+                               BEGIN
+                                 CRMCouplingManagement.RemoveCoupling(RECORDID);
+                               END;
+                                }
+      { 5       ;1   ;ActionGroup;
+                      CaptionML=[ENU=History;
+                                 FRA=Historique];
+                      Image=History }
+      { 80      ;2   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 FRA=ê&critures comptables];
+                      RunObject=Page 25;
+                      RunPageView=SORTING(Customer No.);
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Promoted=No;
+                      Image=CustomerLedger;
+                      PromotedCategory=Process }
+      { 76      ;2   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 FRA=Statistiques];
+                      RunObject=Page 151;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process }
+      { 79      ;2   ;Action    ;
+                      CaptionML=[ENU=S&ales;
+                                 FRA=&Ventes];
+                      RunObject=Page 155;
+                      RunPageLink=No.=FIELD(No.),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                      Image=Sales }
+      { 77      ;2   ;Action    ;
+                      CaptionML=[ENU=Entry Statistics;
+                                 FRA=Statistiques Çcritures];
+                      RunObject=Page 302;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                      Image=EntryStatistics }
+      { 112     ;2   ;Action    ;
+                      CaptionML=[ENU=Statistics by C&urrencies;
+                                 FRA=Statistiques par &devise];
+                      RunObject=Page 486;
+                      RunPageLink=Customer Filter=FIELD(No.),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Date Filter=FIELD(Date Filter);
+                      Image=Currencies }
+      { 6500    ;2   ;Action    ;
+                      CaptionML=[ENU=Item &Tracking Entries;
+                                 FRA=&Ecritures traáabilitÇ];
+                      Image=ItemTrackingLedger;
+                      OnAction=VAR
+                                 ItemTrackingDocMgt@1000 : Codeunit 6503;
+                               BEGIN
+                                 ItemTrackingDocMgt.ShowItemTrackingForMasterData(1,"No.",'','','','','');
+                               END;
+                                }
+      { 140     ;2   ;Separator  }
+      { 82      ;1   ;ActionGroup;
+                      CaptionML=[ENU=S&ales;
+                                 FRA=&Ventes];
+                      Image=Sales }
+      { 83      ;2   ;Action    ;
+                      CaptionML=[ENU=Invoice &Discounts;
+                                 FRA=Remises &facture];
+                      RunObject=Page 23;
+                      RunPageLink=Code=FIELD(Invoice Disc. Code);
+                      Image=CalculateInvoiceDiscount }
+      { 113     ;2   ;Action    ;
+                      CaptionML=[ENU=Prices;
+                                 FRA=Prix];
+                      RunObject=Page 7002;
+                      RunPageView=SORTING(Sales Type,Sales Code);
+                      RunPageLink=Sales Type=CONST(Customer),
+                                  Sales Code=FIELD(No.);
+                      Image=Price }
+      { 136     ;2   ;Action    ;
+                      CaptionML=[ENU=Line Discounts;
+                                 FRA=Remises ligne];
+                      RunObject=Page 7004;
+                      RunPageView=SORTING(Sales Type,Sales Code);
+                      RunPageLink=Sales Type=CONST(Customer),
+                                  Sales Code=FIELD(No.);
+                      Image=LineDiscount }
+      { 162     ;2   ;Action    ;
+                      CaptionML=[ENU=Prepa&yment Percentages;
+                                 FRA=Pourcentages acom&pte];
+                      RunObject=Page 664;
+                      RunPageView=SORTING(Sales Type,Sales Code);
+                      RunPageLink=Sales Type=CONST(Customer),
+                                  Sales Code=FIELD(No.);
+                      Image=PrepaymentPercentages }
+      { 148     ;2   ;Action    ;
+                      CaptionML=[ENU=S&td. Cust. Sales Codes;
+                                 FRA=Codes &vente std client];
+                      RunObject=Page 173;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=CodesList }
+      { 7       ;1   ;ActionGroup;
+                      CaptionML=[ENU=Documents;
+                                 FRA=Documents];
+                      Image=Documents }
+      { 85      ;2   ;Action    ;
+                      CaptionML=[ENU=Quotes;
+                                 FRA=Devis];
+                      RunObject=Page 9300;
+                      RunPageView=SORTING(Document Type,Sell-to Customer No.);
+                      RunPageLink=Sell-to Customer No.=FIELD(No.);
+                      Image=Quote }
+      { 86      ;2   ;Action    ;
+                      CaptionML=[ENU=Orders;
+                                 FRA=Commandes];
+                      RunObject=Page 9305;
+                      RunPageView=SORTING(Document Type,Sell-to Customer No.);
+                      RunPageLink=Sell-to Customer No.=FIELD(No.);
+                      Image=Document }
+      { 121     ;2   ;Action    ;
+                      CaptionML=[ENU=Return Orders;
+                                 FRA=Retours];
+                      RunObject=Page 9304;
+                      RunPageView=SORTING(Document Type,Sell-to Customer No.);
+                      RunPageLink=Sell-to Customer No.=FIELD(No.);
+                      Image=ReturnOrder }
+      { 151     ;2   ;ActionGroup;
+                      CaptionML=[ENU=Issued Documents;
+                                 FRA=Documents Çmis];
+                      Image=Documents }
+      { 152     ;3   ;Action    ;
+                      CaptionML=[ENU=Issued &Reminders;
+                                 FRA=&Relances Çmises];
+                      RunObject=Page 440;
+                      RunPageView=SORTING(Customer No.,Posting Date);
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=OrderReminder }
+      { 153     ;3   ;Action    ;
+                      CaptionML=[ENU=Issued &Finance Charge Memos;
+                                 FRA=Fact&ures d'intÇràts Çmises];
+                      RunObject=Page 452;
+                      RunPageView=SORTING(Customer No.,Posting Date);
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=FinChargeMemo }
+      { 114     ;2   ;Action    ;
+                      CaptionML=[ENU=Blanket Orders;
+                                 FRA=Commandes ouvertes];
+                      RunObject=Page 9303;
+                      RunPageView=SORTING(Document Type,Sell-to Customer No.);
+                      RunPageLink=Sell-to Customer No.=FIELD(No.);
+                      Image=BlanketOrder }
+      { 147     ;2   ;Action    ;
+                      CaptionML=[ENU=&Jobs;
+                                 FRA=&Projets];
+                      RunObject=Page 89;
+                      RunPageView=SORTING(Bill-to Customer No.);
+                      RunPageLink=Bill-to Customer No.=FIELD(No.);
+                      Image=Job }
+      { 9       ;1   ;ActionGroup;
+                      CaptionML=[ENU=Credit Card;
+                                 FRA=Carte de crÇdit];
+                      Image=CreditCard }
+      { 17      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Credit Cards;
+                                 FRA=Cartes de crÇdit];
+                      Image=CreditCard }
+      { 149     ;3   ;Action    ;
+                      CaptionML=[ENU=C&redit Cards;
+                                 FRA=Cartes de c&rÇdit];
+                      RunObject=Page 828;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=CreditCard }
+      { 165     ;3   ;Action    ;
+                      CaptionML=[ENU=Credit Cards Transaction Lo&g Entries;
+                                 FRA=êcritures du re&gistre des transactions des cartes de crÇdit];
+                      RunObject=Page 829;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=CreditCardLog }
+      { 13      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Service;
+                                 FRA=Service];
+                      Image=ServiceItem }
+      { 128     ;2   ;Action    ;
+                      CaptionML=[ENU=Service Orders;
+                                 FRA=Commandes service];
+                      RunObject=Page 9318;
+                      RunPageView=SORTING(Document Type,Customer No.);
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=Document }
+      { 126     ;2   ;Action    ;
+                      CaptionML=[ENU=Ser&vice Contracts;
+                                 FRA=Co&ntrats de service];
+                      RunObject=Page 6065;
+                      RunPageView=SORTING(Customer No.,Ship-to Code);
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=ServiceAgreement }
+      { 127     ;2   ;Action    ;
+                      CaptionML=[ENU=Service &Items;
+                                 FRA=Ar&ticles de service];
+                      RunObject=Page 5988;
+                      RunPageView=SORTING(Customer No.,Ship-to Code,Item No.,Serial No.);
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Image=ServiceItem }
+      { 1900000005;0 ;ActionContainer;
+                      ActionContainerType=NewDocumentItems }
+      { 1902575205;1 ;Action    ;
+                      CaptionML=[ENU=Blanket Sales Order;
+                                 FRA=Commande ouverte vente];
+                      RunObject=Page 507;
+                      RunPageLink=Sell-to Customer No.=FIELD(No.);
+                      Promoted=No;
+                      Image=BlanketOrder;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1900246505;1 ;Action    ;
+                      CaptionML=[ENU=Sales Quote;
+                                 FRA=Devis];
+                      RunObject=Page 41;
+                      RunPageLink=Sell-to Customer No.=FIELD(No.);
+                      Promoted=No;
+                      Image=Quote;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1906384905;1 ;Action    ;
+                      CaptionML=[ENU=Sales Invoice;
+                                 FRA=Facture vente];
+                      RunObject=Page 43;
+                      RunPageLink=Sell-to Customer No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Invoice;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1904747105;1 ;Action    ;
+                      CaptionML=[ENU=Sales Order;
+                                 FRA=Commande vente];
+                      RunObject=Page 42;
+                      RunPageLink=Sell-to Customer No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Document;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1902583505;1 ;Action    ;
+                      CaptionML=[ENU=Sales Credit Memo;
+                                 FRA=Avoir vente];
+                      RunObject=Page 44;
+                      RunPageLink=Sell-to Customer No.=FIELD(No.);
+                      Promoted=No;
+                      Image=CreditMemo;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1905163705;1 ;Action    ;
+                      CaptionML=[ENU=Sales Return Order;
+                                 FRA=Retour vente];
+                      RunObject=Page 6630;
+                      RunPageLink=Sell-to Customer No.=FIELD(No.);
+                      Promoted=No;
+                      Image=ReturnOrder;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1905185205;1 ;Action    ;
+                      CaptionML=[ENU=Service Quote;
+                                 FRA=Devis service];
+                      RunObject=Page 5964;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Promoted=No;
+                      Image=Quote;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1902079405;1 ;Action    ;
+                      CaptionML=[ENU=Service Invoice;
+                                 FRA=Facture service];
+                      RunObject=Page 5933;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Promoted=No;
+                      Image=Invoice;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1907102005;1 ;Action    ;
+                      CaptionML=[ENU=Service Order;
+                                 FRA=Commande service];
+                      RunObject=Page 5900;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Promoted=No;
+                      Image=Document;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1901662105;1 ;Action    ;
+                      CaptionML=[ENU=Service Credit Memo;
+                                 FRA=Avoir service];
+                      RunObject=Page 5935;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Promoted=No;
+                      Image=CreditMemo;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1903839805;1 ;Action    ;
+                      CaptionML=[ENU=Reminder;
+                                 FRA=Relance];
+                      RunObject=Page 434;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=Reminder;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1901102005;1 ;Action    ;
+                      CaptionML=[ENU=Finance Charge Memo;
+                                 FRA=Facture d'intÇràts];
+                      RunObject=Page 446;
+                      RunPageLink=Customer No.=FIELD(No.);
+                      Promoted=No;
+                      Image=FinChargeMemo;
+                      PromotedCategory=New;
+                      RunPageMode=Create }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 57      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Approval;
+                                 FRA=Approbation] }
+      { 56      ;2   ;Action    ;
+                      Name=Approve;
+                      CaptionML=[ENU=Approve;
+                                 FRA=Approuver];
+                      Promoted=Yes;
+                      Visible=OpenApprovalEntriesExistCurrUser;
+                      PromotedIsBig=Yes;
+                      Image=Approve;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 ApprovalsMgmt@1000 : Codeunit 1535;
+                               BEGIN
+                                 ApprovalsMgmt.ApproveRecordApprovalRequest(RECORDID);
+                               END;
+                                }
+      { 390     ;2   ;Action    ;
+                      Name=Reject;
+                      CaptionML=[ENU=Reject;
+                                 FRA=Rejeter];
+                      Promoted=Yes;
+                      Visible=OpenApprovalEntriesExistCurrUser;
+                      PromotedIsBig=Yes;
+                      Image=Reject;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 ApprovalsMgmt@1000 : Codeunit 1535;
+                               BEGIN
+                                 ApprovalsMgmt.RejectRecordApprovalRequest(RECORDID);
+                               END;
+                                }
+      { 41      ;2   ;Action    ;
+                      Name=Delegate;
+                      CaptionML=[ENU=Delegate;
+                                 FRA=DÇlÇguer];
+                      Promoted=Yes;
+                      Visible=OpenApprovalEntriesExistCurrUser;
+                      Image=Delegate;
+                      PromotedCategory=Category4;
+                      OnAction=VAR
+                                 ApprovalsMgmt@1000 : Codeunit 1535;
+                               BEGIN
+                                 ApprovalsMgmt.DelegateRecordApprovalRequest(RECORDID);
+                               END;
+                                }
+      { 45      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Request Approval;
+                                 FRA=Approbation demande achat];
+                      Image=SendApprovalRequest }
+      { 55      ;2   ;Action    ;
+                      Name=SendApprovalRequest;
+                      CaptionML=[ENU=Send A&pproval Request;
+                                 FRA=Envoyer demande d'a&pprobation];
+                      Promoted=Yes;
+                      Enabled=NOT OpenApprovalEntriesExist;
+                      Image=SendApprovalRequest;
+                      PromotedCategory=Category5;
+                      OnAction=VAR
+                                 ApprovalsMgmt@1001 : Codeunit 1535;
+                               BEGIN
+                                 IF ApprovalsMgmt.CheckCustomerApprovalsWorkflowEnabled(Rec) THEN
+                                   ApprovalsMgmt.OnSendCustomerForApproval(Rec);
+                               END;
+                                }
+      { 37      ;2   ;Action    ;
+                      Name=CancelApprovalRequest;
+                      CaptionML=[ENU=Cancel Approval Re&quest;
+                                 FRA=Annuler demande d'appro&bation];
+                      Promoted=Yes;
+                      Enabled=OpenApprovalEntriesExist;
+                      Image=Cancel;
+                      PromotedCategory=Category5;
+                      OnAction=VAR
+                                 ApprovalsMgmt@1001 : Codeunit 1535;
+                               BEGIN
+                                 ApprovalsMgmt.OnCancelCustomerApprovalRequest(Rec);
+                               END;
+                                }
+      { 163     ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 FRA=Fonction&s];
+                      Image=Action }
+      { 1000000000;2 ;Action    ;
+                      Name=UpdateCreditLimit;
+                      CaptionML=ENU=Update Credit Limit;
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=CalculateCost;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 CallUpdateCreditLimit;
+                               END;
+                                }
+      { 167     ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Apply Template;
+                                 FRA=Appliquer modäle];
+                      Promoted=Yes;
+                      Image=ApplyTemplate;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ConfigTemplateMgt@1000 : Codeunit 8612;
+                                 RecRef@1001 : RecordRef;
+                               BEGIN
+                                 RecRef.GETTABLE(Rec);
+                                 ConfigTemplateMgt.UpdateFromTemplateSelection(RecRef);
+                               END;
+                                }
+      { 1900839804;1 ;Action    ;
+                      CaptionML=[ENU=Cash Receipt Journal;
+                                 FRA=Feuille räglement];
+                      RunObject=Page 255;
+                      Promoted=Yes;
+                      Image=CashReceiptJournal;
+                      PromotedCategory=Process }
+      { 1905171704;1 ;Action    ;
+                      CaptionML=[ENU=Sales Journal;
+                                 FRA=Feuille vente];
+                      RunObject=Page 253;
+                      Promoted=Yes;
+                      Image=Journals;
+                      PromotedCategory=Process }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1906813206;1 ;Action    ;
+                      CaptionML=[ENU=Customer Detailed Aging;
+                                 FRA=êcritures clients Çchues];
+                      RunObject=Report 106;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907586706;1 ;Action    ;
+                      CaptionML=[ENU=Customer - Labels;
+                                 FRA=Clients : êtiquettes];
+                      RunObject=Report 110;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902299006;1 ;Action    ;
+                      CaptionML=[ENU=Customer - Balance to Date;
+                                 FRA=Clients : êcritures ouvertes];
+                      RunObject=Report 121;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;;Container;
+                Name=;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                CaptionML=[ENU=General;
+                           FRA=GÇnÇral] }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No.";
+                Importance=Promoted;
+                OnAssistEdit=BEGIN
+                               IF AssistEdit(xRec) THEN
+                                 CurrPage.UPDATE;
+                             END;
+                              }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Name;
+                Importance=Promoted;
+                ShowMandatory=TRUE }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr=Address }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Address 2" }
+
+    { 1120010;2;Field     ;
+                SourceExpr=County }
+
+    { 90  ;2   ;Field     ;
+                SourceExpr="Post Code";
+                Importance=Promoted }
+
+    { 10  ;2   ;Field     ;
+                SourceExpr=City }
+
+    { 91  ;2   ;Field     ;
+                SourceExpr="Country/Region Code" }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Phone No." }
+
+    { 122 ;2   ;Field     ;
+                SourceExpr="Primary Contact No." }
+
+    { 16  ;2   ;Field     ;
+                SourceExpr=Contact;
+                Importance=Promoted;
+                Editable=ContactEditable;
+                OnValidate=BEGIN
+                             ContactOnAfterValidate;
+                           END;
+                            }
+
+    { 18  ;2   ;Field     ;
+                SourceExpr="Search Name" }
+
+    { 20  ;2   ;Field     ;
+                SourceExpr="Balance (LCY)";
+                OnDrillDown=VAR
+                              DtldCustLedgEntry@1001 : Record 379;
+                              CustLedgEntry@1002 : Record 21;
+                            BEGIN
+                              DtldCustLedgEntry.SETRANGE("Customer No.","No.");
+                              COPYFILTER("Global Dimension 1 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                              COPYFILTER("Global Dimension 2 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                              COPYFILTER("Currency Filter",DtldCustLedgEntry."Currency Code");
+                              CustLedgEntry.DrillDownOnEntries(DtldCustLedgEntry);
+                            END;
+                             }
+
+    { 22  ;2   ;Field     ;
+                SourceExpr="Credit Limit (LCY)";
+                StyleExpr=StyleTxt;
+                OnValidate=BEGIN
+                             StyleTxt := SetStyle;
+                           END;
+                            }
+
+    { 24  ;2   ;Field     ;
+                SourceExpr="Salesperson Code" }
+
+    { 64  ;2   ;Field     ;
+                SourceExpr="Responsibility Center" }
+
+    { 93  ;2   ;Field     ;
+                SourceExpr="Service Zone Code" }
+
+    { 26  ;2   ;Field     ;
+                SourceExpr=Blocked }
+
+    { 28  ;2   ;Field     ;
+                SourceExpr="Last Date Modified" }
+
+    { 1902768601;1;Group  ;
+                CaptionML=[ENU=Communication;
+                           FRA=Communication] }
+
+    { 103 ;2   ;Field     ;
+                Name=Phone No.2;
+                SourceExpr="Phone No.";
+                Importance=Promoted }
+
+    { 104 ;2   ;Field     ;
+                SourceExpr="Fax No." }
+
+    { 107 ;2   ;Field     ;
+                SourceExpr="E-Mail";
+                Importance=Promoted }
+
+    { 109 ;2   ;Field     ;
+                SourceExpr="Home Page" }
+
+    { 154 ;2   ;Field     ;
+                SourceExpr="IC Partner Code" }
+
+    { 23  ;2   ;Field     ;
+                SourceExpr="Document Sending Profile" }
+
+    { 1905885101;1;Group  ;
+                CaptionML=[ENU=Invoicing;
+                           FRA=Facturation] }
+
+    { 34  ;2   ;Field     ;
+                SourceExpr="Bill-to Customer No." }
+
+    { 29  ;2   ;Field     ;
+                SourceExpr="VAT Registration No.";
+                OnDrillDown=VAR
+                              VATRegistrationLogMgt@1000 : Codeunit 249;
+                            BEGIN
+                              VATRegistrationLogMgt.AssistEditCustomerVATReg(Rec);
+                            END;
+                             }
+
+    { 61  ;2   ;Field     ;
+                SourceExpr=GLN }
+
+    { 36  ;2   ;Field     ;
+                SourceExpr="Invoice Copies" }
+
+    { 42  ;2   ;Field     ;
+                NotBlank=Yes;
+                SourceExpr="Invoice Disc. Code" }
+
+    { 156 ;2   ;Field     ;
+                SourceExpr="Copy Sell-to Addr. to Qte From" }
+
+    { 70  ;2   ;Field     ;
+                SourceExpr="Gen. Bus. Posting Group";
+                Importance=Promoted;
+                ShowMandatory=TRUE }
+
+    { 58  ;2   ;Field     ;
+                SourceExpr="VAT Bus. Posting Group";
+                ShowMandatory=TRUE }
+
+    { 38  ;2   ;Field     ;
+                SourceExpr="Customer Posting Group";
+                Importance=Promoted;
+                ShowMandatory=TRUE }
+
+    { 40  ;2   ;Field     ;
+                SourceExpr="Customer Price Group";
+                Importance=Promoted }
+
+    { 44  ;2   ;Field     ;
+                SourceExpr="Customer Disc. Group";
+                Importance=Promoted }
+
+    { 46  ;2   ;Field     ;
+                SourceExpr="Allow Line Disc." }
+
+    { 129 ;2   ;Field     ;
+                SourceExpr="Prices Including VAT" }
+
+    { 160 ;2   ;Field     ;
+                SourceExpr="Prepayment %" }
+
+    { 1901677601;1;Group  ;
+                CaptionML=[ENU=Payments;
+                           FRA=Paiements] }
+
+    { 48  ;2   ;Field     ;
+                SourceExpr="Application Method" }
+
+    { 21  ;2   ;Field     ;
+                SourceExpr="Partner Type" }
+
+    { 50  ;2   ;Field     ;
+                SourceExpr="Payment Terms Code";
+                Importance=Promoted;
+                ShowMandatory=TRUE }
+
+    { 11  ;2   ;Field     ;
+                SourceExpr="Payment Method Code";
+                Importance=Promoted }
+
+    { 15  ;2   ;Field     ;
+                SourceExpr="Reminder Terms Code";
+                Importance=Promoted }
+
+    { 52  ;2   ;Field     ;
+                SourceExpr="Fin. Charge Terms Code";
+                Importance=Promoted }
+
+    { 3   ;2   ;Field     ;
+                SourceExpr="Cash Flow Payment Terms Code" }
+
+    { 54  ;2   ;Field     ;
+                SourceExpr="Print Statements" }
+
+    { 60  ;2   ;Field     ;
+                SourceExpr="Last Statement No." }
+
+    { 143 ;2   ;Field     ;
+                SourceExpr="Block Payment Tolerance" }
+
+    { 1120004;2;Field     ;
+                Name=Payment Balance (LCY);
+                SourceExpr="Balance (LCY)";
+                OnDrillDown=VAR
+                              CustLedgEntry@1120000 : Record 21;
+                              DtldCustLedgEntry@1120001 : Record 379;
+                            BEGIN
+                              DtldCustLedgEntry.SETFILTER("Customer No.","No.");
+                              COPYFILTER("Global Dimension 1 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                              COPYFILTER("Global Dimension 2 Filter",DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                              COPYFILTER("Currency Filter",DtldCustLedgEntry."Currency Code");
+                              CustLedgEntry.DrillDownOnEntries(DtldCustLedgEntry);
+                            END;
+                             }
+
+    { 1120006;2;Field     ;
+                SourceExpr="Payment in progress (LCY)" }
+
+    { 1120008;2;Field     ;
+                CaptionML=[ENU=Net amount (LCY);
+                           FRA=Montant net DS];
+                SourceExpr="Balance (LCY)" - "Payment in progress (LCY)";
+                Editable=FALSE }
+
+    { 25  ;2   ;Field     ;
+                SourceExpr="Preferred Bank Account" }
+
+    { 1906801201;1;Group  ;
+                CaptionML=[ENU=Shipping;
+                           FRA=Livraison] }
+
+    { 95  ;2   ;Field     ;
+                SourceExpr="Location Code";
+                Importance=Promoted }
+
+    { 32  ;2   ;Field     ;
+                SourceExpr="Combine Shipments" }
+
+    { 158 ;2   ;Field     ;
+                SourceExpr=Reserve }
+
+    { 123 ;2   ;Field     ;
+                SourceExpr="Shipping Advice";
+                Importance=Promoted }
+
+    { 30  ;2   ;Field     ;
+                SourceExpr="Shipment Method Code";
+                Importance=Promoted }
+
+    { 101 ;2   ;Field     ;
+                SourceExpr="Shipping Agent Code";
+                Importance=Promoted }
+
+    { 131 ;2   ;Field     ;
+                SourceExpr="Shipping Agent Service Code" }
+
+    { 119 ;2   ;Field     ;
+                SourceExpr="Shipping Time" }
+
+    { 141 ;2   ;Field     ;
+                DrillDown=No;
+                SourceExpr="Base Calendar Code" }
+
+    { 146 ;2   ;Field     ;
+                Name=Customized Calendar;
+                CaptionML=[ENU=Customized Calendar;
+                           FRA=Calendrier personnalisÇ];
+                SourceExpr=CalendarMgmt.CustomizedCalendarExistText(CustomizedCalendar."Source Type"::Customer,"No.",'',"Base Calendar Code");
+                Editable=FALSE;
+                OnDrillDown=BEGIN
+                              CurrPage.SAVERECORD;
+                              TESTFIELD("Base Calendar Code");
+                              CalendarMgmt.ShowCustomizedCalendar(CustomizedCalEntry."Source Type"::Customer,"No.",'',"Base Calendar Code");
+                            END;
+                             }
+
+    { 1907468901;1;Group  ;
+                CaptionML=[ENU=Foreign Trade;
+                           FRA=International] }
+
+    { 67  ;2   ;Field     ;
+                SourceExpr="Currency Code";
+                Importance=Promoted }
+
+    { 66  ;2   ;Field     ;
+                SourceExpr="Language Code" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 39  ;1   ;Part      ;
+                SubPageLink=No.=FIELD(No.);
+                PagePartID=Page5360;
+                Visible=CRMIsCoupledToRecord;
+                PartType=Page }
+
+    { 35  ;1   ;Part      ;
+                SubPageLink=Source Type=CONST(Customer),
+                            Source No.=FIELD(No.);
+                PagePartID=Page875;
+                Visible=SocialListeningVisible;
+                PartType=Page }
+
+    { 27  ;1   ;Part      ;
+                SubPageLink=Source Type=CONST(Customer),
+                            Source No.=FIELD(No.);
+                PagePartID=Page876;
+                Visible=SocialListeningSetupVisible;
+                PartType=Page;
+                UpdatePropagation=Both }
+
+    { 1903720907;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Currency Filter=FIELD(Currency Filter),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                PagePartID=Page9080;
+                Visible=TRUE;
+                PartType=Page }
+
+    { 1907234507;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Currency Filter=FIELD(Currency Filter),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                PagePartID=Page9081;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1902018507;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Currency Filter=FIELD(Currency Filter),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                PagePartID=Page9082;
+                Visible=TRUE;
+                PartType=Page }
+
+    { 1905532107;1;Part   ;
+                SubPageLink=Table ID=CONST(18),
+                            No.=FIELD(No.);
+                PagePartID=Page9083;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1907829707;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Currency Filter=FIELD(Currency Filter),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                PagePartID=Page9085;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1902613707;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Currency Filter=FIELD(Currency Filter),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter);
+                PagePartID=Page9086;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 62  ;1   ;Part      ;
+                Name=WorkflowStatus;
+                PagePartID=Page1528;
+                Visible=ShowWorkflowStatus;
+                Enabled=FALSE;
+                Editable=FALSE;
+                PartType=Page;
+                ShowFilter=No }
+
+    { 1900383207;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      CustomizedCalEntry@1001 : Record 7603;
+      CustomizedCalendar@1005 : Record 7602;
+      CalendarMgmt@1002 : Codeunit 7600;
+      ApprovalsMgmt@1009 : Codeunit 1535;
+      StyleTxt@1004 : Text;
+      MapPointVisible@19022708 : Boolean INDATASET;
+      ContactEditable@19051436 : Boolean INDATASET;
+      SocialListeningSetupVisible@1000 : Boolean INDATASET;
+      SocialListeningVisible@1003 : Boolean INDATASET;
+      CRMIntegrationEnabled@1007 : Boolean;
+      CRMIsCoupledToRecord@1006 : Boolean;
+      OpenApprovalEntriesExistCurrUser@1008 : Boolean;
+      OpenApprovalEntriesExist@1010 : Boolean;
+      ShowWorkflowStatus@1011 : Boolean;
+      Text90001@1000000000 : TextConst 'ENU=Are you sure that you want to set the %1 to %2 ?';
+      Text90002@1000000001 : TextConst 'ENU=The credit limit was rounded to %1 to comply with company policies';
+      Text90003@1000000002 : TextConst 'ENU=The credit limits is up to date';
+
+    LOCAL PROCEDURE ActivateFields@3();
+    BEGIN
+      SetSocialListeningFactboxVisibility;
+      ContactEditable := "Primary Contact No." = '';
+    END;
+
+    LOCAL PROCEDURE ContactOnAfterValidate@19013243();
+    BEGIN
+      ActivateFields;
+    END;
+
+    LOCAL PROCEDURE SetSocialListeningFactboxVisibility@1();
+    VAR
+      SocialListeningMgt@1000 : Codeunit 871;
+    BEGIN
+      SocialListeningMgt.GetCustFactboxVisibility(Rec,SocialListeningSetupVisible,SocialListeningVisible);
+    END;
+
+    LOCAL PROCEDURE CallUpdateCreditLimit@1000000000();
+    VAR
+      CreditLimitCaalculated@1000000000 : Decimal;
+      CreditLimitActual@1000000001 : Decimal;
+    BEGIN
+      CreditLimitCaalculated:=Rec.CalculateCreditLimit;
+
+      IF CreditLimitCaalculated=Rec."Credit Limit (LCY)" THEN BEGIN
+        MESSAGE(Text90003);
+        EXIT;
+      END;
+
+      IF GUIALLOWED AND NOT CONFIRM(
+        Text90001,
+        FALSE,
+        FIELDCAPTION("Credit Limit (LCY)"),
+        CreditLimitCaalculated)
+        THEN
+        EXIT;
+
+      CreditLimitActual:=CreditLimitCaalculated;
+      Rec.UpdateCreditLimit(CreditLimitActual);
+      IF CreditLimitActual<>CreditLimitCaalculated THEN
+        MESSAGE(Text90002,CreditLimitActual);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

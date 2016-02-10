@@ -1,0 +1,3444 @@
+OBJECT Report 10871 Withdraw recapitulation
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Withdraw recapitulation;
+               FRA=R‚capitulatif de pr‚lŠvement];
+    OnPreReport=BEGIN
+                  WithDrawNo := COPYSTR("Payment Lines1".GETFILTER("No."),1,MAXSTRLEN(WithDrawNo));
+                  IF WithDrawNo = '' THEN
+                    ERROR(Text006);
+
+                  CompanyInformation.GET;
+                  FormatAddress.Company(CompanyAddr,CompanyInformation);
+                END;
+
+  }
+  DATASET
+  {
+    { 2424;    ;DataItem;Payment Lines1      ;
+               DataItemTable=Table10866;
+               DataItemTableView=SORTING(No.,Line No.);
+               MaxIteration=1;
+               PrintOnlyIfDetail=Yes;
+               OnPreDataItem=BEGIN
+                               SETRANGE("No.",WithDrawNo);
+                             END;
+
+               OnAfterGetRecord=BEGIN
+                                  PaymtHeader.GET("No.");
+                                  PostingDate := PaymtHeader."Posting Date";
+
+                                  PaymtManagt.PaymentBankAcc(BankAccountAddr,PaymtHeader);
+                                END;
+                                 }
+
+    { 1170000004;1;Column;Payment_Lines1_No_ ;
+               SourceExpr="No." }
+
+    { 1170000005;1;Column;Payment_Lines1_Line_No_;
+               SourceExpr="Line No." }
+
+    { 5701;1   ;DataItem;CopyLoop            ;
+               DataItemTable=Table2000000026;
+               DataItemTableView=SORTING(Number);
+               OnPreDataItem=BEGIN
+                               OutputNo := 1;
+                               LoopsNumber := ABS(CopiesNumber) + 1;
+                               CopyText := '';
+                               SETRANGE(Number,1,LoopsNumber);
+                             END;
+
+               OnAfterGetRecord=BEGIN
+                                  IF Number > 1 THEN BEGIN
+                                    CopyText := Text003;
+                                    OutputNo += 1;
+                                  END;
+                                  CurrReport.PAGENO := 1;
+                                END;
+                                 }
+
+    { 6455;2   ;DataItem;PageLoop            ;
+               DataItemTable=Table2000000026;
+               DataItemTableView=SORTING(Number)
+                                 WHERE(Number=CONST(1)) }
+
+    { 1120027;3;Column  ;PaymtHeader__No__   ;
+               SourceExpr=PaymtHeader."No." }
+
+    { 1120037;3;Column  ;STRSUBSTNO_Text005_CopyText_;
+               SourceExpr=STRSUBSTNO(Text005,CopyText) }
+
+    { 1120040;3;Column  ;STRSUBSTNO__Page__1__FORMAT_CurrReport_PAGENO__;
+               SourceExpr=STRSUBSTNO(Text007,CurrReport.PAGENO) }
+
+    { 1120041;3;Column  ;CompanyAddr_1_      ;
+               SourceExpr=CompanyAddr[1] }
+
+    { 1120042;3;Column  ;CompanyAddr_2_      ;
+               SourceExpr=CompanyAddr[2] }
+
+    { 1120043;3;Column  ;CompanyAddr_3_      ;
+               SourceExpr=CompanyAddr[3] }
+
+    { 1120044;3;Column  ;CompanyAddr_4_      ;
+               SourceExpr=CompanyAddr[4] }
+
+    { 1120048;3;Column  ;CompanyAddr_5_      ;
+               SourceExpr=CompanyAddr[5] }
+
+    { 1120049;3;Column  ;CompanyAddr_6_      ;
+               SourceExpr=CompanyAddr[6] }
+
+    { 1120050;3;Column  ;CompanyInformation__Phone_No__;
+               SourceExpr=CompanyInformation."Phone No." }
+
+    { 1120051;3;Column  ;CompanyInformation__Fax_No__;
+               SourceExpr=CompanyInformation."Fax No." }
+
+    { 1120052;3;Column  ;CompanyInformation__VAT_Registration_No__;
+               SourceExpr=CompanyInformation."VAT Registration No." }
+
+    { 1120062;3;Column  ;FORMAT_PostingDate_0_4_;
+               SourceExpr=FORMAT(PostingDate,0,4) }
+
+    { 1120017;3;Column  ;BankAccountAddr_4_  ;
+               SourceExpr=BankAccountAddr[4] }
+
+    { 1120018;3;Column  ;BankAccountAddr_5_  ;
+               SourceExpr=BankAccountAddr[5] }
+
+    { 1120054;3;Column  ;BankAccountAddr_6_  ;
+               SourceExpr=BankAccountAddr[6] }
+
+    { 1120055;3;Column  ;BankAccountAddr_7_  ;
+               SourceExpr=BankAccountAddr[7] }
+
+    { 1120056;3;Column  ;BankAccountAddr_3_  ;
+               SourceExpr=BankAccountAddr[3] }
+
+    { 1120057;3;Column  ;BankAccountAddr_2_  ;
+               SourceExpr=BankAccountAddr[2] }
+
+    { 1120058;3;Column  ;BankAccountAddr_1_  ;
+               SourceExpr=BankAccountAddr[1] }
+
+    { 1120020;3;Column  ;PrintCurrencyCode   ;
+               SourceExpr=PrintCurrencyCode }
+
+    { 1120023;3;Column  ;PaymtHeader__Bank_Branch_No__;
+               SourceExpr=PaymtHeader."Bank Branch No." }
+
+    { 1120032;3;Column  ;PaymtHeader__Agency_Code_;
+               SourceExpr=PaymtHeader."Agency Code" }
+
+    { 1120053;3;Column  ;PaymtHeader__Bank_Account_No__;
+               SourceExpr=PaymtHeader."Bank Account No." }
+
+    { 1120006;3;Column  ;PaymtHeader__RIB_Key_;
+               SourceExpr=PaymtHeader."RIB Key" }
+
+    { 1120011;3;Column  ;PaymtHeader__National_Issuer_No__;
+               SourceExpr=PaymtHeader."National Issuer No." }
+
+    { 1120065;3;Column  ;OutputNo            ;
+               SourceExpr=OutputNo }
+
+    { 1120069;3;Column  ;PaymtHeader_IBAN    ;
+               SourceExpr=PaymtHeader.IBAN }
+
+    { 1120071;3;Column  ;PaymtHeader__SWIFT_Code_;
+               SourceExpr=PaymtHeader."SWIFT Code" }
+
+    { 1170000006;3;Column;PageLoop_Number    ;
+               SourceExpr=Number }
+
+    { 1120029;3;Column  ;PaymtHeader__No__Caption;
+               SourceExpr=PaymtHeader__No__CaptionLbl }
+
+    { 1120045;3;Column  ;CompanyInformation__Phone_No__Caption;
+               SourceExpr=CompanyInformation__Phone_No__CaptionLbl }
+
+    { 1120046;3;Column  ;CompanyInformation__Fax_No__Caption;
+               SourceExpr=CompanyInformation__Fax_No__CaptionLbl }
+
+    { 1120047;3;Column  ;CompanyInformation__VAT_Registration_No__Caption;
+               SourceExpr=CompanyInformation__VAT_Registration_No__CaptionLbl }
+
+    { 1120019;3;Column  ;PrintCurrencyCodeCaption;
+               SourceExpr=PrintCurrencyCodeCaptionLbl }
+
+    { 1120025;3;Column  ;PaymtHeader__Bank_Branch_No__Caption;
+               SourceExpr=PaymtHeader__Bank_Branch_No__CaptionLbl }
+
+    { 1120033;3;Column  ;PaymtHeader__Agency_Code_Caption;
+               SourceExpr=PaymtHeader__Agency_Code_CaptionLbl }
+
+    { 1120038;3;Column  ;PaymtHeader__Bank_Account_No__Caption;
+               SourceExpr=PaymtHeader__Bank_Account_No__CaptionLbl }
+
+    { 1120008;3;Column  ;PaymtHeader__RIB_Key_Caption;
+               SourceExpr=PaymtHeader__RIB_Key_CaptionLbl }
+
+    { 1120012;3;Column  ;PaymtHeader__National_Issuer_No__Caption;
+               SourceExpr=PaymtHeader__National_Issuer_No__CaptionLbl }
+
+    { 1120067;3;Column  ;PageCaption         ;
+               SourceExpr=PageCaptionLbl }
+
+    { 1120070;3;Column  ;PaymtHeader_IBANCaption;
+               SourceExpr=PaymtHeader_IBANCaptionLbl }
+
+    { 1120072;3;Column  ;PaymtHeader__SWIFT_Code_Caption;
+               SourceExpr=PaymtHeader__SWIFT_Code_CaptionLbl }
+
+    { 5215;3   ;DataItem;Payment Lines       ;
+               DataItemTable=Table10866;
+               DataItemTableView=SORTING(No.,Line No.);
+               OnPreDataItem=BEGIN
+                               CurrReport.CREATETOTALS(WithdrawAmount);
+                               CurrReport.CREATETOTALS(WithdrawCounting);
+
+                               SETRANGE("Account Type","Account Type"::Customer);
+                             END;
+
+               OnAfterGetRecord=BEGIN
+                                  Customer.SETRANGE("No.","Account No.");
+                                  IF NOT Customer.FINDFIRST THEN
+                                    ERROR(Text004,"Account No.");
+
+                                  WithdrawAmount := ABS(Amount);
+                                  WithdrawCounting := 1;
+                                END;
+
+               DataItemLinkReference=Payment Lines1;
+               DataItemLink=No.=FIELD(No.) }
+
+    { 1120022;4;Column  ;ABS_Amount_         ;
+               SourceExpr=ABS(Amount);
+               AutoFormatType=1;
+               AutoFormatExpr="Currency Code" }
+
+    { 1120060;4;Column  ;PrintCurrencyCode_Control1120060;
+               SourceExpr=PrintCurrencyCode }
+
+    { 1120028;4;Column  ;Customer_Name       ;
+               SourceExpr=Customer.Name }
+
+    { 1120030;4;Column  ;Payment_Lines__Bank_Branch_No__;
+               SourceExpr="Bank Branch No." }
+
+    { 1120031;4;Column  ;ABS_Amount__Control1120031;
+               SourceExpr=ABS(Amount);
+               AutoFormatType=1;
+               AutoFormatExpr="Currency Code" }
+
+    { 1120009;4;Column  ;Payment_Lines__Bank_Account_Name_;
+               SourceExpr="Bank Account Name" }
+
+    { 1120001;4;Column  ;Payment_Lines__Account_No__;
+               SourceExpr="Account No." }
+
+    { 1120061;4;Column  ;PrintCurrencyCode_Control1120061;
+               SourceExpr=PrintCurrencyCode }
+
+    { 1120003;4;Column  ;Payment_Lines__Agency_Code_;
+               SourceExpr="Agency Code" }
+
+    { 1120004;4;Column  ;Payment_Lines__Bank_Account_No__;
+               SourceExpr="Bank Account No." }
+
+    { 1120074;4;Column  ;Payment_Lines__SWIFT_Code_;
+               SourceExpr="SWIFT Code" }
+
+    { 1120075;4;Column  ;Payment_Lines_IBAN  ;
+               SourceExpr=IBAN }
+
+    { 1120036;4;Column  ;ABS_Amount__Control1120036;
+               SourceExpr=ABS(Amount);
+               AutoFormatType=1;
+               AutoFormatExpr="Currency Code" }
+
+    { 1120063;4;Column  ;PrintCurrencyCode_Control1120063;
+               SourceExpr=PrintCurrencyCode }
+
+    { 1120039;4;Column  ;WithdrawAmount      ;
+               SourceExpr=WithdrawAmount;
+               AutoFormatType=1;
+               AutoFormatExpr="Currency Code" }
+
+    { 1120059;4;Column  ;PrintWithdrawCounting;
+               DecimalPlaces=0:0;
+               SourceExpr=PrintWithdrawCounting }
+
+    { 1120064;4;Column  ;PrintCurrencyCode_Control1120064;
+               SourceExpr=PrintCurrencyCode }
+
+    { 1120034;4;Column  ;FORMAT_PostingDate_0_4__Control1120034;
+               SourceExpr=FORMAT(PostingDate,0,4) }
+
+    { 1120035;4;Column  ;CompanyInformation_City;
+               SourceExpr=CompanyInformation.City }
+
+    { 1120000;4;Column  ;WithdrawCounting    ;
+               SourceExpr=WithdrawCounting }
+
+    { 1120066;4;Column  ;Text001             ;
+               SourceExpr=Text001Lbl }
+
+    { 1120068;4;Column  ;Text002             ;
+               SourceExpr=Text002Lbl }
+
+    { 1170000007;4;Column;Payment_Lines_No_  ;
+               SourceExpr="No." }
+
+    { 1170000008;4;Column;Payment_Lines_Line_No_;
+               SourceExpr="Line No." }
+
+    { 1120002;4;Column  ;Payment_Lines__Account_No__Caption;
+               SourceExpr=FIELDCAPTION("Account No.") }
+
+    { 1120007;4;Column  ;Customer_NameCaption;
+               SourceExpr=Customer_NameCaptionLbl }
+
+    { 1120010;4;Column  ;Payment_Lines__Bank_Account_Name_Caption;
+               SourceExpr=FIELDCAPTION("Bank Account Name") }
+
+    { 1120013;4;Column  ;ABS_Amount__Control1120031Caption;
+               SourceExpr=ABS_Amount__Control1120031CaptionLbl }
+
+    { 1120005;4;Column  ;Bank_AccountCaption ;
+               SourceExpr=Bank_AccountCaptionLbl }
+
+    { 1120073;4;Column  ;Payment_Lines__SWIFT_Code_Caption;
+               SourceExpr=Payment_Lines__SWIFT_Code_CaptionLbl }
+
+    { 1120076;4;Column  ;Payment_Lines_IBANCaption;
+               SourceExpr=Payment_Lines_IBANCaptionLbl }
+
+    { 1120024;4;Column  ;ReportCaption       ;
+               SourceExpr=ReportCaptionLbl }
+
+    { 1120015;4;Column  ;ReportCaption_Control1120015;
+               SourceExpr=ReportCaption_Control1120015Lbl }
+
+    { 1120016;4;Column  ;TotalCaption        ;
+               SourceExpr=TotalCaptionLbl }
+
+    { 1120026;4;Column  ;Done_at__Caption    ;
+               SourceExpr=Done_at__CaptionLbl }
+
+    { 1120014;4;Column  ;On__Caption         ;
+               SourceExpr=On__CaptionLbl }
+
+    { 1120021;4;Column  ;Signature__Caption  ;
+               SourceExpr=Signature__CaptionLbl }
+
+    { 1120077;4;Column  ;DirectDebitMandateID_PaymentLines;
+               SourceExpr="Direct Debit Mandate ID" }
+
+    { 1120078;4;Column  ;DirectDebitMandateID_PaymentLines_Caption;
+               SourceExpr=FIELDCAPTION("Direct Debit Mandate ID") }
+
+  }
+  REQUESTPAGE
+  {
+    PROPERTIES
+    {
+    }
+    CONTROLS
+    {
+      { 1900000001;0;Container;
+                  ContainerType=ContentArea }
+
+      { 1900000002;1;Group  ;
+                  CaptionML=[ENU=Options;
+                             FRA=Options] }
+
+      { 1120002;2;Field     ;
+                  CaptionML=[ENU=Number of copies;
+                             FRA=Nombre de copies];
+                  SourceExpr=CopiesNumber }
+
+    }
+  }
+  LABELS
+  {
+  }
+  CODE
+  {
+    VAR
+      CompanyInformation@1120000 : Record 79;
+      Customer@1120002 : Record 18;
+      GLSetup@1120011 : Record 98;
+      PaymtHeader@1120010 : Record 10865;
+      PaymtManagt@1120003 : Codeunit 10860;
+      FormatAddress@1120004 : Codeunit 365;
+      BankAccountAddr@1120005 : ARRAY [8] OF Text[50];
+      CompanyAddr@1120006 : ARRAY [8] OF Text[50];
+      LoopsNumber@1120007 : Integer;
+      CopiesNumber@1120008 : Integer;
+      CopyText@1120009 : Text;
+      WithdrawAmount@1120014 : Decimal;
+      WithdrawCounting@1120015 : Decimal;
+      WithDrawNo@1120018 : Code[20];
+      PostingDate@1120020 : Date;
+      Text003@1120024 : TextConst 'ENU=COPY;FRA=COPIE';
+      Text004@1120025 : TextConst 'ENU=Customer %1 does not exist.;FRA=Le client %1 n''existe pas.';
+      Text005@1120001 : TextConst 'ENU=Withdraw Recapitulation %1;FRA=R‚capitulatif de pr‚lŠvement %1';
+      Text006@1120027 : TextConst 'ENU=You must specify a withdraw number.;FRA=Vous devez sp‚cifier un num‚ro de pr‚lŠvement.';
+      OutputNo@1120021 : Integer;
+      Text007@1120038 : TextConst 'ENU=Page %1;FRA=Page %1';
+      PaymtHeader__No__CaptionLbl@1125394 : TextConst 'ENU=Withdraw No.;FRA=Nø pr‚lŠvement';
+      CompanyInformation__Phone_No__CaptionLbl@1126659 : TextConst 'ENU=Phone No.;FRA=Nø t‚l‚phone';
+      CompanyInformation__Fax_No__CaptionLbl@1128309 : TextConst 'ENU=Fax No.;FRA=Nø t‚l‚copie';
+      CompanyInformation__VAT_Registration_No__CaptionLbl@1124122 : TextConst 'ENU=VAT Registration No.;FRA=Nø identif. intracomm.';
+      PrintCurrencyCodeCaptionLbl@1127566 : TextConst 'ENU=Currency Code;FRA=Code devise';
+      PaymtHeader__Bank_Branch_No__CaptionLbl@1128054 : TextConst 'ENU=Bank Branch No.;FRA=Code ‚tablissement';
+      PaymtHeader__Agency_Code_CaptionLbl@1128159 : TextConst 'ENU=Agency Code;FRA=Code agence';
+      PaymtHeader__Bank_Account_No__CaptionLbl@1129949 : TextConst 'ENU=Bank Account No.;FRA=Nø compte bancaire';
+      PaymtHeader__RIB_Key_CaptionLbl@1126602 : TextConst 'ENU=RIB Key;FRA=Cl‚ RIB';
+      PaymtHeader__National_Issuer_No__CaptionLbl@1128926 : TextConst 'ENU=National Issuer No.;FRA=Nø ‚metteur national';
+      PageCaptionLbl@1120143 : TextConst 'ENU=Page;FRA=Page';
+      PaymtHeader_IBANCaptionLbl@1121861 : TextConst '@@@={Locked};ENU=IBAN;FRA=IBAN';
+      PaymtHeader__SWIFT_Code_CaptionLbl@1129494 : TextConst 'ENU=SWIFT Code;FRA=Code SWIFT';
+      Text001Lbl@1123968 : TextConst 'ENU=" WITHDRAWS";FRA=" PRLÔVEMENTS"';
+      Text002Lbl@1123209 : TextConst 'ENU=" WITHDRAW";FRA=" PRLÔVEMENT"';
+      Customer_NameCaptionLbl@1124047 : TextConst 'ENU=Name;FRA=Nom';
+      ABS_Amount__Control1120031CaptionLbl@1127885 : TextConst 'ENU=Amount;FRA=Montant';
+      Bank_AccountCaptionLbl@1127489 : TextConst 'ENU=Bank Account;FRA=Compte bancaire';
+      Payment_Lines__SWIFT_Code_CaptionLbl@1121734 : TextConst 'ENU=SWIFT Code;FRA=Code SWIFT';
+      Payment_Lines_IBANCaptionLbl@1127723 : TextConst '@@@={Locked};ENU=IBAN;FRA=IBAN';
+      ReportCaptionLbl@1125274 : TextConst 'ENU=Report;FRA=tat';
+      ReportCaption_Control1120015Lbl@1129632 : TextConst 'ENU=Report;FRA=tat';
+      TotalCaptionLbl@1122937 : TextConst 'ENU=Total;FRA=Total';
+      Done_at__CaptionLbl@1121136 : TextConst 'ENU=Done at :;FRA=Fait … :';
+      On__CaptionLbl@1121363 : TextConst 'ENU=On :;FRA=Le :';
+      Signature__CaptionLbl@1129152 : TextConst 'ENU=Signature :;FRA=Signature :';
+
+    PROCEDURE PrintWithdrawCounting@1120002() : Text[30];
+    BEGIN
+      IF WithdrawCounting > 1 THEN
+        EXIT(FORMAT(WithdrawCounting) + Text001Lbl);
+
+      EXIT(FORMAT(WithdrawCounting) + Text002Lbl);
+    END;
+
+    PROCEDURE InitRequest@1120001(InitWithdrawNo@1120000 : Code[20];InitCopies@1120001 : Integer);
+    BEGIN
+      WithDrawNo := InitWithdrawNo;
+      CopiesNumber := InitCopies;
+    END;
+
+    PROCEDURE PrintCurrencyCode@1120000() : Code[10];
+    BEGIN
+      IF "Payment Lines1"."Currency Code" = '' THEN BEGIN
+        GLSetup.GET;
+        EXIT(GLSetup."LCY Code");
+      END;
+      EXIT("Payment Lines1"."Currency Code");
+    END;
+
+    BEGIN
+    END.
+  }
+  RDLDATA
+  {
+    <?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/reportdefinition">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:DataSourceID>92d58a04-af66-42d1-87c5-088bcaab09ea</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+      <Fields>
+        <Field Name="Payment_Lines1_No_">
+          <DataField>Payment_Lines1_No_</DataField>
+        </Field>
+        <Field Name="Payment_Lines1_Line_No_">
+          <DataField>Payment_Lines1_Line_No_</DataField>
+        </Field>
+        <Field Name="PaymtHeader__No__">
+          <DataField>PaymtHeader__No__</DataField>
+        </Field>
+        <Field Name="STRSUBSTNO_Text005_CopyText_">
+          <DataField>STRSUBSTNO_Text005_CopyText_</DataField>
+        </Field>
+        <Field Name="STRSUBSTNO__Page__1__FORMAT_CurrReport_PAGENO__">
+          <DataField>STRSUBSTNO__Page__1__FORMAT_CurrReport_PAGENO__</DataField>
+        </Field>
+        <Field Name="CompanyAddr_1_">
+          <DataField>CompanyAddr_1_</DataField>
+        </Field>
+        <Field Name="CompanyAddr_2_">
+          <DataField>CompanyAddr_2_</DataField>
+        </Field>
+        <Field Name="CompanyAddr_3_">
+          <DataField>CompanyAddr_3_</DataField>
+        </Field>
+        <Field Name="CompanyAddr_4_">
+          <DataField>CompanyAddr_4_</DataField>
+        </Field>
+        <Field Name="CompanyAddr_5_">
+          <DataField>CompanyAddr_5_</DataField>
+        </Field>
+        <Field Name="CompanyAddr_6_">
+          <DataField>CompanyAddr_6_</DataField>
+        </Field>
+        <Field Name="CompanyInformation__Phone_No__">
+          <DataField>CompanyInformation__Phone_No__</DataField>
+        </Field>
+        <Field Name="CompanyInformation__Fax_No__">
+          <DataField>CompanyInformation__Fax_No__</DataField>
+        </Field>
+        <Field Name="CompanyInformation__VAT_Registration_No__">
+          <DataField>CompanyInformation__VAT_Registration_No__</DataField>
+        </Field>
+        <Field Name="FORMAT_PostingDate_0_4_">
+          <DataField>FORMAT_PostingDate_0_4_</DataField>
+        </Field>
+        <Field Name="BankAccountAddr_4_">
+          <DataField>BankAccountAddr_4_</DataField>
+        </Field>
+        <Field Name="BankAccountAddr_5_">
+          <DataField>BankAccountAddr_5_</DataField>
+        </Field>
+        <Field Name="BankAccountAddr_6_">
+          <DataField>BankAccountAddr_6_</DataField>
+        </Field>
+        <Field Name="BankAccountAddr_7_">
+          <DataField>BankAccountAddr_7_</DataField>
+        </Field>
+        <Field Name="BankAccountAddr_3_">
+          <DataField>BankAccountAddr_3_</DataField>
+        </Field>
+        <Field Name="BankAccountAddr_2_">
+          <DataField>BankAccountAddr_2_</DataField>
+        </Field>
+        <Field Name="BankAccountAddr_1_">
+          <DataField>BankAccountAddr_1_</DataField>
+        </Field>
+        <Field Name="PrintCurrencyCode">
+          <DataField>PrintCurrencyCode</DataField>
+        </Field>
+        <Field Name="PaymtHeader__Bank_Branch_No__">
+          <DataField>PaymtHeader__Bank_Branch_No__</DataField>
+        </Field>
+        <Field Name="PaymtHeader__Agency_Code_">
+          <DataField>PaymtHeader__Agency_Code_</DataField>
+        </Field>
+        <Field Name="PaymtHeader__Bank_Account_No__">
+          <DataField>PaymtHeader__Bank_Account_No__</DataField>
+        </Field>
+        <Field Name="PaymtHeader__RIB_Key_">
+          <DataField>PaymtHeader__RIB_Key_</DataField>
+        </Field>
+        <Field Name="PaymtHeader__National_Issuer_No__">
+          <DataField>PaymtHeader__National_Issuer_No__</DataField>
+        </Field>
+        <Field Name="OutputNo">
+          <DataField>OutputNo</DataField>
+        </Field>
+        <Field Name="PaymtHeader_IBAN">
+          <DataField>PaymtHeader_IBAN</DataField>
+        </Field>
+        <Field Name="PaymtHeader__SWIFT_Code_">
+          <DataField>PaymtHeader__SWIFT_Code_</DataField>
+        </Field>
+        <Field Name="PageLoop_Number">
+          <DataField>PageLoop_Number</DataField>
+        </Field>
+        <Field Name="PaymtHeader__No__Caption">
+          <DataField>PaymtHeader__No__Caption</DataField>
+        </Field>
+        <Field Name="CompanyInformation__Phone_No__Caption">
+          <DataField>CompanyInformation__Phone_No__Caption</DataField>
+        </Field>
+        <Field Name="CompanyInformation__Fax_No__Caption">
+          <DataField>CompanyInformation__Fax_No__Caption</DataField>
+        </Field>
+        <Field Name="CompanyInformation__VAT_Registration_No__Caption">
+          <DataField>CompanyInformation__VAT_Registration_No__Caption</DataField>
+        </Field>
+        <Field Name="PrintCurrencyCodeCaption">
+          <DataField>PrintCurrencyCodeCaption</DataField>
+        </Field>
+        <Field Name="PaymtHeader__Bank_Branch_No__Caption">
+          <DataField>PaymtHeader__Bank_Branch_No__Caption</DataField>
+        </Field>
+        <Field Name="PaymtHeader__Agency_Code_Caption">
+          <DataField>PaymtHeader__Agency_Code_Caption</DataField>
+        </Field>
+        <Field Name="PaymtHeader__Bank_Account_No__Caption">
+          <DataField>PaymtHeader__Bank_Account_No__Caption</DataField>
+        </Field>
+        <Field Name="PaymtHeader__RIB_Key_Caption">
+          <DataField>PaymtHeader__RIB_Key_Caption</DataField>
+        </Field>
+        <Field Name="PaymtHeader__National_Issuer_No__Caption">
+          <DataField>PaymtHeader__National_Issuer_No__Caption</DataField>
+        </Field>
+        <Field Name="PageCaption">
+          <DataField>PageCaption</DataField>
+        </Field>
+        <Field Name="PaymtHeader_IBANCaption">
+          <DataField>PaymtHeader_IBANCaption</DataField>
+        </Field>
+        <Field Name="PaymtHeader__SWIFT_Code_Caption">
+          <DataField>PaymtHeader__SWIFT_Code_Caption</DataField>
+        </Field>
+        <Field Name="ABS_Amount_">
+          <DataField>ABS_Amount_</DataField>
+        </Field>
+        <Field Name="ABS_Amount_Format">
+          <DataField>ABS_Amount_Format</DataField>
+        </Field>
+        <Field Name="PrintCurrencyCode_Control1120060">
+          <DataField>PrintCurrencyCode_Control1120060</DataField>
+        </Field>
+        <Field Name="Customer_Name">
+          <DataField>Customer_Name</DataField>
+        </Field>
+        <Field Name="Payment_Lines__Bank_Branch_No__">
+          <DataField>Payment_Lines__Bank_Branch_No__</DataField>
+        </Field>
+        <Field Name="ABS_Amount__Control1120031">
+          <DataField>ABS_Amount__Control1120031</DataField>
+        </Field>
+        <Field Name="ABS_Amount__Control1120031Format">
+          <DataField>ABS_Amount__Control1120031Format</DataField>
+        </Field>
+        <Field Name="Payment_Lines__Bank_Account_Name_">
+          <DataField>Payment_Lines__Bank_Account_Name_</DataField>
+        </Field>
+        <Field Name="Payment_Lines__Account_No__">
+          <DataField>Payment_Lines__Account_No__</DataField>
+        </Field>
+        <Field Name="PrintCurrencyCode_Control1120061">
+          <DataField>PrintCurrencyCode_Control1120061</DataField>
+        </Field>
+        <Field Name="Payment_Lines__Agency_Code_">
+          <DataField>Payment_Lines__Agency_Code_</DataField>
+        </Field>
+        <Field Name="Payment_Lines__Bank_Account_No__">
+          <DataField>Payment_Lines__Bank_Account_No__</DataField>
+        </Field>
+        <Field Name="Payment_Lines__SWIFT_Code_">
+          <DataField>Payment_Lines__SWIFT_Code_</DataField>
+        </Field>
+        <Field Name="Payment_Lines_IBAN">
+          <DataField>Payment_Lines_IBAN</DataField>
+        </Field>
+        <Field Name="ABS_Amount__Control1120036">
+          <DataField>ABS_Amount__Control1120036</DataField>
+        </Field>
+        <Field Name="ABS_Amount__Control1120036Format">
+          <DataField>ABS_Amount__Control1120036Format</DataField>
+        </Field>
+        <Field Name="PrintCurrencyCode_Control1120063">
+          <DataField>PrintCurrencyCode_Control1120063</DataField>
+        </Field>
+        <Field Name="WithdrawAmount">
+          <DataField>WithdrawAmount</DataField>
+        </Field>
+        <Field Name="WithdrawAmountFormat">
+          <DataField>WithdrawAmountFormat</DataField>
+        </Field>
+        <Field Name="PrintWithdrawCounting">
+          <DataField>PrintWithdrawCounting</DataField>
+        </Field>
+        <Field Name="PrintCurrencyCode_Control1120064">
+          <DataField>PrintCurrencyCode_Control1120064</DataField>
+        </Field>
+        <Field Name="FORMAT_PostingDate_0_4__Control1120034">
+          <DataField>FORMAT_PostingDate_0_4__Control1120034</DataField>
+        </Field>
+        <Field Name="CompanyInformation_City">
+          <DataField>CompanyInformation_City</DataField>
+        </Field>
+        <Field Name="WithdrawCounting">
+          <DataField>WithdrawCounting</DataField>
+        </Field>
+        <Field Name="WithdrawCountingFormat">
+          <DataField>WithdrawCountingFormat</DataField>
+        </Field>
+        <Field Name="Text001">
+          <DataField>Text001</DataField>
+        </Field>
+        <Field Name="Text002">
+          <DataField>Text002</DataField>
+        </Field>
+        <Field Name="Payment_Lines_No_">
+          <DataField>Payment_Lines_No_</DataField>
+        </Field>
+        <Field Name="Payment_Lines_Line_No_">
+          <DataField>Payment_Lines_Line_No_</DataField>
+        </Field>
+        <Field Name="Payment_Lines__Account_No__Caption">
+          <DataField>Payment_Lines__Account_No__Caption</DataField>
+        </Field>
+        <Field Name="Customer_NameCaption">
+          <DataField>Customer_NameCaption</DataField>
+        </Field>
+        <Field Name="Payment_Lines__Bank_Account_Name_Caption">
+          <DataField>Payment_Lines__Bank_Account_Name_Caption</DataField>
+        </Field>
+        <Field Name="ABS_Amount__Control1120031Caption">
+          <DataField>ABS_Amount__Control1120031Caption</DataField>
+        </Field>
+        <Field Name="Bank_AccountCaption">
+          <DataField>Bank_AccountCaption</DataField>
+        </Field>
+        <Field Name="Payment_Lines__SWIFT_Code_Caption">
+          <DataField>Payment_Lines__SWIFT_Code_Caption</DataField>
+        </Field>
+        <Field Name="Payment_Lines_IBANCaption">
+          <DataField>Payment_Lines_IBANCaption</DataField>
+        </Field>
+        <Field Name="ReportCaption">
+          <DataField>ReportCaption</DataField>
+        </Field>
+        <Field Name="ReportCaption_Control1120015">
+          <DataField>ReportCaption_Control1120015</DataField>
+        </Field>
+        <Field Name="TotalCaption">
+          <DataField>TotalCaption</DataField>
+        </Field>
+        <Field Name="Done_at__Caption">
+          <DataField>Done_at__Caption</DataField>
+        </Field>
+        <Field Name="On__Caption">
+          <DataField>On__Caption</DataField>
+        </Field>
+        <Field Name="Signature__Caption">
+          <DataField>Signature__Caption</DataField>
+        </Field>
+        <Field Name="DirectDebitMandateID_PaymentLines">
+          <DataField>DirectDebitMandateID_PaymentLines</DataField>
+        </Field>
+        <Field Name="DirectDebitMandateID_PaymentLines_Caption">
+          <DataField>DirectDebitMandateID_PaymentLines_Caption</DataField>
+        </Field>
+      </Fields>
+      <rd:DataSetInfo>
+        <rd:DataSetName>DataSet</rd:DataSetName>
+        <rd:SchemaPath>Report.xsd</rd:SchemaPath>
+        <rd:TableName>Result</rd:TableName>
+      </rd:DataSetInfo>
+    </DataSet>
+  </DataSets>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <ReportItems>
+          <Tablix Name="list1">
+            <TablixBody>
+              <TablixColumns>
+                <TablixColumn>
+                  <Width>16.81389cm</Width>
+                </TablixColumn>
+              </TablixColumns>
+              <TablixRows>
+                <TablixRow>
+                  <Height>15.76411cm</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Rectangle Name="list1_Contents">
+                          <ReportItems>
+                            <Textbox Name="PaymtHeader__National_Issuer_No__Caption1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__National_Issuer_No__Caption.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>7.61737cm</Top>
+                              <Left>8.25397cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3cm</Width>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__RIB_Key_Caption1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__RIB_Key_Caption.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>7.19437cm</Top>
+                              <Left>8.27857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3cm</Width>
+                              <ZIndex>1</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__Bank_Account_No__Caption1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__Bank_Account_No__Caption.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>5.92537cm</Top>
+                              <Left>8.27857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3cm</Width>
+                              <ZIndex>2</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__Agency_Code_Caption1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__Agency_Code_Caption.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>5.50236cm</Top>
+                              <Left>8.27857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3cm</Width>
+                              <ZIndex>3</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__Bank_Branch_No__Caption1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__Bank_Branch_No__Caption.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>5.07937cm</Top>
+                              <Left>8.27857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3cm</Width>
+                              <ZIndex>4</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PrintCurrencyCodeCaption1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!PrintCurrencyCodeCaption.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                        <FontWeight>Bold</FontWeight>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>8.883cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3cm</Width>
+                              <ZIndex>5</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyInformation__VAT_Registration_No__Caption1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyInformation__VAT_Registration_No__Caption.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>4.65299cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>2.1cm</Width>
+                              <ZIndex>6</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyInformation__Fax_No__Caption1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyInformation__Fax_No__Caption.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>4.22999cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>2.1cm</Width>
+                              <ZIndex>7</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyInformation__Phone_No__Caption1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyInformation__Phone_No__Caption.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>3.807cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>2.1cm</Width>
+                              <ZIndex>8</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__No__Caption1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!PaymtHeader__No__Caption.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                        <FontWeight>Bold</FontWeight>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>8.45999cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3cm</Width>
+                              <ZIndex>9</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__National_Issuer_No__1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__National_Issuer_No__.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>7.61737cm</Top>
+                              <Left>11.42857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>5.07937cm</Width>
+                              <ZIndex>10</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__RIB_Key_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=FORMAT(Fields!PaymtHeader__RIB_Key_.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>7.19437cm</Top>
+                              <Left>11.42857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>5.07937cm</Width>
+                              <ZIndex>11</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__Bank_Account_No__1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__Bank_Account_No__.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>5.92537cm</Top>
+                              <Left>11.42857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>5.07937cm</Width>
+                              <ZIndex>12</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__Agency_Code_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__Agency_Code_.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>5.50236cm</Top>
+                              <Left>11.42857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>5.07937cm</Width>
+                              <ZIndex>13</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__Bank_Branch_No__1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__Bank_Branch_No__.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>5.07937cm</Top>
+                              <Left>11.42857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>5.07937cm</Width>
+                              <ZIndex>14</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PrintCurrencyCode1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!PrintCurrencyCode.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                        <FontWeight>Bold</FontWeight>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>8.883cm</Top>
+                              <Left>3.25873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3.15cm</Width>
+                              <ZIndex>15</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="BankAccountAddr_1_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!BankAccountAddr_1_.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                        <FontWeight>Bold</FontWeight>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>1.80006cm</Top>
+                              <Left>8.25397cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>8.25397cm</Width>
+                              <ZIndex>16</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="BankAccountAddr_2_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!BankAccountAddr_2_.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>2.22306cm</Top>
+                              <Left>8.25397cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>8.25397cm</Width>
+                              <ZIndex>17</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="BankAccountAddr_3_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!BankAccountAddr_3_.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>2.64607cm</Top>
+                              <Left>8.25397cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>8.25397cm</Width>
+                              <ZIndex>18</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="BankAccountAddr_7_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!BankAccountAddr_7_.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>4.33806cm</Top>
+                              <Left>8.25397cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>8.25397cm</Width>
+                              <ZIndex>19</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="BankAccountAddr_6_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!BankAccountAddr_6_.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>3.91507cm</Top>
+                              <Left>8.25397cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>8.25397cm</Width>
+                              <ZIndex>20</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="BankAccountAddr_5_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!BankAccountAddr_5_.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>3.49206cm</Top>
+                              <Left>8.25397cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>8.25397cm</Width>
+                              <ZIndex>21</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="BankAccountAddr_4_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!BankAccountAddr_4_.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>3.06906cm</Top>
+                              <Left>8.25397cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>8.25397cm</Width>
+                              <ZIndex>22</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="FORMAT_PostingDate_0_4_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!FORMAT_PostingDate_0_4_.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>8.57143cm</Top>
+                              <Left>11.42857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>5.07937cm</Width>
+                              <ZIndex>23</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyInformation__VAT_Registration_No__1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyInformation__VAT_Registration_No__.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>4.65299cm</Top>
+                              <Left>2.35873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>4.6254cm</Width>
+                              <ZIndex>24</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyInformation__Fax_No__1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyInformation__Fax_No__.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>4.22999cm</Top>
+                              <Left>2.35873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>4.6254cm</Width>
+                              <ZIndex>25</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyInformation__Phone_No__1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyInformation__Phone_No__.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>3.807cm</Top>
+                              <Left>2.35873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>4.6254cm</Width>
+                              <ZIndex>26</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyAddr_6_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyAddr_6_.Value )</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>3.38399cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>6.8754cm</Width>
+                              <ZIndex>27</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyAddr_5_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyAddr_5_.Value )</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>2.96099cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>6.8754cm</Width>
+                              <ZIndex>28</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyAddr_4_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyAddr_4_.Value )</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>2.538cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>6.8754cm</Width>
+                              <ZIndex>29</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyAddr_3_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyAddr_3_.Value )</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>2.11499cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>6.8754cm</Width>
+                              <ZIndex>30</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyAddr_2_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyAddr_2_.Value )</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>1.69199cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>6.8754cm</Width>
+                              <ZIndex>31</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="CompanyAddr_1_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!CompanyAddr_1_.Value )</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                        <FontWeight>Bold</FontWeight>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>1.269cm</Top>
+                              <Left>0.10873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>6.8754cm</Width>
+                              <ZIndex>32</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PageNumberTextBox">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!STRSUBSTNO__Page__1__FORMAT_CurrReport_PAGENO__.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>0.42299cm</Top>
+                              <Left>8.25397cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>1.68cm</Width>
+                              <ZIndex>33</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="PaymtHeader__No__1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=First(Fields!PaymtHeader__No__.Value)</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                        <FontWeight>Bold</FontWeight>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>8.45999cm</Top>
+                              <Left>3.25873cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3.15cm</Width>
+                              <ZIndex>34</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="STRSUBSTNO_Text005_CopyText_1">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!STRSUBSTNO_Text005_CopyText_.Value </Value>
+                                      <Style>
+                                        <FontWeight>Bold</FontWeight>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Left>8.25397cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>8.25397cm</Width>
+                              <ZIndex>35</ZIndex>
+                              <Style>
+                                <VerticalAlign>Middle</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Tablix Name="Table1">
+                              <TablixBody>
+                                <TablixColumns>
+                                  <TablixColumn>
+                                    <Width>1.65cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>3.35cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>3.45cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>1.35cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>1.5873cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>0.63492cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>1.5873cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>2.3cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>0.825cm</Width>
+                                  </TablixColumn>
+                                  <TablixColumn>
+                                    <Width>0.07937cm</Width>
+                                  </TablixColumn>
+                                </TablixColumns>
+                                <TablixRows>
+                                  <TablixRow>
+                                    <Height>0.63492cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__Account_No__Caption">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!Payment_Lines__Account_No__Caption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>34</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Customer_NameCaption">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!Customer_NameCaption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>33</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__Bank_Account_Name_Caption">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!Payment_Lines__Bank_Account_Name_Caption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>32</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Bank_AccountCaption">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!Bank_AccountCaption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>31</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>4</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="ABS_Amount__Control1120031Caption">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!ABS_Amount__Control1120031Caption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>30</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox12">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox12</rd:DefaultName>
+                                            <ZIndex>29</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.63492cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__SWIFT_Code_Caption2">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!DirectDebitMandateID_PaymentLines_Caption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                          <rd:Selected>true</rd:Selected>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__SWIFT_Code_Caption">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!Payment_Lines__SWIFT_Code_Caption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines_IBANCaption">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!Payment_Lines_IBANCaption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>4</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox18">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox18</rd:DefaultName>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox20">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox20</rd:DefaultName>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.423cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox2">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox2</rd:DefaultName>
+                                            <ZIndex>28</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>10</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.423cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__Account_No__">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!Payment_Lines__Account_No__.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>=IIF(IsNumeric(Fields!Payment_Lines__Account_No__.Value),"Right","Left")</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>8</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Customer_Name">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!Customer_Name.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>7</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>1pt</PaddingLeft>
+                                              <PaddingRight>1pt</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__Bank_Account_Name_">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!Payment_Lines__Bank_Account_Name_.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>6</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__Bank_Branch_No__">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!Payment_Lines__Bank_Branch_No__.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>5</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__Agency_Code_">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!Payment_Lines__Agency_Code_.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>4</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__Bank_Account_No__">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!Payment_Lines__Bank_Account_No__.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>3</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="ABS_Amount__Control1120031">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!ABS_Amount_.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <Format>=Fields!ABS_Amount__Control1120031Format.Value</Format>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>2</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="PrintCurrencyCode_Control1120061">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!PrintCurrencyCode_Control1120060.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>1</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox15">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox15</rd:DefaultName>
+                                            <Style>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.423cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__SWIFT_Code_2">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!DirectDebitMandateID_PaymentLines.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>=IIF(IsNumeric(Fields!Payment_Lines__SWIFT_Code_.Value),"Right","Left")</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines__SWIFT_Code_">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!Payment_Lines__SWIFT_Code_.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>=IIF(IsNumeric(Fields!Payment_Lines__SWIFT_Code_.Value),"Right","Left")</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Payment_Lines_IBAN">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Fields!Payment_Lines_IBAN.Value</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>4</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox23">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <Format>=Fields!ABS_Amount__Control1120031Format.Value</Format>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox23</rd:DefaultName>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox25">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox25</rd:DefaultName>
+                                            <Style>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.423cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox10">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox10</rd:DefaultName>
+                                            <ZIndex>9</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>10</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.423cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="TotalCaption">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!TotalCaption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>14</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox1">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Format(Sum(Fields!WithdrawCounting.Value)) + IIF(Sum(Fields!WithdrawCounting.Value) &gt; 1,Fields!Text001.Value,Fields!Text002.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox1</rd:DefaultName>
+                                            <ZIndex>13</ZIndex>
+                                            <Style>
+                                              <PaddingLeft>2cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>5</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="WithdrawAmount">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=Sum(Fields!WithdrawAmount.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                      <Format>=First(Fields!WithdrawAmountFormat.Value)</Format>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>12</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="PrintCurrencyCode_Control1120064">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!PrintCurrencyCode_Control1120060.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <FontWeight>Bold</FontWeight>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>11</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="NewPage">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=iif(Code.IsNewPage(Fields!OutputNo.Value),TRUE,FALSE)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                      <Color>Red</Color>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>10</ZIndex>
+                                            <Visibility>
+                                              <Hidden>true</Hidden>
+                                            </Visibility>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>0cm</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixCell>
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.423cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox27">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox27</rd:DefaultName>
+                                            <ZIndex>15</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>10</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.423cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="textbox35">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <rd:DefaultName>textbox35</rd:DefaultName>
+                                            <ZIndex>16</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>10</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.423cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="TextBox17">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>20</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>4</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Done_at__Caption">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!Done_at__Caption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>19</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="CompanyInformation_City">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!CompanyInformation_City.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Left</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>18</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.75cm</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="TextBox112">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>17</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.423cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="TextBox113">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>24</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>4</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="On__Caption">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!On__Caption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>23</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="FORMAT_PostingDate_0_4__Control1120034">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!FORMAT_PostingDate_0_4__Control1120034.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Left</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>22</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.75cm</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="TextBox118">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>21</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                    </TablixCells>
+                                  </TablixRow>
+                                  <TablixRow>
+                                    <Height>0.423cm</Height>
+                                    <TablixCells>
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="TextBox119">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>27</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>4</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="Signature__Caption">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value>=First(Fields!Signature__Caption.Value)</Value>
+                                                    <Style>
+                                                      <FontSize>9pt</FontSize>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>26</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Bottom</VerticalAlign>
+                                              <PaddingLeft>0.075cm</PaddingLeft>
+                                              <PaddingRight>0.075cm</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>2</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell>
+                                        <CellContents>
+                                          <Textbox Name="TextBox123">
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value />
+                                                    <Style />
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style />
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <ZIndex>25</ZIndex>
+                                            <Style>
+                                              <VerticalAlign>Middle</VerticalAlign>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                              <PaddingTop>2pt</PaddingTop>
+                                              <PaddingBottom>2pt</PaddingBottom>
+                                            </Style>
+                                          </Textbox>
+                                          <ColSpan>4</ColSpan>
+                                        </CellContents>
+                                      </TablixCell>
+                                      <TablixCell />
+                                      <TablixCell />
+                                      <TablixCell />
+                                    </TablixCells>
+                                  </TablixRow>
+                                </TablixRows>
+                              </TablixBody>
+                              <TablixColumnHierarchy>
+                                <TablixMembers>
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                  <TablixMember />
+                                </TablixMembers>
+                              </TablixColumnHierarchy>
+                              <TablixRowHierarchy>
+                                <TablixMembers>
+                                  <TablixMember>
+                                    <Group Name="Table1_Group">
+                                      <GroupExpressions>
+                                        <GroupExpression>=Fields!Payment_Lines1_No_.Value</GroupExpression>
+                                      </GroupExpressions>
+                                    </Group>
+                                    <TablixMembers>
+                                      <TablixMember>
+                                        <KeepWithGroup>After</KeepWithGroup>
+                                        <RepeatOnNewPage>true</RepeatOnNewPage>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                      <TablixMember>
+                                        <KeepWithGroup>After</KeepWithGroup>
+                                        <RepeatOnNewPage>true</RepeatOnNewPage>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                      <TablixMember>
+                                        <KeepWithGroup>After</KeepWithGroup>
+                                        <RepeatOnNewPage>true</RepeatOnNewPage>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                      <TablixMember>
+                                        <Group Name="Table1_Details_Group">
+                                          <DataElementName>Detail</DataElementName>
+                                        </Group>
+                                        <TablixMembers>
+                                          <TablixMember />
+                                          <TablixMember />
+                                        </TablixMembers>
+                                        <DataElementName>Detail_Collection</DataElementName>
+                                        <DataElementOutput>Output</DataElementOutput>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                      <TablixMember>
+                                        <KeepWithGroup>Before</KeepWithGroup>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                      <TablixMember>
+                                        <KeepWithGroup>Before</KeepWithGroup>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                      <TablixMember>
+                                        <KeepWithGroup>Before</KeepWithGroup>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                      <TablixMember>
+                                        <KeepWithGroup>Before</KeepWithGroup>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                      <TablixMember>
+                                        <KeepWithGroup>Before</KeepWithGroup>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                      <TablixMember>
+                                        <KeepWithGroup>Before</KeepWithGroup>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                      <TablixMember>
+                                        <KeepWithGroup>Before</KeepWithGroup>
+                                        <KeepTogether>true</KeepTogether>
+                                      </TablixMember>
+                                    </TablixMembers>
+                                  </TablixMember>
+                                </TablixMembers>
+                              </TablixRowHierarchy>
+                              <DataSetName>DataSet_Result</DataSetName>
+                              <Top>9.84127cm</Top>
+                              <Height>5.49984cm</Height>
+                              <Width>16.81389cm</Width>
+                              <ZIndex>36</ZIndex>
+                              <Style />
+                            </Tablix>
+                            <Textbox Name="textbox4">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__SWIFT_Code_Caption.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>6.77137cm</Top>
+                              <Left>8.27857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3cm</Width>
+                              <ZIndex>37</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="textbox3">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader__SWIFT_Code_.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>6.77137cm</Top>
+                              <Left>11.42857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>5.07937cm</Width>
+                              <ZIndex>38</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="textbox6">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader_IBANCaption.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style />
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>6.34921cm</Top>
+                              <Left>8.27857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>3cm</Width>
+                              <ZIndex>39</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                            <Textbox Name="textbox5">
+                              <KeepTogether>true</KeepTogether>
+                              <Paragraphs>
+                                <Paragraph>
+                                  <TextRuns>
+                                    <TextRun>
+                                      <Value>=Fields!PaymtHeader_IBAN.Value</Value>
+                                      <Style>
+                                        <FontSize>9pt</FontSize>
+                                      </Style>
+                                    </TextRun>
+                                  </TextRuns>
+                                  <Style>
+                                    <TextAlign>Left</TextAlign>
+                                  </Style>
+                                </Paragraph>
+                              </Paragraphs>
+                              <Top>6.34837cm</Top>
+                              <Left>11.42857cm</Left>
+                              <Height>0.423cm</Height>
+                              <Width>5.07937cm</Width>
+                              <ZIndex>40</ZIndex>
+                              <Style>
+                                <VerticalAlign>Bottom</VerticalAlign>
+                              </Style>
+                            </Textbox>
+                          </ReportItems>
+                          <KeepTogether>true</KeepTogether>
+                          <Style />
+                        </Rectangle>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+              </TablixRows>
+            </TablixBody>
+            <TablixColumnHierarchy>
+              <TablixMembers>
+                <TablixMember />
+              </TablixMembers>
+            </TablixColumnHierarchy>
+            <TablixRowHierarchy>
+              <TablixMembers>
+                <TablixMember>
+                  <Group Name="list1_Details_Group">
+                    <GroupExpressions>
+                      <GroupExpression>=Fields!OutputNo.Value</GroupExpression>
+                    </GroupExpressions>
+                    <PageBreak>
+                      <BreakLocation>Between</BreakLocation>
+                    </PageBreak>
+                  </Group>
+                  <DataElementOutput>Output</DataElementOutput>
+                  <KeepTogether>true</KeepTogether>
+                </TablixMember>
+              </TablixMembers>
+            </TablixRowHierarchy>
+            <DataSetName>DataSet_Result</DataSetName>
+            <PageBreak>
+              <BreakLocation>End</BreakLocation>
+            </PageBreak>
+            <Height>15.76411cm</Height>
+            <Width>16.81389cm</Width>
+            <Style />
+          </Tablix>
+        </ReportItems>
+        <Height>15.76411cm</Height>
+        <Style />
+      </Body>
+      <Width>16.81389cm</Width>
+      <Page>
+        <PageHeight>29.7cm</PageHeight>
+        <PageWidth>21cm</PageWidth>
+        <InteractiveHeight>11in</InteractiveHeight>
+        <InteractiveWidth>8.5in</InteractiveWidth>
+        <LeftMargin>1.5cm</LeftMargin>
+        <TopMargin>2cm</TopMargin>
+        <BottomMargin>2cm</BottomMargin>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+
+Shared Data as Object
+
+Public Function GetData(Num as Integer) as Object
+  Return Cstr(Choose(Num, Split(Cstr(Data),Chr(177))))
+End Function
+
+Public Function SetData(NewData as Object)
+  If NewData &lt;&gt; "" Then
+      Data = NewData
+  End If
+End Function
+
+Shared offset as Integer
+Shared newPage as Object
+Shared currentgroup1 as Object
+Public Function GetGroupPageNumber(NewPage as Boolean, pagenumber as Integer) as Object
+  If NewPage
+    offset = pagenumber - 1
+  End If
+  Return pagenumber - offset
+End Function
+
+Public Function IsNewPage(group1 as Object) As Boolean 
+  newPage = FALSE
+  If Not (group1 = currentgroup1)
+    newPage = TRUE
+    currentgroup1 = group1
+  End If
+  Return newPage
+End Function</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>03c00d17-f8d7-49c7-b925-f347d24bb84d</rd:ReportID>
+</Report>
+    END_OF_RDLDATA
+  }
+}
+

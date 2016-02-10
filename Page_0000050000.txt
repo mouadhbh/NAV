@@ -1,0 +1,1328 @@
+OBJECT Page 50000 Item List veh
+{
+  OBJECT-PROPERTIES
+  {
+    Date=05/02/16;
+    Time=14:19:37;
+    Modified=Yes;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Item List;
+               FRA=Liste des articles];
+    SourceTable=Table27;
+    PageType=List;
+    CardPageID=Item Card veh;
+    OnOpenPage=VAR
+                 CRMIntegrationManagement@1000 : Codeunit 5330;
+               BEGIN
+                 CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
+               END;
+
+    OnAfterGetRecord=BEGIN
+                       SetSocialListeningFactboxVisibility
+                     END;
+
+    OnAfterGetCurrRecord=VAR
+                           CRMCouplingManagement@1001 : Codeunit 5331;
+                         BEGIN
+                           SetSocialListeningFactboxVisibility;
+
+                           CRMIsCoupledToRecord :=
+                             CRMCouplingManagement.IsRecordCoupledToCRM(RECORDID) AND CRMIntegrationEnabled;
+
+                           OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RECORDID)
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000003;0 ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 10      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Availability;
+                                 FRA=DisponibilitÇ];
+                      Image=Item }
+      { 73      ;2   ;Action    ;
+                      AccessByPermission=TableData 14=R;
+                      CaptionML=[ENU=Items b&y Location;
+                                 FRA=Articles &par magasin];
+                      Image=ItemAvailbyLoc;
+                      OnAction=VAR
+                                 ItemsByLocation@1001 : Page 491;
+                               BEGIN
+                                 ItemsByLocation.SETRECORD(Rec);
+                                 ItemsByLocation.RUN;
+                               END;
+                                }
+      { 79      ;2   ;ActionGroup;
+                      CaptionML=[ENU=&Item Availability by;
+                                 FRA=Disponibi&litÇ article par];
+                      Image=ItemAvailability }
+      { 5       ;3   ;Action    ;
+                      Name=<Action5>;
+                      CaptionML=[ENU=Event;
+                                 FRA=êvÇnement];
+                      Image=Event;
+                      OnAction=BEGIN
+                                 ItemAvailFormsMgt.ShowItemAvailFromItem(Rec,ItemAvailFormsMgt.ByEvent);
+                               END;
+                                }
+      { 21      ;3   ;Action    ;
+                      CaptionML=[ENU=Period;
+                                 FRA=PÇriode];
+                      RunObject=Page 157;
+                      RunPageLink=No.=FIELD(No.),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Location Filter=FIELD(Location Filter),
+                                  Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                                  Variant Filter=FIELD(Variant Filter);
+                      Image=Period }
+      { 80      ;3   ;Action    ;
+                      CaptionML=[ENU=Variant;
+                                 FRA=Variante];
+                      RunObject=Page 5414;
+                      RunPageLink=No.=FIELD(No.),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Location Filter=FIELD(Location Filter),
+                                  Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                                  Variant Filter=FIELD(Variant Filter);
+                      Image=ItemVariant }
+      { 78      ;3   ;Action    ;
+                      CaptionML=[ENU=Location;
+                                 FRA=Magasin];
+                      RunObject=Page 492;
+                      RunPageLink=No.=FIELD(No.),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Location Filter=FIELD(Location Filter),
+                                  Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                                  Variant Filter=FIELD(Variant Filter);
+                      Image=Warehouse }
+      { 13      ;3   ;Action    ;
+                      CaptionML=[ENU=BOM Level;
+                                 FRA=Niveau nomenclature];
+                      Image=BOMLevel;
+                      OnAction=BEGIN
+                                 ItemAvailFormsMgt.ShowItemAvailFromItem(Rec,ItemAvailFormsMgt.ByBOM);
+                               END;
+                                }
+      { 19      ;3   ;Action    ;
+                      CaptionML=[ENU=Timeline;
+                                 FRA=Chronologie];
+                      Image=Timeline;
+                      OnAction=BEGIN
+                                 ShowTimelineFromItem(Rec);
+                               END;
+                                }
+      { 83      ;1   ;ActionGroup;
+                      Name=ActionGroupCRM;
+                      CaptionML=[ENU=Dynamics CRM;
+                                 FRA=Dynamics CRM];
+                      Visible=CRMIntegrationEnabled }
+      { 75      ;2   ;Action    ;
+                      Name=CRMGoToProduct;
+                      CaptionML=[ENU=Product;
+                                 FRA=Produit];
+                      ToolTipML=[ENU=Open the coupled Microsoft Dynamics CRM product.;
+                                 FRA=Ouvrez le produit Microsoft Dynamics CRM couplÇ.];
+                      Image=CoupledItem;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.ShowCRMEntityFromRecordID(RECORDID);
+                               END;
+                                }
+      { 72      ;2   ;Action    ;
+                      Name=CRMSynchronizeNow;
+                      AccessByPermission=TableData 5331=IM;
+                      CaptionML=[ENU=Synchronize Now;
+                                 FRA=Synchroniser maintenant];
+                      ToolTipML=[ENU=Send updated data to Microsoft Dynamics CRM.;
+                                 FRA=Envoyez des donnÇes mises Ö jour Ö Microsoft Dynamics CRM.];
+                      Image=Refresh;
+                      OnAction=VAR
+                                 Item@1000 : Record 27;
+                                 CRMIntegrationManagement@1001 : Codeunit 5330;
+                                 ItemRecordRef@1003 : RecordRef;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(Item);
+                                 Item.NEXT;
+
+                                 IF Item.COUNT = 1 THEN
+                                   CRMIntegrationManagement.UpdateOneNow(Item.RECORDID)
+                                 ELSE BEGIN
+                                   ItemRecordRef.GETTABLE(Item);
+                                   CRMIntegrationManagement.UpdateMultipleNow(ItemRecordRef);
+                                 END
+                               END;
+                                }
+      { 70      ;2   ;ActionGroup;
+                      Name=Coupling;
+                      CaptionML=[@@@=Coupling is a noun;
+                                 ENU=Coupling;
+                                 FRA=Couplage];
+                      ToolTipML=[ENU=Create, change, or delete a coupling between the Microsoft Dynamics NAV record and a Microsoft Dynamics CRM record.;
+                                 FRA=CrÇez, modifiez ou supprimez un couplage entre l'enregistrement Microsoft Dynamics NAV et un enregistrement Microsoft Dynamics CRM.];
+                      Image=LinkAccount }
+      { 68      ;3   ;Action    ;
+                      Name=ManageCRMCoupling;
+                      AccessByPermission=TableData 5331=IM;
+                      CaptionML=[ENU=Set Up Coupling;
+                                 FRA=Configurer le couplage];
+                      ToolTipML=[ENU=Create or modify the coupling to a Microsoft Dynamics CRM product.;
+                                 FRA=CrÇez ou modifiez le couplage avec un produit Microsoft Dynamics CRM.];
+                      Image=LinkAccount;
+                      OnAction=VAR
+                                 CRMIntegrationManagement@1000 : Codeunit 5330;
+                               BEGIN
+                                 CRMIntegrationManagement.CreateOrUpdateCoupling(RECORDID);
+                               END;
+                                }
+      { 66      ;3   ;Action    ;
+                      Name=DeleteCRMCoupling;
+                      AccessByPermission=TableData 5331=IM;
+                      CaptionML=[ENU=Delete Coupling;
+                                 FRA=Supprimer le couplage];
+                      ToolTipML=[ENU=Delete the coupling to a Microsoft Dynamics CRM product.;
+                                 FRA=Supprimez le couplage avec un produit Microsoft Dynamics CRM.];
+                      Enabled=CRMIsCoupledToRecord;
+                      Image=UnLinkAccount;
+                      OnAction=VAR
+                                 CRMCouplingManagement@1000 : Codeunit 5331;
+                               BEGIN
+                                 CRMCouplingManagement.RemoveCoupling(RECORDID);
+                               END;
+                                }
+      { 64      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Master Data;
+                                 FRA=DonnÇes principales];
+                      Image=DataEntry }
+      { 25      ;2   ;Action    ;
+                      CaptionML=[ENU=&Units of Measure;
+                                 FRA=&UnitÇs];
+                      RunObject=Page 5404;
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=UnitOfMeasure }
+      { 30      ;2   ;Action    ;
+                      CaptionML=[ENU=Va&riants;
+                                 FRA=&Variantes];
+                      RunObject=Page 5401;
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=ItemVariant }
+      { 94      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      Image=Dimensions }
+      { 184     ;3   ;Action    ;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions-Single;
+                                 FRA=Affectations - Simples];
+                      RunObject=Page 540;
+                      RunPageLink=Table ID=CONST(27),
+                                  No.=FIELD(No.);
+                      Image=Dimensions }
+      { 93      ;3   ;Action    ;
+                      AccessByPermission=TableData 348=R;
+                      CaptionML=[ENU=Dimensions-&Multiple;
+                                 FRA=Affectations - &Multiples];
+                      Image=DimensionSets;
+                      OnAction=VAR
+                                 Item@1001 : Record 27;
+                                 DefaultDimMultiple@1002 : Page 542;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(Item);
+                                 DefaultDimMultiple.SetMultiItem(Item);
+                                 DefaultDimMultiple.RUNMODAL;
+                               END;
+                                }
+      { 500     ;2   ;Action    ;
+                      CaptionML=[ENU=Substituti&ons;
+                                 FRA=Articles de su&bstitution];
+                      RunObject=Page 5716;
+                      RunPageLink=Type=CONST(Item),
+                                  No.=FIELD(No.);
+                      Image=ItemSubstitution }
+      { 82      ;2   ;Action    ;
+                      CaptionML=[ENU=Cross Re&ferences;
+                                 FRA=&RÇfÇrences externes];
+                      RunObject=Page 5721;
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=Change }
+      { 28      ;2   ;Action    ;
+                      CaptionML=[ENU=E&xtended Texts;
+                                 FRA=Te&xtes Çtendus];
+                      RunObject=Page 391;
+                      RunPageView=SORTING(Table Name,No.,Language Code,All Language Codes,Starting Date,Ending Date);
+                      RunPageLink=Table Name=CONST(Item),
+                                  No.=FIELD(No.);
+                      Image=Text }
+      { 27      ;2   ;Action    ;
+                      CaptionML=[ENU=Translations;
+                                 FRA=Traductions];
+                      RunObject=Page 35;
+                      RunPageLink=Item No.=FIELD(No.),
+                                  Variant Code=CONST();
+                      Image=Translations }
+      { 20      ;2   ;Action    ;
+                      CaptionML=[ENU=&Picture;
+                                 FRA=&Image];
+                      RunObject=Page 346;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Location Filter=FIELD(Location Filter),
+                                  Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                                  Variant Filter=FIELD(Variant Filter);
+                      Image=Picture }
+      { 121     ;2   ;Action    ;
+                      CaptionML=[ENU=Identifiers;
+                                 FRA=Identifiants];
+                      RunObject=Page 7706;
+                      RunPageView=SORTING(Item No.,Variant Code,Unit of Measure Code);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=BarCode }
+      { 54      ;1   ;ActionGroup;
+                      Name=Assembly/Production;
+                      CaptionML=[ENU=Assembly/Production;
+                                 FRA=Assemblage/Production];
+                      Image=Production }
+      { 52      ;2   ;Action    ;
+                      CaptionML=[ENU=Structure;
+                                 FRA=Structure];
+                      Image=Hierarchy;
+                      OnAction=VAR
+                                 BOMStructure@1000 : Page 5870;
+                               BEGIN
+                                 BOMStructure.InitItem(Rec);
+                                 BOMStructure.RUN;
+                               END;
+                                }
+      { 50      ;2   ;Action    ;
+                      CaptionML=[ENU=Cost Shares;
+                                 FRA=Coñts totaux];
+                      Image=CostBudget;
+                      OnAction=VAR
+                                 BOMCostShares@1000 : Page 5872;
+                               BEGIN
+                                 BOMCostShares.InitItem(Rec);
+                                 BOMCostShares.RUN;
+                               END;
+                                }
+      { 49      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Assemb&ly;
+                                 FRA=Assemb&lage];
+                      Image=AssemblyBOM }
+      { 48      ;3   ;Action    ;
+                      Name=<Action32>;
+                      CaptionML=[ENU=Assembly BOM;
+                                 FRA=Nomenclature d'ÇlÇment d'assemblage];
+                      RunObject=Page 36;
+                      RunPageLink=Parent Item No.=FIELD(No.);
+                      Image=BOM }
+      { 47      ;3   ;Action    ;
+                      CaptionML=[ENU=Where-Used;
+                                 FRA=Cas d'emploi];
+                      RunObject=Page 37;
+                      RunPageView=SORTING(Type,No.);
+                      RunPageLink=Type=CONST(Item),
+                                  No.=FIELD(No.);
+                      Image=Track }
+      { 46      ;3   ;Action    ;
+                      AccessByPermission=TableData 90=R;
+                      CaptionML=[ENU=Calc. Stan&dard Cost;
+                                 FRA=Calculer coñt stan&dard];
+                      Image=CalculateCost;
+                      OnAction=BEGIN
+                                 CalculateStdCost.CalcItem("No.",TRUE);
+                               END;
+                                }
+      { 44      ;3   ;Action    ;
+                      AccessByPermission=TableData 90=R;
+                      CaptionML=[ENU=Calc. Unit Price;
+                                 FRA=Calculer prix unitaire];
+                      Image=SuggestItemPrice;
+                      OnAction=BEGIN
+                                 CalculateStdCost.CalcAssemblyItemPrice("No.");
+                               END;
+                                }
+      { 41      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Production;
+                                 FRA=Fabrication];
+                      Image=Production }
+      { 32      ;3   ;Action    ;
+                      CaptionML=[ENU=Production BOM;
+                                 FRA=Nomenclature de production];
+                      RunObject=Page 99000786;
+                      RunPageLink=No.=FIELD(Production BOM No.);
+                      Image=BOM }
+      { 29      ;3   ;Action    ;
+                      AccessByPermission=TableData 90=R;
+                      CaptionML=[ENU=Where-Used;
+                                 FRA=Cas d'emploi];
+                      Image=Where-Used;
+                      OnAction=VAR
+                                 ProdBOMWhereUsed@1001 : Page 99000811;
+                               BEGIN
+                                 ProdBOMWhereUsed.SetItem(Rec,WORKDATE);
+                                 ProdBOMWhereUsed.RUNMODAL;
+                               END;
+                                }
+      { 24      ;3   ;Action    ;
+                      AccessByPermission=TableData 99000771=R;
+                      CaptionML=[ENU=Calc. Stan&dard Cost;
+                                 FRA=Calculer coñt stan&dard];
+                      Image=CalculateCost;
+                      OnAction=BEGIN
+                                 CalculateStdCost.CalcItem("No.",FALSE);
+                               END;
+                                }
+      { 56      ;1   ;ActionGroup;
+                      CaptionML=[ENU=History;
+                                 FRA=Historique];
+                      Image=History }
+      { 84      ;2   ;ActionGroup;
+                      CaptionML=[ENU=E&ntries;
+                                 FRA=ê&critures];
+                      Image=Entries }
+      { 14      ;3   ;Action    ;
+                      ShortCutKey=Ctrl+F7;
+                      CaptionML=[ENU=Ledger E&ntries;
+                                 FRA=ê&critures comptables];
+                      RunObject=Page 38;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Promoted=No;
+                      Image=ItemLedger;
+                      PromotedCategory=Process }
+      { 77      ;3   ;Action    ;
+                      CaptionML=[ENU=&Reservation Entries;
+                                 FRA=êcritures &rÇservation];
+                      RunObject=Page 497;
+                      RunPageView=SORTING(Item No.,Variant Code,Location Code,Reservation Status);
+                      RunPageLink=Reservation Status=CONST(Reservation),
+                                  Item No.=FIELD(No.);
+                      Image=ReservationLedger }
+      { 23      ;3   ;Action    ;
+                      CaptionML=[ENU=&Phys. Inventory Ledger Entries;
+                                 FRA=êcritures comptables &inventaire];
+                      RunObject=Page 390;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=PhysicalInventoryLedger }
+      { 5800    ;3   ;Action    ;
+                      CaptionML=[ENU=&Value Entries;
+                                 FRA=êcritures &valeur];
+                      RunObject=Page 5802;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=ValueLedger }
+      { 6500    ;3   ;Action    ;
+                      CaptionML=[ENU=Item &Tracking Entries;
+                                 FRA=&Ecritures traáabilitÇ];
+                      Image=ItemTrackingLedger;
+                      OnAction=VAR
+                                 ItemTrackingDocMgt@1000 : Codeunit 6503;
+                               BEGIN
+                                 ItemTrackingDocMgt.ShowItemTrackingForMasterData(3,'',"No.",'','','','');
+                               END;
+                                }
+      { 7       ;3   ;Action    ;
+                      CaptionML=[ENU=&Warehouse Entries;
+                                 FRA=ê&critures entrepìt];
+                      RunObject=Page 7318;
+                      RunPageView=SORTING(Item No.,Bin Code,Location Code,Variant Code,Unit of Measure Code,Lot No.,Serial No.,Entry Type,Dedicated);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=BinLedger }
+      { 85      ;2   ;ActionGroup;
+                      CaptionML=[ENU=Statistics;
+                                 FRA=Statistiques];
+                      Image=Statistics }
+      { 16      ;3   ;Action    ;
+                      ShortCutKey=F7;
+                      CaptionML=[ENU=Statistics;
+                                 FRA=Statistiques];
+                      Promoted=Yes;
+                      Image=Statistics;
+                      PromotedCategory=Process;
+                      OnAction=VAR
+                                 ItemStatistics@1001 : Page 5827;
+                               BEGIN
+                                 ItemStatistics.SetItem(Rec);
+                                 ItemStatistics.RUNMODAL;
+                               END;
+                                }
+      { 17      ;3   ;Action    ;
+                      CaptionML=[ENU=Entry Statistics;
+                                 FRA=Statistiques Çcritures];
+                      RunObject=Page 304;
+                      RunPageLink=No.=FIELD(No.),
+                                  Date Filter=FIELD(Date Filter),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Location Filter=FIELD(Location Filter),
+                                  Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                                  Variant Filter=FIELD(Variant Filter);
+                      Image=EntryStatistics }
+      { 22      ;3   ;Action    ;
+                      CaptionML=[ENU=T&urnover;
+                                 FRA=&Rotation];
+                      RunObject=Page 158;
+                      RunPageLink=No.=FIELD(No.),
+                                  Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                                  Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                                  Location Filter=FIELD(Location Filter),
+                                  Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                                  Variant Filter=FIELD(Variant Filter);
+                      Image=Turnover }
+      { 15      ;2   ;Action    ;
+                      CaptionML=[ENU=Co&mments;
+                                 FRA=Co&mmentaires];
+                      RunObject=Page 124;
+                      RunPageLink=Table Name=CONST(Item),
+                                  No.=FIELD(No.);
+                      Image=ViewComments }
+      { 33      ;1   ;ActionGroup;
+                      CaptionML=[ENU=S&ales;
+                                 FRA=&Ventes];
+                      Image=Sales }
+      { 36      ;2   ;Action    ;
+                      CaptionML=[ENU=Prices;
+                                 FRA=Prix];
+                      RunObject=Page 7002;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=Price }
+      { 34      ;2   ;Action    ;
+                      CaptionML=[ENU=Line Discounts;
+                                 FRA=Remises ligne];
+                      RunObject=Page 7004;
+                      RunPageView=SORTING(Type,Code);
+                      RunPageLink=Type=CONST(Item),
+                                  Code=FIELD(No.);
+                      Image=LineDiscount }
+      { 124     ;2   ;Action    ;
+                      CaptionML=[ENU=Prepa&yment Percentages;
+                                 FRA=Pourcentages acom&pte];
+                      RunObject=Page 664;
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=PrepaymentPercentages }
+      { 37      ;2   ;Action    ;
+                      CaptionML=[ENU=Orders;
+                                 FRA=Commandes];
+                      RunObject=Page 48;
+                      RunPageView=SORTING(Document Type,Type,No.);
+                      RunPageLink=Type=CONST(Item),
+                                  No.=FIELD(No.);
+                      Image=Document }
+      { 114     ;2   ;Action    ;
+                      CaptionML=[ENU=Returns Orders;
+                                 FRA=Retours];
+                      RunObject=Page 6633;
+                      RunPageView=SORTING(Document Type,Type,No.);
+                      RunPageLink=Type=CONST(Item),
+                                  No.=FIELD(No.);
+                      Image=ReturnOrder }
+      { 38      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Purchases;
+                                 FRA=Ac&hats];
+                      Image=Purchasing }
+      { 118     ;2   ;Action    ;
+                      CaptionML=[ENU=Ven&dors;
+                                 FRA=&Fournisseurs];
+                      RunObject=Page 114;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=Vendor }
+      { 39      ;2   ;Action    ;
+                      CaptionML=[ENU=Prices;
+                                 FRA=Prix];
+                      RunObject=Page 7012;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=Price }
+      { 42      ;2   ;Action    ;
+                      CaptionML=[ENU=Line Discounts;
+                                 FRA=Remises ligne];
+                      RunObject=Page 7014;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=LineDiscount }
+      { 125     ;2   ;Action    ;
+                      CaptionML=[ENU=Prepa&yment Percentages;
+                                 FRA=Pourcentages acom&pte];
+                      RunObject=Page 665;
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=PrepaymentPercentages }
+      { 40      ;2   ;Action    ;
+                      CaptionML=[ENU=Orders;
+                                 FRA=Commandes];
+                      RunObject=Page 56;
+                      RunPageView=SORTING(Document Type,Type,No.);
+                      RunPageLink=Type=CONST(Item),
+                                  No.=FIELD(No.);
+                      Image=Document }
+      { 115     ;2   ;Action    ;
+                      CaptionML=[ENU=Return Orders;
+                                 FRA=Retours];
+                      RunObject=Page 6643;
+                      RunPageView=SORTING(Document Type,Type,No.);
+                      RunPageLink=Type=CONST(Item),
+                                  No.=FIELD(No.);
+                      Image=ReturnOrder }
+      { 76      ;2   ;Action    ;
+                      CaptionML=[ENU=Nonstoc&k Items;
+                                 FRA=Articles &non stockÇs];
+                      RunObject=Page 5726;
+                      Image=NonStockItem }
+      { 58      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Warehouse;
+                                 FRA=Entrepìt];
+                      Image=Warehouse }
+      { 116     ;2   ;Action    ;
+                      CaptionML=[ENU=&Bin Contents;
+                                 FRA=C&ontenu emplacement];
+                      RunObject=Page 7379;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=BinContent }
+      { 81      ;2   ;Action    ;
+                      CaptionML=[ENU=Stockkeepin&g Units;
+                                 FRA=Point de stoc&k];
+                      RunObject=Page 5701;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=SKU }
+      { 60      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Service;
+                                 FRA=Service];
+                      Image=ServiceItem }
+      { 103     ;2   ;Action    ;
+                      CaptionML=[ENU=Ser&vice Items;
+                                 FRA=&Articles de service];
+                      RunObject=Page 5988;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Image=ServiceItem }
+      { 11      ;2   ;Action    ;
+                      AccessByPermission=TableData 5900=R;
+                      CaptionML=[ENU=Troubleshooting;
+                                 FRA=Incident];
+                      Image=Troubleshoot;
+                      OnAction=VAR
+                                 TroubleshootingHeader@1000 : Record 5943;
+                               BEGIN
+                                 TroubleshootingHeader.ShowForItem(Rec);
+                               END;
+                                }
+      { 105     ;2   ;Action    ;
+                      CaptionML=[ENU=Troubleshooting Setup;
+                                 FRA=Paramätres incidents];
+                      RunObject=Page 5993;
+                      RunPageLink=Type=CONST(Item),
+                                  No.=FIELD(No.);
+                      Image=Troubleshoot }
+      { 62      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Resources;
+                                 FRA=Ressources];
+                      Image=Resource }
+      { 107     ;2   ;ActionGroup;
+                      CaptionML=[ENU=R&esource;
+                                 FRA=Re&ssource];
+                      Image=Resource }
+      { 108     ;3   ;Action    ;
+                      CaptionML=[ENU=Resource &Skills;
+                                 FRA=&CompÇtences ressources];
+                      RunObject=Page 6019;
+                      RunPageLink=Type=CONST(Item),
+                                  No.=FIELD(No.);
+                      Image=ResourceSkills }
+      { 109     ;3   ;Action    ;
+                      AccessByPermission=TableData 5900=R;
+                      CaptionML=[ENU=Skilled R&esources;
+                                 FRA=&Ressources compÇtentes];
+                      Image=ResourceSkills;
+                      OnAction=VAR
+                                 ResourceSkill@1001 : Record 5956;
+                               BEGIN
+                                 CLEAR(SkilledResourceList);
+                                 SkilledResourceList.Initialize(ResourceSkill.Type::Item,"No.",Description);
+                                 SkilledResourceList.RUNMODAL;
+                               END;
+                                }
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 88      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Request Approval;
+                                 FRA=Approbation demande achat];
+                      Image=SendApprovalRequest }
+      { 87      ;2   ;Action    ;
+                      Name=SendApprovalRequest;
+                      CaptionML=[ENU=Send A&pproval Request;
+                                 FRA=Envoyer demande d'a&pprobation];
+                      Enabled=NOT OpenApprovalEntriesExist;
+                      Image=SendApprovalRequest;
+                      OnAction=VAR
+                                 ApprovalsMgmt@1001 : Codeunit 1535;
+                               BEGIN
+                                 IF ApprovalsMgmt.CheckItemApprovalsWorkflowEnabled(Rec) THEN
+                                   ApprovalsMgmt.OnSendItemForApproval(Rec);
+                               END;
+                                }
+      { 86      ;2   ;Action    ;
+                      Name=CancelApprovalRequest;
+                      CaptionML=[ENU=Cancel Approval Re&quest;
+                                 FRA=Annuler demande d'appro&bation];
+                      Enabled=OpenApprovalEntriesExist;
+                      Image=Cancel;
+                      OnAction=VAR
+                                 ApprovalsMgmt@1001 : Codeunit 1535;
+                               BEGIN
+                                 ApprovalsMgmt.OnCancelItemApprovalRequest(Rec);
+                               END;
+                                }
+      { 110     ;1   ;ActionGroup;
+                      CaptionML=[ENU=F&unctions;
+                                 FRA=Fonction&s];
+                      Image=Action }
+      { 111     ;2   ;Action    ;
+                      AccessByPermission=TableData 5700=R;
+                      CaptionML=[ENU=&Create Stockkeeping Unit;
+                                 FRA=&CrÇer point de stock];
+                      Image=CreateSKU;
+                      OnAction=VAR
+                                 Item@1001 : Record 27;
+                               BEGIN
+                                 Item.SETRANGE("No.","No.");
+                                 REPORT.RUNMODAL(REPORT::"Create Stockkeeping Unit",TRUE,FALSE,Item);
+                               END;
+                                }
+      { 7380    ;2   ;Action    ;
+                      AccessByPermission=TableData 7380=R;
+                      CaptionML=[ENU=C&alculate Counting Period;
+                                 FRA=C&alculer pÇriode d'inventaire];
+                      Image=CalculateCalendar;
+                      OnAction=VAR
+                                 Item@1001 : Record 27;
+                                 PhysInvtCountMgt@1000 : Codeunit 7380;
+                               BEGIN
+                                 CurrPage.SETSELECTIONFILTER(Item);
+                                 PhysInvtCountMgt.UpdateItemPhysInvtCount(Item);
+                               END;
+                                }
+      { 1901240604;1 ;Action    ;
+                      CaptionML=[ENU=Sales Prices;
+                                 FRA=Prix vente];
+                      RunObject=Page 7002;
+                      RunPageView=SORTING(Item No.);
+                      RunPageLink=Item No.=FIELD(No.);
+                      Promoted=Yes;
+                      Image=SalesPrices;
+                      PromotedCategory=Process }
+      { 1900869004;1 ;Action    ;
+                      CaptionML=[ENU=Sales Line Discounts;
+                                 FRA=Remises ligne vente];
+                      RunObject=Page 7004;
+                      RunPageView=SORTING(Type,Code);
+                      RunPageLink=Type=CONST(Item),
+                                  Code=FIELD(No.);
+                      Promoted=No;
+                      Image=SalesLineDisc;
+                      PromotedCategory=Process }
+      { 1905370404;1 ;Action    ;
+                      CaptionML=[ENU=Requisition Worksheet;
+                                 FRA=Demande achat];
+                      RunObject=Page 291;
+                      Promoted=Yes;
+                      Image=Worksheet;
+                      PromotedCategory=Process }
+      { 1904344904;1 ;Action    ;
+                      CaptionML=[ENU=Item Journal;
+                                 FRA=Feuille article];
+                      RunObject=Page 40;
+                      Promoted=Yes;
+                      Image=Journals;
+                      PromotedCategory=Process }
+      { 1906716204;1 ;Action    ;
+                      CaptionML=[ENU=Item Reclassification Journal;
+                                 FRA=Feuille reclassement article];
+                      RunObject=Page 393;
+                      Promoted=No;
+                      Image=Journals;
+                      PromotedCategory=Process }
+      { 1902532604;1 ;Action    ;
+                      CaptionML=[ENU=Item Tracing;
+                                 FRA=TraáabilitÇ];
+                      RunObject=Page 6520;
+                      Promoted=No;
+                      Image=ItemTracing;
+                      PromotedCategory=Process }
+      { 1900805004;1 ;Action    ;
+                      CaptionML=[ENU=Adjust Item Cost/Price;
+                                 FRA=Ajuster coñt et prix article];
+                      RunObject=Report 794;
+                      Promoted=No;
+                      Image=AdjustItemCost;
+                      PromotedCategory=Process }
+      { 1907108104;1 ;Action    ;
+                      CaptionML=[ENU=Adjust Cost - Item Entries;
+                                 FRA=Ajuster coñts : êcr. article];
+                      RunObject=Report 795;
+                      Promoted=Yes;
+                      Image=AdjustEntries;
+                      PromotedCategory=Process }
+      { 1900000006;0 ;ActionContainer;
+                      ActionContainerType=Reports }
+      { 1900907306;1 ;Action    ;
+                      CaptionML=[ENU=Inventory - List;
+                                 FRA=Stocks : Liste des articles];
+                      RunObject=Report 701;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907629906;1 ;Action    ;
+                      CaptionML=[ENU=Item Register - Quantity;
+                                 FRA=Hist trans article - QtÇ];
+                      RunObject=Report 703;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904068306;1 ;Action    ;
+                      CaptionML=[ENU=Inventory - Transaction Detail;
+                                 FRA=Stocks : Liste des mouvements];
+                      RunObject=Report 704;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1901091106;1 ;Action    ;
+                      CaptionML=[ENU=Inventory Availability;
+                                 FRA=DisponibilitÇ articles];
+                      RunObject=Report 705;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1901254106;1 ;Action    ;
+                      CaptionML=[ENU=Status;
+                                 FRA=Statut];
+                      RunObject=Report 706;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1906212206;1 ;Action    ;
+                      CaptionML=[ENU=Inventory - Availability Plan;
+                                 FRA=Stocks : êchÇancier des dispo.];
+                      RunObject=Report 707;
+                      Promoted=No;
+                      Image=ItemAvailability;
+                      PromotedCategory=Report }
+      { 1903262806;1 ;Action    ;
+                      CaptionML=[ENU=Inventory Order Details;
+                                 FRA=Commandes vente en cours];
+                      RunObject=Report 708;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904739806;1 ;Action    ;
+                      CaptionML=[ENU=Inventory Purchase Orders;
+                                 FRA=Commandes achat en cours];
+                      RunObject=Report 709;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907930606;1 ;Action    ;
+                      CaptionML=[ENU=Inventory - Top 10 List;
+                                 FRA=Stocks : Palmaräs articles];
+                      RunObject=Report 711;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900762706;1 ;Action    ;
+                      CaptionML=[ENU=Inventory - Sales Statistics;
+                                 FRA=Stocks : Statistiques vente];
+                      RunObject=Report 712;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 18      ;1   ;Action    ;
+                      CaptionML=[ENU=Assemble to Order - Sales;
+                                 FRA=Assembler pour commande - Ventes];
+                      RunObject=Report 915;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904034006;1 ;Action    ;
+                      CaptionML=[ENU=Inventory - Customer Sales;
+                                 FRA=Stocks : Ventes par client];
+                      RunObject=Report 713;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1906231806;1 ;Action    ;
+                      CaptionML=[ENU=Inventory - Vendor Purchases;
+                                 FRA=Stocks : Achats par fourn.];
+                      RunObject=Report 714;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1905572506;1 ;Action    ;
+                      CaptionML=[ENU=Price List;
+                                 FRA=Liste des prix];
+                      RunObject=Report 715;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900128906;1 ;Action    ;
+                      CaptionML=[ENU=Inventory Cost and Price List;
+                                 FRA=Prix et coñts article];
+                      RunObject=Report 716;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1906101206;1 ;Action    ;
+                      CaptionML=[ENU=Inventory - Reorders;
+                                 FRA=Stocks : RÇappro. Ö effectuer];
+                      RunObject=Report 717;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900210306;1 ;Action    ;
+                      CaptionML=[ENU=Inventory - Sales Back Orders;
+                                 FRA=Stocks : Commandes Ö livrer];
+                      RunObject=Report 718;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900430206;1 ;Action    ;
+                      CaptionML=[ENU=Item/Vendor Catalog;
+                                 FRA=Articles : Catalogue fourn.];
+                      RunObject=Report 720;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900730006;1 ;Action    ;
+                      CaptionML=[ENU=Inventory - Cost Variance;
+                                 FRA=Stocks : êvolution des coñts];
+                      RunObject=Report 721;
+                      Promoted=No;
+                      Image=ItemCosts;
+                      PromotedCategory=Report }
+      { 1907644006;1 ;Action    ;
+                      CaptionML=[ENU=Phys. Inventory List;
+                                 FRA=Liste d'inventaire];
+                      RunObject=Report 722;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1906316306;1 ;Action    ;
+                      CaptionML=[ENU=Inventory Valuation;
+                                 FRA=êvaluation du stock];
+                      RunObject=Report 1001;
+                      Promoted=Yes;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907253406;1 ;Action    ;
+                      CaptionML=[ENU=Nonstock Item Sales;
+                                 FRA=Ventes d'articles non stockÇs];
+                      RunObject=Report 5700;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1905753506;1 ;Action    ;
+                      CaptionML=[ENU=Item Substitutions;
+                                 FRA=Articles de substitution];
+                      RunObject=Report 5701;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1904299906;1 ;Action    ;
+                      CaptionML=[ENU=Invt. Valuation - Cost Spec.;
+                                 FRA=êval. stock : Composante coñt];
+                      RunObject=Report 5801;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907928706;1 ;Action    ;
+                      CaptionML=[ENU=Inventory Valuation - WIP;
+                                 FRA=êvaluation du stock d'en-cours];
+                      RunObject=Report 5802;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902962906;1 ;Action    ;
+                      CaptionML=[ENU=Item Register - Value;
+                                 FRA=Transactions article : Valeur];
+                      RunObject=Report 5805;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900461506;1 ;Action    ;
+                      CaptionML=[ENU=Item Charges - Specification;
+                                 FRA=Frais annexes : Composante];
+                      RunObject=Report 5806;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900111206;1 ;Action    ;
+                      CaptionML=[ENU=Item Age Composition - Qty.;
+                                 FRA=AnciennetÇ stock : QtÇ];
+                      RunObject=Report 5807;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1903496006;1 ;Action    ;
+                      CaptionML=[ENU=Item Age Composition - Value;
+                                 FRA=AnciennetÇ stock : Valeur];
+                      RunObject=Report 5808;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1906747006;1 ;Action    ;
+                      CaptionML=[ENU=Item Expiration - Quantity;
+                                 FRA=PÇremption article - QuantitÇ];
+                      RunObject=Report 5809;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1905889606;1 ;Action    ;
+                      CaptionML=[ENU=Cost Shares Breakdown;
+                                 FRA=Analyse des coñts];
+                      RunObject=Report 5848;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1901374406;1 ;Action    ;
+                      CaptionML=[ENU=Detailed Calculation;
+                                 FRA=Coñt dÇtaillÇ];
+                      RunObject=Report 99000756;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1900812706;1 ;Action    ;
+                      CaptionML=[ENU=Rolled-up Cost Shares;
+                                 FRA=Coñt multi-niveau dÇtaillÇ];
+                      RunObject=Report 99000754;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1901316306;1 ;Action    ;
+                      CaptionML=[ENU=Single-Level Cost Shares;
+                                 FRA=Coñt mono-niveau dÇtaillÇ];
+                      RunObject=Report 99000755;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1902353206;1 ;Action    ;
+                      CaptionML=[ENU=Where-Used (Top Level);
+                                 FRA=Cas d'emploi (multi-niveau)];
+                      RunObject=Report 99000757;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907778006;1 ;Action    ;
+                      CaptionML=[ENU=Quantity Explosion of BOM;
+                                 FRA=Nomenclature multi-niveau];
+                      RunObject=Report 99000753;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+      { 1907846806;1 ;Action    ;
+                      CaptionML=[ENU=Compare List;
+                                 FRA=Liste de comparaison];
+                      RunObject=Report 99000758;
+                      Promoted=No;
+                      Image=Report;
+                      PromotedCategory=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr="No." }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 95  ;2   ;Field     ;
+                SourceExpr="Created From Nonstock Item";
+                Visible=FALSE }
+
+    { 97  ;2   ;Field     ;
+                SourceExpr="Substitutes Exist" }
+
+    { 112 ;2   ;Field     ;
+                SourceExpr="Stockkeeping Unit Exists";
+                Visible=FALSE }
+
+    { 8   ;2   ;Field     ;
+                SourceExpr="Assembly BOM" }
+
+    { 99  ;2   ;Field     ;
+                SourceExpr="Production BOM No." }
+
+    { 101 ;2   ;Field     ;
+                SourceExpr="Routing No." }
+
+    { 6   ;2   ;Field     ;
+                SourceExpr="Base Unit of Measure" }
+
+    { 43  ;2   ;Field     ;
+                SourceExpr="Shelf No.";
+                Visible=FALSE }
+
+    { 45  ;2   ;Field     ;
+                SourceExpr="Costing Method";
+                Visible=FALSE }
+
+    { 122 ;2   ;Field     ;
+                SourceExpr="Cost is Adjusted" }
+
+    { 51  ;2   ;Field     ;
+                SourceExpr="Standard Cost";
+                Visible=FALSE }
+
+    { 53  ;2   ;Field     ;
+                SourceExpr="Unit Cost" }
+
+    { 55  ;2   ;Field     ;
+                SourceExpr="Last Direct Cost";
+                Visible=FALSE }
+
+    { 57  ;2   ;Field     ;
+                SourceExpr="Price/Profit Calculation";
+                Visible=FALSE }
+
+    { 59  ;2   ;Field     ;
+                SourceExpr="Profit %";
+                Visible=FALSE }
+
+    { 61  ;2   ;Field     ;
+                SourceExpr="Unit Price" }
+
+    { 63  ;2   ;Field     ;
+                SourceExpr="Inventory Posting Group";
+                Visible=FALSE }
+
+    { 12  ;2   ;Field     ;
+                SourceExpr="Gen. Prod. Posting Group";
+                Visible=FALSE }
+
+    { 74  ;2   ;Field     ;
+                SourceExpr="VAT Prod. Posting Group";
+                Visible=FALSE }
+
+    { 35  ;2   ;Field     ;
+                SourceExpr="Item Disc. Group";
+                Visible=FALSE }
+
+    { 65  ;2   ;Field     ;
+                SourceExpr="Vendor No." }
+
+    { 67  ;2   ;Field     ;
+                SourceExpr="Vendor Item No.";
+                Visible=FALSE }
+
+    { 69  ;2   ;Field     ;
+                SourceExpr="Tariff No.";
+                Visible=FALSE }
+
+    { 71  ;2   ;Field     ;
+                SourceExpr="Search Description" }
+
+    { 91  ;2   ;Field     ;
+                SourceExpr="Overhead Rate";
+                Visible=FALSE }
+
+    { 89  ;2   ;Field     ;
+                SourceExpr="Indirect Cost %";
+                Visible=FALSE }
+
+    { 1102601000;2;Field  ;
+                SourceExpr="Item Category Code";
+                Visible=FALSE }
+
+    { 1102601002;2;Field  ;
+                SourceExpr="Product Group Code";
+                Visible=FALSE }
+
+    { 1102601004;2;Field  ;
+                SourceExpr=Blocked;
+                Visible=FALSE }
+
+    { 1102601006;2;Field  ;
+                SourceExpr="Last Date Modified";
+                Visible=FALSE }
+
+    { 1102601010;2;Field  ;
+                SourceExpr="Sales Unit of Measure";
+                Visible=FALSE }
+
+    { 1102601012;2;Field  ;
+                SourceExpr="Replenishment System";
+                Visible=FALSE }
+
+    { 1102601016;2;Field  ;
+                SourceExpr="Purch. Unit of Measure";
+                Visible=FALSE }
+
+    { 1102601018;2;Field  ;
+                SourceExpr="Lead Time Calculation";
+                Visible=FALSE }
+
+    { 1102601020;2;Field  ;
+                SourceExpr="Manufacturing Policy";
+                Visible=FALSE }
+
+    { 1102601024;2;Field  ;
+                SourceExpr="Flushing Method";
+                Visible=FALSE }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr="Assembly Policy";
+                Visible=FALSE }
+
+    { 1102601026;2;Field  ;
+                SourceExpr="Item Tracking Code";
+                Visible=FALSE }
+
+    { 31  ;2   ;Field     ;
+                CaptionML=[ENU=Default Deferral Template;
+                           FRA=Modäle Çchelonnement par dÇfaut];
+                SourceExpr="Default Deferral Template Code" }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 3   ;1   ;Part      ;
+                SubPageLink=Source Type=CONST(Item),
+                            Source No.=FIELD(No.);
+                PagePartID=Page875;
+                Visible=SocialListeningVisible;
+                PartType=Page }
+
+    { 26  ;1   ;Part      ;
+                SubPageLink=Source Type=CONST(Item),
+                            Source No.=FIELD(No.);
+                PagePartID=Page876;
+                Visible=SocialListeningSetupVisible;
+                PartType=Page;
+                UpdatePropagation=Both }
+
+    { 1901314507;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                            Location Filter=FIELD(Location Filter),
+                            Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                            Bin Filter=FIELD(Bin Filter),
+                            Variant Filter=FIELD(Variant Filter),
+                            Lot No. Filter=FIELD(Lot No. Filter),
+                            Serial No. Filter=FIELD(Serial No. Filter);
+                PagePartID=Page9089;
+                Visible=TRUE;
+                PartType=Page }
+
+    { 1903326807;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                            Location Filter=FIELD(Location Filter),
+                            Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                            Bin Filter=FIELD(Bin Filter),
+                            Variant Filter=FIELD(Variant Filter),
+                            Lot No. Filter=FIELD(Lot No. Filter),
+                            Serial No. Filter=FIELD(Serial No. Filter);
+                PagePartID=Page9090;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1906840407;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                            Location Filter=FIELD(Location Filter),
+                            Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                            Bin Filter=FIELD(Bin Filter),
+                            Variant Filter=FIELD(Variant Filter),
+                            Lot No. Filter=FIELD(Lot No. Filter),
+                            Serial No. Filter=FIELD(Serial No. Filter);
+                PagePartID=Page9091;
+                Visible=TRUE;
+                PartType=Page }
+
+    { 1901796907;1;Part   ;
+                SubPageLink=No.=FIELD(No.),
+                            Date Filter=FIELD(Date Filter),
+                            Global Dimension 1 Filter=FIELD(Global Dimension 1 Filter),
+                            Global Dimension 2 Filter=FIELD(Global Dimension 2 Filter),
+                            Location Filter=FIELD(Location Filter),
+                            Drop Shipment Filter=FIELD(Drop Shipment Filter),
+                            Bin Filter=FIELD(Bin Filter),
+                            Variant Filter=FIELD(Variant Filter),
+                            Lot No. Filter=FIELD(Lot No. Filter),
+                            Serial No. Filter=FIELD(Serial No. Filter);
+                PagePartID=Page9109;
+                Visible=FALSE;
+                PartType=Page }
+
+    { 1900383207;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=TRUE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      SkilledResourceList@1001 : Page 6023;
+      CalculateStdCost@1005 : Codeunit 5812;
+      ItemAvailFormsMgt@1000 : Codeunit 353;
+      ApprovalsMgmt@1008 : Codeunit 1535;
+      SocialListeningSetupVisible@1003 : Boolean INDATASET;
+      SocialListeningVisible@1002 : Boolean INDATASET;
+      CRMIntegrationEnabled@1006 : Boolean;
+      CRMIsCoupledToRecord@1004 : Boolean;
+      OpenApprovalEntriesExist@1007 : Boolean;
+
+    PROCEDURE GetSelectionFilter@3() : Text;
+    VAR
+      Item@1001 : Record 27;
+      SelectionFilterManagement@1002 : Codeunit 46;
+    BEGIN
+      CurrPage.SETSELECTIONFILTER(Item);
+      EXIT(SelectionFilterManagement.GetSelectionFilterForItem(Item));
+    END;
+
+    PROCEDURE SetSelection@1(VAR Item@1000 : Record 27);
+    BEGIN
+      CurrPage.SETSELECTIONFILTER(Item);
+    END;
+
+    LOCAL PROCEDURE SetSocialListeningFactboxVisibility@2();
+    VAR
+      SocialListeningMgt@1000 : Codeunit 871;
+    BEGIN
+      SocialListeningMgt.GetItemFactboxVisibility(Rec,SocialListeningSetupVisible,SocialListeningVisible);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

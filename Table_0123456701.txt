@@ -1,0 +1,38 @@
+OBJECT Table 123456701 Seminar Setup
+{
+  OBJECT-PROPERTIES
+  {
+    Date=08/02/16;
+    Time=13:54:36;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    CaptionML=FRA=Seminar Setup;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Primary Key         ;Code10         }
+    { 2   ;   ;Seminar Nos.        ;Code10        ;TableRelation="No. Series";
+                                                   Description=Set the TableRelation property to 308 (the No. Series table) }
+    { 3   ;   ;Seminar Registration Nos.;Code10   ;TableRelation="No. Series";
+                                                   Description=Set the TableRelation property to 308 (the No. Series table) }
+    { 4   ;   ;Posted Seminar Reg. No.;Code10     ;TableRelation="No. Series";
+                                                   Description=Set the TableRelation property to 308 (the No. Series table) }
+  }
+  KEYS
+  {
+    {    ;Primary Key                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

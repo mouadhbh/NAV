@@ -1,0 +1,46 @@
+OBJECT MenuSuite 1090 Dept - Company
+{
+  OBJECT-PROPERTIES
+  {
+    Date=08/02/16;
+    Time=14:40:22;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+  }
+  MENUNODES
+  {
+    {                ;[{7B6E9322-C8EA-46D4-A4AB-4967431CF762}] ;NextNodeID=[{B0598CC5-2BFE-4583-BB1E-717F131F8BA5}] }
+    { MenuItem       ;[{B0598CC5-2BFE-4583-BB1E-717F131F8BA5}] ;Name=Item List;
+                                                                CaptionML=ENU=Item List;
+                                                                MemberOfMenu=[{03134937-C76A-4D80-A8B2-FF6458E180EB}];
+                                                                RunObjectType=Page;
+                                                                RunObjectID=50000;
+                                                                ParentNodeID=[{13145B1E-A94A-4BC1-8B21-80EE82CA624F}];
+                                                                Visible=Yes;
+                                                                NextNodeID=[{00000000-0000-0000-0000-000000000000}];
+                                                                DepartmentCategory=Lists }
+    { MenuItem       ;[{66E2BF08-CF3E-4B5C-A69D-5C8E72B21939}] ;Name=Item mouadh;
+                                                                CaptionML=ENU=Item mouadh;
+                                                                MemberOfMenu=[{03134937-C76A-4D80-A8B2-FF6458E180EB}];
+                                                                RunObjectType=Page;
+                                                                RunObjectID=50000;
+                                                                ParentNodeID=[{13145B1E-A94A-4BC1-8B21-80EE82CA624F}];
+                                                                Visible=Yes;
+                                                                NextNodeID=[{F2F52B4F-2C9A-40F8-823F-F2E79F608868}];
+                                                                DepartmentCategory=Lists }
+    {                ;[{FED6FF9A-CE8A-415D-BC8D-1998705DCB0B}] ;NextNodeID=[{66E2BF08-CF3E-4B5C-A69D-5C8E72B21939}] }
+    {                ;[{F1BC557C-C9E0-4E0D-B5F1-C57CD3BDA1E7}] ;NextNodeID=[{9B322295-0F53-435A-9247-C05BE5EA77AE}] }
+    { MenuItem       ;[{9B322295-0F53-435A-9247-C05BE5EA77AE}] ;Name=Liste des vehicules;
+                                                                CaptionML=FRA=Liste des vehicules;
+                                                                MemberOfMenu=[{2DC8C4FE-7346-4124-8C20-383346384C03}];
+                                                                RunObjectType=Page;
+                                                                RunObjectID=70002;
+                                                                ParentNodeID=[{2DC8C4FE-7346-4124-8C20-383346384C03}];
+                                                                Visible=Yes;
+                                                                NextNodeID=[{00000000-0000-0000-0000-000000000000}];
+                                                                DepartmentCategory=Lists }
+  }
+}

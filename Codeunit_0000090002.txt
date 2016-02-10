@@ -1,0 +1,40 @@
+OBJECT Codeunit 90002 My Codeunit 3
+{
+  OBJECT-PROPERTIES
+  {
+    Date=28/01/16;
+    Time=15:31:42;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+            Int1:=25 DIV 3;
+            Int2:=25 MOD 3;
+            IntResult:= Int1 * 3 + Int2;
+            MESSAGE('the value of %1 is %2','IntResult',IntResult);
+            Amt1:=25/3;
+            Amt2:=0.0000000000001;
+            AmtResult:=(Amt1-Int1)*3+Amt2;
+            MESSAGE('the value of %1 is %2','AmtResult',AmtResult);
+            Int1:=5+3*6-2 DIV -2;
+            MESSAGE('the value of %1 is %2','Int1',Int1);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      Int1@1000000000 : Integer;
+      Int2@1000000001 : Integer;
+      IntResult@1000000002 : Integer;
+      Amt1@1000000003 : Decimal;
+      Amt2@1000000004 : Decimal;
+      AmtResult@1000000005 : Decimal;
+
+    BEGIN
+    END.
+  }
+}
+

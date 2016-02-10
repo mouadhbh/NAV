@@ -1,0 +1,57 @@
+OBJECT Table 7112 Analysis Line Template
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    DataCaptionFields=Name,Description;
+    OnDelete=VAR
+               ItemSchedLine@1000 : Record 7114;
+             BEGIN
+               ItemSchedLine.SETRANGE("Analysis Area","Analysis Area");
+               ItemSchedLine.SETRANGE("Analysis Line Template Name",Name);
+               ItemSchedLine.DELETEALL(TRUE);
+             END;
+
+    CaptionML=[ENU=Analysis Line Template;
+               FRA=Modäle de ligne d'analyse];
+    LookupPageID=Page7112;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Analysis Area       ;Option        ;CaptionML=[ENU=Analysis Area;
+                                                              FRA=Zone d'analyse];
+                                                   OptionCaptionML=[ENU=Sales,Purchase,Inventory;
+                                                                    FRA=Ventes,Achats,Stocks];
+                                                   OptionString=Sales,Purchase,Inventory }
+    { 2   ;   ;Name                ;Code10        ;CaptionML=[ENU=Name;
+                                                              FRA=Nom];
+                                                   NotBlank=Yes }
+    { 3   ;   ;Description         ;Text80        ;CaptionML=[ENU=Description;
+                                                              FRA=DÇsignation] }
+    { 4   ;   ;Default Column Template Name;Code10;TableRelation="Analysis Column Template".Name WHERE (Analysis Area=FIELD(Analysis Area));
+                                                   CaptionML=[ENU=Default Column Template Name;
+                                                              FRA=Nom modäle colonne par dÇfaut] }
+    { 5   ;   ;Item Analysis View Code;Code10     ;TableRelation="Item Analysis View".Code WHERE (Analysis Area=FIELD(Analysis Area));
+                                                   CaptionML=[ENU=Item Analysis View Code;
+                                                              FRA=Code vue analytique article] }
+  }
+  KEYS
+  {
+    {    ;Analysis Area,Name                      ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

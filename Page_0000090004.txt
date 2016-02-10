@@ -1,0 +1,83 @@
+OBJECT Page 90004 Sales Order - Nex
+{
+  OBJECT-PROPERTIES
+  {
+    Date=26/01/16;
+    Time=16:18:35;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    SourceTable=Table36;
+    SourceTableView=WHERE(Document Type=CONST(Order));
+    PageType=Document;
+  }
+  CONTROLS
+  {
+    { 1000000000;0;Container;
+                ContainerType=ContentArea }
+
+    { 1000000001;1;Group  ;
+                Name=General;
+                GroupType=Group }
+
+    { 1000000002;2;Field  ;
+                SourceExpr="No." }
+
+    { 1000000003;2;Field  ;
+                SourceExpr="Sell-to Customer No." }
+
+    { 1000000004;2;Field  ;
+                SourceExpr="Sell-to Customer Name" }
+
+    { 1000000005;2;Field  ;
+                SourceExpr="Sell-to Address" }
+
+    { 1000000006;2;Field  ;
+                SourceExpr="Sell-to City" }
+
+    { 1000000007;2;Field  ;
+                SourceExpr="Sell-to Post Code" }
+
+    { 1000000008;2;Field  ;
+                SourceExpr="Sell-to Country/Region Code" }
+
+    { 1000000016;1;Part   ;
+                CaptionML=ENU=Lines;
+                SubPageLink=Document Type=FIELD(Document Type),
+                            Document No.=FIELD(No.);
+                PagePartID=Page46;
+                PartType=Page }
+
+    { 1000000009;1;Group  ;
+                Name=Shipping;
+                GroupType=Group }
+
+    { 1000000010;2;Field  ;
+                SourceExpr="Ship-to Code" }
+
+    { 1000000011;2;Field  ;
+                SourceExpr="Ship-to Name" }
+
+    { 1000000012;2;Field  ;
+                SourceExpr="Ship-to Address" }
+
+    { 1000000013;2;Field  ;
+                SourceExpr="Ship-to City" }
+
+    { 1000000014;2;Field  ;
+                SourceExpr="Ship-to Post Code" }
+
+    { 1000000015;2;Field  ;
+                SourceExpr="Ship-to Country/Region Code" }
+
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

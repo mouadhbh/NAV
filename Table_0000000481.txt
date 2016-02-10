@@ -1,0 +1,41 @@
+OBJECT Table 481 Dimension Set Tree Node
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Dimension Set Tree Node;
+               FRA=Noeud d'arbre ensemble de dimensions];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Parent Dimension Set ID;Integer    ;CaptionML=[ENU=Parent Dimension Set ID;
+                                                              FRA=ID ensemble de dimensions parent] }
+    { 2   ;   ;Dimension Value ID  ;Integer       ;CaptionML=[ENU=Dimension Value ID;
+                                                              FRA=ID section analytique] }
+    { 3   ;   ;Dimension Set ID    ;Integer       ;AutoIncrement=Yes;
+                                                   CaptionML=[ENU=Dimension Set ID;
+                                                              FRA=ID ensemble de dimensions] }
+    { 4   ;   ;In Use              ;Boolean       ;CaptionML=[ENU=In Use;
+                                                              FRA=Utilis‚] }
+  }
+  KEYS
+  {
+    {    ;Parent Dimension Set ID,Dimension Value ID;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

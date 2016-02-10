@@ -1,0 +1,40 @@
+OBJECT Table 1240 Positive Pay Header
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Positive Pay Header;
+               FRA=En-tˆte Positive Pay];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Data Exch. Entry No.;Integer       ;TableRelation="Data Exch."."Entry No.";
+                                                   CaptionML=[ENU=Data Exch. Entry No.;
+                                                              FRA=Nø ‚criture ‚chge donn‚es] }
+    { 2   ;   ;Company Name        ;Text30        ;CaptionML=[ENU=Company Name;
+                                                              FRA=Nom de la soci‚t‚] }
+    { 3   ;   ;Account Number      ;Text30        ;CaptionML=[ENU=Account Number;
+                                                              FRA=Num‚ro de compte] }
+    { 4   ;   ;Date of File        ;Date          ;CaptionML=[ENU=Date of File;
+                                                              FRA=Date du fichier] }
+  }
+  KEYS
+  {
+    {    ;Data Exch. Entry No.                    ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

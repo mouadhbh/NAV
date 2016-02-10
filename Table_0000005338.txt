@@ -1,0 +1,76 @@
+OBJECT Table 5338 Integration Synch. Job
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Integration Synch. Job;
+               FRA=Projet synch. intÇgration];
+  }
+  FIELDS
+  {
+    { 1   ;   ;ID                  ;GUID          ;CaptionML=[ENU=ID;
+                                                              FRA=ID] }
+    { 2   ;   ;Start Date/Time     ;DateTime      ;CaptionML=[ENU=Start Date/Time;
+                                                              FRA=Date/heure dÇbut] }
+    { 3   ;   ;Finish Date/Time    ;DateTime      ;CaptionML=[ENU=Finish Date/Time;
+                                                              FRA=Date/heure fin] }
+    { 4   ;   ;Message             ;Text250       ;CaptionML=[ENU=Message;
+                                                              FRA=Message] }
+    { 5   ;   ;Integration Table Mapping Name;Code20;
+                                                   TableRelation="Integration Table Mapping".Name;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=Integration Table Mapping Name;
+                                                              FRA=Nom correspondance table intÇgration] }
+    { 6   ;   ;Inserted            ;Integer       ;CaptionML=[ENU=Inserted;
+                                                              FRA=InsÇrÇ] }
+    { 7   ;   ;Modified            ;Integer       ;CaptionML=[ENU=Modified;
+                                                              FRA=ModifiÇ] }
+    { 8   ;   ;Deleted             ;Integer       ;CaptionML=[ENU=Deleted;
+                                                              FRA=SupprimÇ] }
+    { 9   ;   ;Unchanged           ;Integer       ;CaptionML=[ENU=Unchanged;
+                                                              FRA=InchangÇ] }
+    { 10  ;   ;Skipped             ;Integer       ;CaptionML=[ENU=Skipped;
+                                                              FRA=IgnorÇ(e)] }
+    { 11  ;   ;Failed              ;Integer       ;CaptionML=[ENU=Failed;
+                                                              FRA=êchec] }
+    { 12  ;   ;Synch. Direction    ;Option        ;CaptionML=[ENU=Synch. Direction;
+                                                              FRA=Direction synch.];
+                                                   OptionCaptionML=[ENU=Bidirectional,ToIntegrationTable,FromIntegrationTable;
+                                                                    FRA=Bidirectionnel,Vers la table d'intÇgration,∑ partir de la table d'intÇgration];
+                                                   OptionString=Bidirectional,ToIntegrationTable,FromIntegrationTable }
+  }
+  KEYS
+  {
+    {    ;ID                                      ;Clustered=Yes }
+    {    ;Start Date/Time,ID                       }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      DeleteEntriesQst@1000 : TextConst '@@@="%1 = Integration Synch. Job caption";ENU=Are you sure that you want to delete the %1 entries?;FRA=Voulez-vous vraiment supprimer les Çcritures %1ˇ?';
+
+    PROCEDURE DeleteEntries@2(DaysOld@1000 : Integer);
+    VAR
+      IntegrationSynchJobErrors@1001 : Record 5339;
+    BEGIN
+      IF NOT CONFIRM(STRSUBSTNO(DeleteEntriesQst,TABLECAPTION)) THEN
+        EXIT;
+      IntegrationSynchJobErrors.DeleteEntries(DaysOld);
+      SETFILTER("Finish Date/Time",'<=%1',CREATEDATETIME(TODAY - DaysOld,TIME));
+      DELETEALL;
+      SETRANGE("Finish Date/Time");
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

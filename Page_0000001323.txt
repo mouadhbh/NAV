@@ -1,0 +1,172 @@
+OBJECT Page 1323 Mini Pst.Sales Cr.Memo Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Lines;
+               FRA=Lignes];
+    LinksAllowed=No;
+    SourceTable=Table115;
+    PageType=ListPart;
+    AutoSplitKey=Yes;
+    OnAfterGetCurrRecord=BEGIN
+                           MiniDocumentTotals.CalculatePostedSalesCreditMemoTotals(SalesCrMemoHeader,VATAmount,Rec);
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 10      ;1   ;Action    ;
+                      Name=DeferralSchedule;
+                      CaptionML=[ENU=Deferral Schedule;
+                                 FRA=Tableau ‚chelonnement];
+                      Image=PaymentPeriod;
+                      OnAction=BEGIN
+                                 ShowDeferrals;
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=Item No.;
+                           FRA=Nø article];
+                ToolTipML=[ENU=Specifies a general ledger account number or an item number that identifies the general ledger account or item specified when the line was posted.;
+                           FRA=Sp‚cifie un num‚ro de compte g‚n‚ral ou d'article qui identifie le compte g‚n‚ral ou article sp‚cifi‚ lors de la validation de la ligne.];
+                SourceExpr="No.";
+                LookupPageID=Mini Item List }
+
+    { 26  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the cross-reference number of the item specified on the line.;
+                           FRA=Indique la r‚f‚rence externe de l'article sp‚cifi‚ sur la ligne.];
+                SourceExpr="Cross-Reference No.";
+                Visible=FALSE }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Description/Comment;
+                           FRA=Description/Commentaire];
+                ToolTipML=[ENU=Specifies the name of the item or general ledger account, or some descriptive text.;
+                           FRA=Affiche le nom de l'article ou du compte g‚n‚ral, ou un texte descriptif.];
+                SourceExpr=Description }
+
+    { 8   ;2   ;Field     ;
+                Width=8;
+                ToolTipML=[ENU=Specifies the number of units of the item specified on the line.;
+                           FRA=Indique le nombre d'unit‚s de l'article sp‚cifi‚ sur la ligne.];
+                BlankZero=Yes;
+                SourceExpr=Quantity }
+
+    { 24  ;2   ;Field     ;
+                Width=8;
+                ToolTipML=[ENU=Specifies the unit of measure code for the items sold.;
+                           FRA=Sp‚cifie le code unit‚ des articles vendus.];
+                SourceExpr="Unit of Measure Code" }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the price of one unit of the item.;
+                           FRA=Sp‚cifie le prix unitaire de l'article.];
+                BlankZero=Yes;
+                SourceExpr="Unit Price" }
+
+    { 16  ;2   ;Field     ;
+                Width=8;
+                ToolTipML=[ENU=Specifies the line discount percentage that was given on the line.;
+                           FRA=Affiche le pourcentage de remise ligne accord‚ pour la ligne.];
+                BlankZero=Yes;
+                SourceExpr="Line Discount %" }
+
+    { 30  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the net amount (excluding the invoice discount amount) that will be posted. If you have placed a check mark in the Prices Including VAT field, the amount displayed will include VAT.;
+                           FRA=Sp‚cifie le montant net (hors montant remise facture) qui sera valid‚. Si vous avez activ‚ le champ Prix TTC, le montant affich‚ inclut la TVA.];
+                BlankZero=Yes;
+                SourceExpr="Line Amount" }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr="Deferral Code" }
+
+    { 22  ;1   ;Group     ;
+                GroupType=Group }
+
+    { 18  ;2   ;Group     ;
+                GroupType=Group }
+
+    { 17  ;3   ;Field     ;
+                Name=Invoice Discount Amount;
+                CaptionML=[ENU=Invoice Discount Amount;
+                           FRA=Montant remise facture];
+                ToolTipML=[ENU=Specifies the sum of the value in the Line Amount Excl. VAT field on all lines in the document minus any discount amount in the Invoice Discount Amount field. Note that amounts on document lines are shown with or without VAT depending on what you selected in the Prices Including VAT field on the customer or vendor card.;
+                           FRA=Sp‚cifie la somme de la valeur du champ Montant ligne HT sur toutes les lignes du document, moins l'‚ventuel montant remise indiqu‚ dans le champ Montant remise facture. Notez que les montants sur les lignes de document sont affich‚s avec ou sans la TVA en fonction de ce que vous avez s‚lectionn‚ dans le champ Prix TTC de la fiche client ou fournisseur.];
+                SourceExpr=SalesCrMemoHeader."Invoice Discount Amount";
+                AutoFormatType=1;
+                AutoFormatExpr=SalesCrMemoHeader."Currency Code";
+                Editable=FALSE }
+
+    { 7   ;2   ;Group     ;
+                GroupType=Group }
+
+    { 5   ;3   ;Field     ;
+                Name=Total Amount Excl. VAT;
+                DrillDown=No;
+                CaptionML=[ENU=Total Amount Excl. VAT;
+                           FRA=Montant total HT];
+                ToolTipML=[ENU=Specifies the sum of the value in the Line Amount Excl. VAT field on all lines in the document minus any discount amount in the Invoice Discount Amount field. Note that amounts on document lines are shown with or without VAT depending on what you selected in the Prices Including VAT field on the customer or vendor card.;
+                           FRA=Sp‚cifie la somme de la valeur du champ Montant ligne HT sur toutes les lignes du document, moins l'‚ventuel montant remise indiqu‚ dans le champ Montant remise facture. Notez que les montants sur les lignes de document sont affich‚s avec ou sans la TVA en fonction de ce que vous avez s‚lectionn‚ dans le champ Prix TTC de la fiche client ou fournisseur.];
+                SourceExpr=SalesCrMemoHeader.Amount;
+                AutoFormatType=1;
+                AutoFormatExpr=SalesCrMemoHeader."Currency Code";
+                CaptionClass=MiniDocumentTotals.GetTotalExclVATCaption(SalesCrMemoHeader."Currency Code");
+                Editable=FALSE }
+
+    { 3   ;3   ;Field     ;
+                Name=Total VAT Amount;
+                CaptionML=[ENU=Total VAT;
+                           FRA=Total TVA];
+                ToolTipML=[ENU=Specifies the sum of VAT amounts on all lines in the document. Note that amounts on document lines are shown with or without VAT depending on what you selected in the Prices Including VAT field on the customer or vendor card.;
+                           FRA=Sp‚cifie la somme des montants de TVA sur toutes les lignes du document. Notez que les montants sur les lignes de document sont affich‚s avec ou sans la TVA en fonction de ce que vous avez s‚lectionn‚ dans le champ Prix TTC de la fiche client ou fournisseur.];
+                SourceExpr=VATAmount;
+                AutoFormatType=1;
+                AutoFormatExpr=SalesCrMemoHeader."Currency Code";
+                CaptionClass=MiniDocumentTotals.GetTotalVATCaption(SalesCrMemoHeader."Currency Code");
+                Editable=FALSE }
+
+    { 2   ;3   ;Field     ;
+                Name=Total Amount Incl. VAT;
+                CaptionML=[ENU=Total Amount Incl. VAT;
+                           FRA=Montant total TTC];
+                ToolTipML=[ENU=Specifies the sum of the value in the Line Amount Incl. VAT field on all lines in the document minus any discount amount in the Invoice Discount Amount field. Note that amounts on document lines are shown with or without VAT depending on what you selected in the Prices Including VAT field on the customer or vendor card.;
+                           FRA=Sp‚cifie la somme de la valeur du champ Montant ligne TTC sur toutes les lignes du document, moins l'‚ventuel montant remise indiqu‚ dans le champ Montant remise facture. Notez que les montants sur les lignes de document sont affich‚s avec ou sans la TVA en fonction de ce que vous avez s‚lectionn‚ dans le champ Prix TTC de la fiche client ou fournisseur.];
+                SourceExpr=SalesCrMemoHeader."Amount Including VAT";
+                AutoFormatType=1;
+                AutoFormatExpr=SalesCrMemoHeader."Currency Code";
+                CaptionClass=MiniDocumentTotals.GetTotalInclVATCaption(SalesCrMemoHeader."Currency Code");
+                Editable=FALSE;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+  }
+  CODE
+  {
+    VAR
+      SalesCrMemoHeader@1001 : Record 114;
+      MiniDocumentTotals@1000 : Codeunit 1301;
+      VATAmount@1003 : Decimal;
+
+    BEGIN
+    END.
+  }
+}
+

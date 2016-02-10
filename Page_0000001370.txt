@@ -1,0 +1,345 @@
+OBJECT Page 1370 Mini Purch. Cr.Memo Subform
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Lines;
+               FRA=Lignes];
+    MultipleNewLines=Yes;
+    LinksAllowed=No;
+    SourceTable=Table39;
+    DelayedInsert=Yes;
+    SourceTableView=WHERE(Document Type=FILTER(Credit Memo));
+    PageType=ListPart;
+    AutoSplitKey=Yes;
+    OnNewRecord=BEGIN
+                  Type := Type::Item;
+                END;
+
+    OnInsertRecord=BEGIN
+                     Type := Type::Item;
+                   END;
+
+    OnDeleteRecord=BEGIN
+                     DELETE;
+                     MiniDocumentTotals.CalculatePurchHeaderTotals(TotalPurchHeader,VATAmount,Rec);
+                     UpdatePage;
+                   END;
+
+    OnAfterGetCurrRecord=VAR
+                           SalesLine@1000 : Record 37;
+                         BEGIN
+                           MiniDocumentTotals.CalculatePurchHeaderTotals(TotalPurchHeader,VATAmount,Rec);
+                           UpdateEditableOnRow;
+
+                           SalesLine.SETRANGE("Document Type","Document Type");
+                           SalesLine.SETRANGE("Document No.","Document No.");
+                           InvDiscAmountEditable := SalesLine.FINDFIRST AND CurrPage.EDITABLE;
+                         END;
+
+    ActionList=ACTIONS
+    {
+      { 1900000004;0 ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 1900206204;1 ;Action    ;
+                      Name=InsertExtTextsAction;
+                      AccessByPermission=TableData 279=R;
+                      CaptionML=[ENU=Insert &Ext. Texts;
+                                 FRA=Ins‚rer te&xtes ‚tendus];
+                      ToolTipML=[ENU=Insert the extended item description that is set up for the item.;
+                                 FRA=Ins‚rez la description plus longue qui est configur‚e pour l'article.];
+                      Image=Text;
+                      Scope=Repeater;
+                      OnAction=BEGIN
+                                 InsertExtendedText(TRUE);
+                               END;
+                                }
+      { 1904522204;1 ;Action    ;
+                      AccessByPermission=TableData 348=R;
+                      ShortCutKey=Shift+Ctrl+D;
+                      CaptionML=[ENU=Dimensions;
+                                 FRA=Axes analytiques];
+                      ToolTipML=[ENU=View or edit the dimension sets that are set up for the combination of vendor and item on the invoice line.;
+                                 FRA=Affichez ou modifiez les ensembles de dimensions qui sont configur‚s pour la combinaison fournisseur-article sur la ligne facture.];
+                      Image=Dimensions;
+                      Scope=Repeater;
+                      OnAction=BEGIN
+                                 ShowDimensions;
+                               END;
+                                }
+      { 10      ;1   ;Action    ;
+                      Name=DeferralSchedule;
+                      CaptionML=[ENU=Deferral Schedule;
+                                 FRA=Tableau ‚chelonnement];
+                      Enabled="Deferral Code" <> '';
+                      Image=PaymentPeriod;
+                      OnAction=BEGIN
+                                 TotalPurchHeader.GET("Document Type","Document No.");
+                                 ShowDeferrals(TotalPurchHeader."Posting Date",TotalPurchHeader."Currency Code");
+                               END;
+                                }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 4   ;2   ;Field     ;
+                CaptionML=[ENU=Item No.;
+                           FRA=Nø article];
+                ToolTipML=[ENU=Specifies the number of a general ledger account, an item, an additional cost or a fixed asset, depending on what you selected in the Type field.;
+                           FRA=Sp‚cifie le num‚ro d'un compte g‚n‚ral, d'un article, d'un co–t suppl‚mentaire ou d'une immobilisation, selon la s‚lection effectu‚e dans le champ Type.];
+                SourceExpr="No.";
+                LookupPageID=Mini Item List;
+                OnValidate=BEGIN
+                             NoOnAfterValidate;
+                             UpdateEditableOnRow;
+                             UpdatePage;
+                           END;
+
+                ShowMandatory=TRUE }
+
+    { 58  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the cross-reference number for this item. To see the available item cross-reference numbers, click the field.;
+                           FRA=Indique la r‚f‚rence externe de cet article. Pour visualiser les r‚f‚rences externes disponibles, cliquez sur le champ.];
+                SourceExpr="Cross-Reference No.";
+                Visible=FALSE;
+                OnValidate=BEGIN
+                             CrossReferenceNoOnAfterValidat;
+                           END;
+
+                OnLookup=BEGIN
+                           CrossReferenceNoLookUp;
+                           InsertExtendedText(FALSE);
+                         END;
+                          }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Description/Comment;
+                           FRA=Description/Commentaire];
+                ToolTipML=[ENU=Contains a description of the entry. The description depends on what you chose in the Type field. If you did not choose Blank, the program will fill in the field when you enter something in the No. field.;
+                           FRA=Indique la d‚signation de l'‚criture. Cette description d‚pend de votre choix dans le champ Type. Si vous n'avez pas choisi Vide, le programme renseigne le champ lorsque vous renseignez le champ Nø.];
+                SourceExpr=Description;
+                OnValidate=VAR
+                             MiniLinesInstructionMgt@1000 : Codeunit 1320;
+                           BEGIN
+                             MiniLinesInstructionMgt.ShowCreateLineInstruction("No.");
+                           END;
+                            }
+
+    { 8   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of units of the item that will be specified on the line. Even if you later change the item number, this quantity stays unchanged on the line.;
+                           FRA=Sp‚cifie le nombre d'unit‚s de l'article sp‚cifi‚ sur la ligne. Mˆme si ult‚rieurement vous modifiez le num‚ro de l'article, cette quantit‚ reste inchang‚e sur la ligne.];
+                BlankZero=Yes;
+                SourceExpr=Quantity;
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UpdatePage;
+                           END;
+
+                ShowMandatory=TRUE }
+
+    { 34  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the unit of measure code that is valid for the purchase line.;
+                           FRA=Sp‚cifie le code unit‚ valable pour la ligne achat.];
+                SourceExpr="Unit of Measure Code";
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UpdatePage;
+                           END;
+                            }
+
+    { 12  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the direct unit cost of the item on the line.;
+                           FRA=Indique le co–t unitaire direct de l'article de la ligne.];
+                BlankZero=Yes;
+                SourceExpr="Direct Unit Cost";
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UpdatePage;
+                           END;
+
+                ShowMandatory=TRUE }
+
+    { 16  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the line discount percentage that is valid for the item on the line.;
+                           FRA=Affiche le pourcentage de remise ligne applicable … l'article de la ligne.];
+                BlankZero=Yes;
+                SourceExpr="Line Discount %";
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UpdatePage;
+                           END;
+                            }
+
+    { 40  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the amount of the line discount that will be granted on the purchase line. The amount is shown in the currency of the purchase document.;
+                           FRA=Indique le montant de la remise ligne qui est accord‚e sur la ligne achat. Le montant est indiqu‚ dans la devise du document achat.];
+                SourceExpr="Line Discount Amount";
+                Visible=FALSE;
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UpdatePage;
+                           END;
+                            }
+
+    { 64  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the net amount (excluding the invoice discount amount) of the line, in the currency of the purchase document. If you have placed a check mark in the Prices Including VAT field, the amount displayed will include VAT.;
+                           FRA=Indique le montant net (excluant le montant remise facture) de la ligne, dans la devise du document achat. Si vous avez activ‚ le champ Prix TTC, le montant affich‚ inclut la TVA.];
+                BlankZero=Yes;
+                SourceExpr="Line Amount";
+                Enabled=RowEditable;
+                Editable=RowEditable;
+                OnValidate=BEGIN
+                             UpdatePage;
+                           END;
+                            }
+
+    { 9   ;2   ;Field     ;
+                SourceExpr="Deferral Code";
+                TableRelation="Deferral Template"."Deferral Code" }
+
+    { 103 ;1   ;Group     ;
+                GroupType=Group }
+
+    { 106 ;2   ;Group     ;
+                GroupType=Group }
+
+    { 107 ;3   ;Field     ;
+                Name=Invoice Discount Amount;
+                CaptionML=[ENU=Invoice Discount Amount;
+                           FRA=Montant remise facture];
+                ToolTipML=[ENU=Specifies a discount amount that is deducted from the value in the Total Incl. VAT field. You can enter or change the amount manually. If you have set up invoice discounts, the specified percentage is shown in the Invoice Discount % field if the criteria are met. The calculated discount amount is then inserted in the Invoice Discount Amount field.;
+                           FRA=Indique un montant de remise qui est d‚duit de la valeur indiqu‚e dans le champ Total TTC. Vous pouvez entrer ou modifier le montant manuellement. Si vous avez d‚fini des remises facture, le pourcentage sp‚cifi‚ est automatiquement affich‚ dans le champ Pourcentage de remise facture si les critŠres sont r‚unis. Le montant remise calcul‚ est alors ins‚r‚ dans le champ Montant remise facture.];
+                SourceExpr=TotalPurchHeader."Invoice Discount Amount";
+                AutoFormatType=1;
+                AutoFormatExpr=TotalPurchHeader."Currency Code";
+                Editable=InvDiscAmountEditable;
+                OnValidate=VAR
+                             PurchHeader@1000 : Record 38;
+                           BEGIN
+                             PurchHeader.GET("Document Type","Document No.");
+                             MiniPurchCalcDiscByType.ApplyInvDiscBasedOnAmt(TotalPurchHeader."Invoice Discount Amount",PurchHeader);
+                             CurrPage.UPDATE;
+                           END;
+                            }
+
+    { 5   ;3   ;Field     ;
+                Name=Vend. Invoice Disc. Pct.;
+                CaptionML=[ENU=Vendor Invoice Discount %;
+                           FRA=% remise facture fournisseur];
+                ToolTipML=[ENU=Specifies a discount percentage that is granted if the criteria are met that you have set up for invoice discounts. The calculated discount amount is inserted in the Invoice Discount Amount field, but you can change it manually.;
+                           FRA=Indique un pourcentage de remise qui est accord‚ si les critŠres que vous avez param‚tr‚s pour les remises facture sont r‚unis. Le montant remise calcul‚ est ins‚r‚ dans le champ Montant remise facture, mais vous pouvez le modifier manuellement.];
+                DecimalPlaces=0:1;
+                SourceExpr=MiniPurchCalcDiscByType.GetVendInvoiceDiscountPct(Rec);
+                Editable=FALSE }
+
+    { 131 ;2   ;Group     ;
+                GroupType=Group }
+
+    { 7   ;3   ;Field     ;
+                Name=Total Amount Excl. VAT;
+                DrillDown=No;
+                CaptionML=[ENU=Total Amount Excl. VAT;
+                           FRA=Montant total HT];
+                ToolTipML=[ENU=Specifies the sum of the value in the Line Amount Excl. VAT field on all lines in the document minus any discount amount in the Invoice Discount Amount field. Note that amounts on document lines are shown with or without VAT depending on what you selected in the Prices Including VAT field on the customer or vendor card.;
+                           FRA=Sp‚cifie la somme de la valeur du champ Montant ligne HT sur toutes les lignes du document, moins l'‚ventuel montant remise indiqu‚ dans le champ Montant remise facture. Notez que les montants sur les lignes de document sont affich‚s avec ou sans la TVA en fonction de ce que vous avez s‚lectionn‚ dans le champ Prix TTC de la fiche client ou fournisseur.];
+                SourceExpr=TotalPurchHeader.Amount;
+                AutoFormatType=1;
+                AutoFormatExpr=TotalPurchHeader."Currency Code";
+                CaptionClass=MiniDocumentTotals.GetTotalExclVATCaption(TotalPurchHeader."Currency Code");
+                Editable=FALSE }
+
+    { 2   ;3   ;Field     ;
+                Name=Total VAT Amount;
+                CaptionML=[ENU=Total VAT;
+                           FRA=Total TVA];
+                ToolTipML=[ENU=Specifies the sum of VAT amounts on all lines in the document. Note that amounts on document lines are shown with or without VAT depending on what you selected in the Prices Including VAT field on the customer or vendor card.;
+                           FRA=Sp‚cifie la somme des montants de TVA sur toutes les lignes du document. Notez que les montants sur les lignes de document sont affich‚s avec ou sans la TVA en fonction de ce que vous avez s‚lectionn‚ dans le champ Prix TTC de la fiche client ou fournisseur.];
+                SourceExpr=VATAmount;
+                AutoFormatType=1;
+                AutoFormatExpr=TotalPurchHeader."Currency Code";
+                CaptionClass=MiniDocumentTotals.GetTotalVATCaption(TotalPurchHeader."Currency Code");
+                Editable=FALSE }
+
+    { 3   ;3   ;Field     ;
+                Name=Total Amount Incl. VAT;
+                CaptionML=[ENU=Total Amount Incl. VAT;
+                           FRA=Montant total TTC];
+                ToolTipML=[ENU=Specifies the sum of the value in the Line Amount Incl. VAT field on all lines in the document minus any discount amount in the Invoice Discount Amount field. Note that amounts on document lines are shown with or without VAT depending on what you selected in the Prices Including VAT field on the customer or vendor card.;
+                           FRA=Sp‚cifie la somme de la valeur du champ Montant ligne TTC sur toutes les lignes du document, moins l'‚ventuel montant remise indiqu‚ dans le champ Montant remise facture. Notez que les montants sur les lignes de document sont affich‚s avec ou sans la TVA en fonction de ce que vous avez s‚lectionn‚ dans le champ Prix TTC de la fiche client ou fournisseur.];
+                SourceExpr=TotalPurchHeader."Amount Including VAT";
+                AutoFormatType=1;
+                AutoFormatExpr=TotalPurchHeader."Currency Code";
+                CaptionClass=MiniDocumentTotals.GetTotalInclVATCaption(TotalPurchHeader."Currency Code");
+                Editable=FALSE;
+                Style=Strong;
+                StyleExpr=TRUE }
+
+  }
+  CODE
+  {
+    VAR
+      TotalPurchHeader@1000 : Record 38;
+      TransferExtendedText@1003 : Codeunit 378;
+      MiniPurchCalcDiscByType@1001 : Codeunit 1310;
+      MiniDocumentTotals@1002 : Codeunit 1301;
+      VATAmount@1004 : Decimal;
+      RowEditable@1005 : Boolean;
+      InvDiscAmountEditable@1006 : Boolean;
+
+    LOCAL PROCEDURE InsertExtendedText@7(Unconditionally@1000 : Boolean);
+    BEGIN
+      IF TransferExtendedText.PurchCheckIfAnyExtText(Rec,Unconditionally) THEN BEGIN
+        CurrPage.SAVERECORD;
+        COMMIT;
+        TransferExtendedText.InsertPurchExtText(Rec);
+      END;
+      IF TransferExtendedText.MakeUpdate THEN
+        UpdatePage;
+    END;
+
+    LOCAL PROCEDURE UpdatePage@12();
+    VAR
+      PurchHeader@1001 : Record 38;
+    BEGIN
+      CurrPage.UPDATE;
+      PurchHeader.GET("Document Type","Document No.");
+      MiniPurchCalcDiscByType.ApplyDefaultInvoiceDiscount(TotalPurchHeader."Invoice Discount Amount",PurchHeader);
+    END;
+
+    LOCAL PROCEDURE NoOnAfterValidate@19066594();
+    BEGIN
+      InsertExtendedText(FALSE);
+      TESTFIELD(Type,Type::Item);
+    END;
+
+    LOCAL PROCEDURE CrossReferenceNoOnAfterValidat@19048248();
+    BEGIN
+      InsertExtendedText(FALSE);
+    END;
+
+    LOCAL PROCEDURE UpdateEditableOnRow@5();
+    BEGIN
+      RowEditable := "No." <> '';
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

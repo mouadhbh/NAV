@@ -1,0 +1,40 @@
+OBJECT Table 10869 Bank Account Buffer
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVFR7.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Bank Account Buffer;
+               FRA=Tampon compte bancaire];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Customer No.        ;Code20        ;CaptionML=[ENU=Customer No.;
+                                                              FRA=Nø client] }
+    { 2   ;   ;Bank Branch No.     ;Text20        ;CaptionML=[ENU=Bank Branch No.;
+                                                              FRA=Code ‚tablissement] }
+    { 3   ;   ;Agency Code         ;Text20        ;CaptionML=[ENU=Agency Code;
+                                                              FRA=Code agence] }
+    { 4   ;   ;Bank Account No.    ;Text30        ;CaptionML=[ENU=Bank Account No.;
+                                                              FRA=Nø compte bancaire] }
+  }
+  KEYS
+  {
+    {    ;Customer No.,Bank Branch No.,Agency Code,Bank Account No.;
+                                                   Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

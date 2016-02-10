@@ -1,0 +1,63 @@
+OBJECT Table 9182 Generic Chart Y-Axis
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    OnInsert=BEGIN
+               TESTFIELD("Y-Axis Measure Field ID");
+             END;
+
+    CaptionML=[ENU=Generic Chart Y-Axis;
+               FRA=Axe Y graphique gÇnÇrique];
+  }
+  FIELDS
+  {
+    { 2   ;   ;ID                  ;Code20        ;CaptionML=[ENU=ID;
+                                                              FRA=ID] }
+    { 3   ;   ;Line No.            ;Integer       ;CaptionML=[ENU=Line No.;
+                                                              FRA=N¯ ligne] }
+    { 10  ;   ;Y-Axis Measure Field ID;Integer    ;CaptionML=[ENU=Y-Axis Measure Field ID;
+                                                              FRA=ID champ mesure axe Y] }
+    { 11  ;   ;Y-Axis Measure Field Name;Text50   ;CaptionML=[ENU=Y-Axis Measure Field Name;
+                                                              FRA=Nom champ mesure axe Y] }
+    { 12  ;   ;Measure Operator    ;Option        ;CaptionML=[ENU=Measure Operator;
+                                                              FRA=OpÇrateur mesure];
+                                                   OptionCaptionML=[ENU=Sum,Count;
+                                                                    FRA=Somme,Nombre];
+                                                   OptionString=Sum,Count }
+    { 13  ;   ;Y-Axis Measure Field Caption;Text250;
+                                                   CaptionML=[ENU=Y-Axis Measure Field Caption;
+                                                              FRA=LÇgende champ mesure axe Y] }
+    { 20  ;   ;Show Title          ;Boolean       ;CaptionML=[ENU=Show Title;
+                                                              FRA=Afficher titre] }
+    { 21  ;   ;Aggregation         ;Option        ;CaptionML=[ENU=Aggregation;
+                                                              FRA=AgrÇgation];
+                                                   OptionCaptionML=[ENU=None,Count,Sum,Min,Max,Avg;
+                                                                    FRA=Aucun,Nombre,Somme,Min,Max,Moy];
+                                                   OptionString=None,Count,Sum,Min,Max,Avg }
+    { 22  ;   ;Chart Type          ;Option        ;CaptionML=[ENU=Chart Type;
+                                                              FRA=Type de graphique];
+                                                   OptionCaptionML=[ENU=Column,Point,Line,ColumnStacked,ColumnStacked100,Area,AreaStacked,AreaStacked100,StepLine,Pie,Doughnut,Range,Radar,Funnel;
+                                                                    FRA=Colonne,Point,Ligne,HistogrammeempilÇ,HistogrammeempilÇ100,Aires,AiresempilÇes,AiresempilÇes100,Escalier,Secteurs,Anneau,êtendue,Radar,Entonnoir];
+                                                   OptionString=Column,Point,Line,ColumnStacked,ColumnStacked100,Area,AreaStacked,AreaStacked100,StepLine,Pie,Doughnut,Range,Radar,Funnel }
+  }
+  KEYS
+  {
+    {    ;ID,Line No.                             ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

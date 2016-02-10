@@ -1,0 +1,37 @@
+OBJECT Codeunit 90001 My Codeunit 2
+{
+  OBJECT-PROPERTIES
+  {
+    Date=28/01/16;
+    Time=11:46:37;
+    Modified=Yes;
+    Version List=;
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+             CodeA:='hello there';
+             TextA:='how are u';
+             CodeB:=CodeA+'!'+TextA;
+             MESSAGE(CodeB);
+            MaxChar:=MAXSTRLEN(Description);
+            MESSAGE('the value of %1 is %2','MaxChar',MaxChar);
+            Description:=COPYSTR('the message is:'+CodeB,1,MAXSTRLEN(Description));
+            MESSAGE('the value of %1 is %2','Description',Description);
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      CodeA@1000000000 : Code[30];
+      CodeB@1000000001 : Code[50];
+      TextA@1000000002 : Text[50];
+      MaxChar@1000000003 : Integer;
+      Description@1000000004 : Text[30];
+
+    BEGIN
+    END.
+  }
+}
+

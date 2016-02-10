@@ -1,0 +1,334 @@
+OBJECT Page 1317 Mini Sales Credit Memos
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    Editable=No;
+    CaptionML=[ENU=Sales Credit Memos;
+               FRA=Avoirs vente];
+    SourceTable=Table36;
+    SourceTableView=WHERE(Document Type=CONST(Credit Memo));
+    PageType=List;
+    CardPageID=Mini Sales Credit Memo;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Credit Memo,Posting;
+                                FRA=Nouveau,Traitement,êtat,Avoir,Validation];
+    OnOpenPage=VAR
+                 FileManagement@1000 : Codeunit 419;
+               BEGIN
+                 SetSecurityFilterOnRespCenter;
+
+                 AllowDotNetAddIn := FileManagement.CanRunDotNetOnClient;
+               END;
+
+    ActionList=ACTIONS
+    {
+      { 21      ;0   ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 24      ;1   ;ActionGroup;
+                      Name=CreditMemo;
+                      CaptionML=[ENU=Credit Memo;
+                                 FRA=Avoir];
+                      Image=Invoice }
+      { 4       ;2   ;Action    ;
+                      ShortCutKey=Shift+F7;
+                      CaptionML=[ENU=Customer;
+                                 FRA=Client];
+                      ToolTipML=[ENU=View or edit detailed information about the customer on the selected sales document.;
+                                 FRA=Affichez ou modifiez des informations dÇtaillÇes concernant le client sur le document vente sÇlectionnÇ.];
+                      RunObject=Page 1300;
+                      RunPageLink=No.=FIELD(Sell-to Customer No.);
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=Customer;
+                      PromotedCategory=Category4;
+                      Scope=Repeater }
+      { 49      ;1   ;ActionGroup;
+                      Name=Posting;
+                      CaptionML=[ENU=P&osting;
+                                 FRA=&Validation];
+                      Image=Post }
+      { 51      ;2   ;Action    ;
+                      Name=Post;
+                      ShortCutKey=F9;
+                      CaptionML=[ENU=P&ost;
+                                 FRA=&Valider];
+                      ToolTipML=[ENU=Finalize the selected sales document. Posting updates the books with the document's amounts and quantities.;
+                                 FRA=Finalisez le document vente sÇlectionnÇ. La validation met Ö jour la comptabilitÇ avec les montants et les quantitÇs du document.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostOrder;
+                      PromotedCategory=Category5;
+                      Scope=Repeater;
+                      OnAction=BEGIN
+                                 Post(CODEUNIT::"Sales-Post (Yes/No)");
+                               END;
+                                }
+      { 22      ;2   ;Action    ;
+                      Name=PostAndSend;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Post and &Send;
+                                 FRA=Valider et en&voyer];
+                      ToolTipML=[ENU=Finalize and send the selected sales document.;
+                                 FRA=Finalisez et envoyez le document vente sÇlectionnÇ.];
+                      Promoted=Yes;
+                      PromotedIsBig=Yes;
+                      Image=PostSendTo;
+                      PromotedCategory=Category5;
+                      Scope=Repeater;
+                      OnAction=BEGIN
+                                 SendToPosting(CODEUNIT::"Sales-Post and Send");
+                               END;
+                                }
+      { 1001    ;2   ;Action    ;
+                      Name=Printer;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Print;
+                                 FRA=Im&primer];
+                      ToolTipML=[ENU=Finalize and print the selected sales document.;
+                                 FRA=Finalisez et imprimez le document vente sÇlectionnÇ.];
+                      PromotedIsBig=Yes;
+                      Image=Print;
+                      PromotedCategory=Category5;
+                      Scope=Repeater;
+                      OnAction=BEGIN
+                                 PostAndPrint(CODEUNIT::"Sales-Post");
+                               END;
+                                }
+      { 1002    ;2   ;Action    ;
+                      Name=Email as PDF;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=Email;
+                                 FRA=E-mail];
+                      ToolTipML=[ENU=Finalize and attach the selected sales document to an email to the customer.;
+                                 FRA=Finalisez et joignez le document vente sÇlectionnÇ Ö un e-mail adressÇ au client.];
+                      Visible=AllowDotNetAddIn;
+                      PromotedIsBig=Yes;
+                      Image=Email;
+                      PromotedCategory=Category5;
+                      Scope=Repeater;
+                      OnAction=BEGIN
+                                 Post(CODEUNIT::"Sales-Post + Email");
+                               END;
+                                }
+      { 20      ;2   ;Action    ;
+                      CaptionML=[ENU=Preview Posting;
+                                 FRA=Aperáu compta.];
+                      Image=ViewPostedOrder;
+                      OnAction=BEGIN
+                                 ShowPreview;
+                               END;
+                                }
+      { 19      ;1   ;ActionGroup;
+                      Name=Reports;
+                      CaptionML=[ENU=Reports;
+                                 FRA=êtats];
+                      ActionContainerType=Reports }
+      { 18      ;2   ;ActionGroup;
+                      Name=SalesReports;
+                      CaptionML=[ENU=Sales Reports;
+                                 FRA=êtats vente];
+                      Image=Report }
+      { 17      ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Top 10 List;
+                                 FRA=Clients : Palmaräs];
+                      ToolTipML=[ENU=View, print, or save an overview of the customers that purchase the most or that owe the most in a selected period. Only customers that have either purchases during the period or a balance at the end of the period will be included.;
+                                 FRA=Affichez, imprimez ou enregistrez un aperáu des clients qui achätent le plus ou de ceux qui doivent le plus d'argent au cours d'une pÇriode sÇlectionnÇe. Seuls les clients qui ont des achats pour cette pÇriode ou un solde Ö la fin de la pÇriode sont inclus.];
+                      RunObject=Report 111;
+                      Image=Report }
+      { 16      ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Sales List;
+                                 FRA=Clients : Liste des ventes];
+                      ToolTipML=[ENU=View, print, or save customer sales in a period, for example, to report sales activity to customs and tax authorities.;
+                                 FRA=Affichez, imprimez ou enregistrez les ventes client au cours d'une pÇriode, par exemple, pour signaler une activitÇ vente aux autoritÇs douaniäres et fiscales.];
+                      RunObject=Report 119;
+                      Image=Report }
+      { 15      ;3   ;Action    ;
+                      CaptionML=[ENU=Sales Statistics;
+                                 FRA=Statistiques vente];
+                      ToolTipML=[ENU=View, print, or save the customer's total cost, sale, and profit over time, for example, to analyze earnings trends. The report shows amounts for original and adjusted cost, sales, profit, invoice discount, payment discount, and profit percentage in three adjustable periods.;
+                                 FRA=Affichez, imprimez ou enregistrez le coñt total, les ventes et la marge Ö long terme du client, par exemple, pour analyser ses tendances bÇnÇficiaires. L'Çtat affiche les montants des coñts originaux et ajustÇs, des ventes, de la marge, de la remise facture et de l'escompte, ainsi que le pourcentage marge sur vente au cours de troisˇpÇriodes sÇlectionnables.];
+                      RunObject=Report 112;
+                      Image=Report }
+      { 14      ;2   ;ActionGroup;
+                      Name=FinanceReports;
+                      CaptionML=[ENU=Finance Reports;
+                                 FRA=êtats financiers];
+                      Image=Report }
+      { 13      ;3   ;Action    ;
+                      CaptionML=[ENU=Statement;
+                                 FRA=RelevÇ];
+                      ToolTipML=[ENU=View, print, or save a list of a customer's transactions for a selected period, for example, to send to the customer at the close of an accounting period. You can choose to have all overdue balances displayed regardless of the period specified, or you can choose to include an aging band.;
+                                 FRA=Affichez, imprimez ou enregistrez une liste des transactions d'un client pendant une pÇriode sÇlectionnÇe, par exemple, pour envoyer au client Ö la clìture d'une pÇriode comptable. Vous pouvez choisir d'afficher tous les soldes Çchus, sans tenir compte de la pÇriode spÇcifiÇe, ou d'inclure un cumul date.];
+                      RunObject=Report 116;
+                      Image=Report }
+      { 12      ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Balance to Date;
+                                 FRA=Clients : êcritures ouvertes];
+                      ToolTipML=[ENU=View, print, or save customers' balances on a certain date. You can use the report to extract your total sales income at the close of an accounting period or fiscal year.;
+                                 FRA=Affichez, imprimez ou enregistrez le solde des clients Ö une certaine date. Vous pouvez utiliser l'Çtat pour extraire vos revenus de vente totaux Ö la clìture d'une pÇriode ou d'un exercice comptable.];
+                      RunObject=Report 121;
+                      Image=Report }
+      { 11      ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Trial Balance;
+                                 FRA=Clients : Balance];
+                      ToolTipML=[ENU=View, print, or save the beginning and ending balance for customers with entries within a specified period. The report can be used to verify that the balance for a customer posting group is equal to the balance on the corresponding general ledger account on a certain date.;
+                                 FRA=Affichez, imprimez ou enregistrez le solde d'ouverture et final pour les clients prÇsentant des Çcritures au cours d'une pÇriode spÇcifiÇe. L'Çtat peut àtre utilisÇ pour vÇrifier que le solde pour un groupe comptabilisation client est Çgal Ö celui du compte gÇnÇral correspondant Ö une certaine date.];
+                      RunObject=Report 129;
+                      Image=Report }
+      { 10      ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Detail Trial Bal.;
+                                 FRA=Clients : Grand livre client];
+                      ToolTipML=[ENU=View, print, or save the balance for customers with balances on a specified date, for example, at the close of an accounting period or for an audit.;
+                                 FRA=Affichez, imprimez ou enregistrez le solde des clients prÇsentant des soldes Ö une date donnÇe, par exemple, Ö la clìture d'une pÇriode comptable ou pour un audit.];
+                      RunObject=Report 104;
+                      Image=Report }
+      { 9       ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Summary Aging;
+                                 FRA=Clients : êchÇancier];
+                      ToolTipML=[ENU=View, print, or save a summary of each customer's total payments due, divided into three time periods. The report can be used to decide when to issue reminders, to evaluate a customer's creditworthiness, or to prepare liquidity analyses.;
+                                 FRA=Affichez, imprimez ou enregistrez un rÇsumÇ des totaux dus de chaque client, divisÇ en troisˇpÇriodes. Cet Çtat sert Ö dÇcider quand Çmettre des relances, Ö Çvaluer la solvabilitÇ d'un client ou Ö prÇparer des analyses de liquiditÇs.];
+                      RunObject=Report 105;
+                      Image=Report }
+      { 8       ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Detailed Aging;
+                                 FRA=Client - êcritures Çchues];
+                      ToolTipML=[ENU=View, print, or save a detailed list of each customer's total payments due, divided into three time periods. The report can be used to decide when to issue reminders, to evaluate a customer's creditworthiness, or to prepare liquidity analyses.;
+                                 FRA=Affichez, imprimez ou enregistrez une liste dÇtaillÇe des totaux dus de chaque client, divisÇe en troisˇpÇriodes. Cet Çtat sert Ö dÇcider quand Çmettre des relances, Ö Çvaluer la solvabilitÇ d'un client ou Ö prÇparer des analyses de liquiditÇs.];
+                      RunObject=Report 106;
+                      Image=Report }
+      { 7       ;3   ;Action    ;
+                      CaptionML=[ENU=Aged Accounts Receivable;
+                                 FRA=ComptabilitÇ client ÉgÇe];
+                      ToolTipML=[ENU=View, print, or save an overview of when customer payments are due or overdue, divided into four periods. You must specify the date you want aging calculated from and the length of the period that each column will contain data for.;
+                                 FRA=Affichez, imprimez ou enregistrez un aperáu de la date d'ÇchÇance des paiements client, divisÇ en quatreˇpÇriodes. Vous devez spÇcifier la date Ö partir de laquelle vous souhaitez que le cumul soit calculÇ et la durÇe de la pÇriode pour laquelle chaque colonne contiendra des donnÇes.];
+                      RunObject=Report 120;
+                      Image=Report }
+      { 5       ;3   ;Action    ;
+                      CaptionML=[ENU=Customer - Payment Receipt;
+                                 FRA=Reáu paiement client];
+                      ToolTipML=[ENU=View, print, or save a document showing which customer ledger entries that a payment has been applied to. This report can be used as a payment receipt that you send to the customer.;
+                                 FRA=Affichez, imprimez ou enregistrez un document affichant les Çcritures comptables client avec lesquelles un paiement a ÇtÇ lettrÇ. Cet Çtat peut àtre utilisÇ comme reáu de paiement Ö envoyer au client.];
+                      RunObject=Report 211;
+                      Image=Report }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the number of the sales document. The field can be filled automatically or manually and can be set up to be invisible.;
+                           FRA=SpÇcifie le numÇro du document vente. Le champ peut àtre renseignÇ manuellement ou automatiquement et peut àtre configurÇ pour àtre invisible.];
+                SourceExpr="No." }
+
+    { 6   ;2   ;Field     ;
+                CaptionML=[ENU=Customer Name;
+                           FRA=Nom client];
+                ToolTipML=[ENU=Specifies the name of the customer who will receive the products and be billed by default. The value is automatically inserted from the customer card when you fill the Sell-to Customer No. field. The value will appear on the printed sales document.;
+                           FRA=SpÇcifie le nom du client qui recevra les produits et sera facturÇ par dÇfaut. La valeur est automatiquement insÇrÇe Ö partir de la fiche client lorsque vous renseignez le champ N¯ donneur d'ordre. Elle sera indiquÇe sur le document vente imprimÇ.];
+                SourceExpr="Sell-to Customer Name" }
+
+    { 30  ;2   ;Field     ;
+                CaptionML=[ENU=Contact;
+                           FRA=Contact];
+                ToolTipML=[ENU=Specifies the name of the person to contact at the customer. The value is automatically inserted from the customer card when you fill the Sell-to Customer No. field. The value will appear on the printed sales document.;
+                           FRA=SpÇcifie le nom de la personne Ö contacter chez le client. La valeur est automatiquement insÇrÇe Ö partir de la fiche client lorsque vous renseignez le champ N¯ donneur d'ordre. Elle sera indiquÇe sur le document vente imprimÇ.];
+                SourceExpr="Sell-to Contact" }
+
+    { 29  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the date when the posting of the sales document will be recorded. By default, today's date is entered.;
+                           FRA=Indique la date Ö laquelle la validation du document vente sera validÇe. Par dÇfaut, la date du jour est indiquÇe.];
+                SourceExpr="Posting Date" }
+
+    { 26  ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies when the sales invoice must be paid. By default, the field is calculated as the date in the Shipment Date field plus the period defined in the Payment Terms Code field.;
+                           FRA=SpÇcifie la date Ö laquelle la facture vente doit àtre payÇe. Par dÇfaut, le champ est calculÇ comme la date dans le champ Date de prÇparation plus la pÇriode dÇfinie dans le champ Code condition paiement.];
+                SourceExpr="Due Date" }
+
+    { 3   ;2   ;Field     ;
+                ToolTipML=[ENU=Specifies the sum of amounts in the Line Amount field on the sales order lines. It is used to calculate the invoice discount of the sales order.;
+                           FRA=SpÇcifie la somme des montants du champ Montant ligne sur les lignes commande vente. Il permet de calculer la remise facture de la commande vente.];
+                SourceExpr=Amount }
+
+  }
+  CODE
+  {
+    VAR
+      MiniLinesInstructionMgt@1001 : Codeunit 1320;
+      AllowDotNetAddIn@1000 : Boolean INDATASET;
+      OpenPostedSalesCrMemoQst@1003 : TextConst 'ENU=The credit memo has been posted and archived.\\Do you want to open the posted credit memo from the Posted Sales Credit Memo list?;FRA=L''avoir a ÇtÇ validÇ et archivÇ.\\Souhaitez-vous ouvrir l''avoir validÇ Ö partir de la liste des avoirs vente validÇsˇ?';
+      PostAndPrintQst@1002 : TextConst 'ENU=Do you want to post and print the credit memo?;FRA=Souhaitez-vous valider et imprimer l''avoirˇ?';
+
+    LOCAL PROCEDURE Post@4(PostingCodeunitID@1000 : Integer);
+    VAR
+      PreAssignedNo@1001 : Code[20];
+    BEGIN
+      MiniLinesInstructionMgt.SalesCheckAllLinesHaveQuantityAssigned(Rec);
+      PreAssignedNo := "No.";
+      SendToPosting(PostingCodeunitID);
+      IF "Job Queue Status" = "Job Queue Status"::"Scheduled for Posting" THEN
+        CurrPage.CLOSE
+      ELSE
+        ShowPostedConfirmationMessage(PreAssignedNo);
+    END;
+
+    LOCAL PROCEDURE PostAndPrint@1(PostingCodeunitID@1000 : Integer);
+    VAR
+      SalesCrMemoHeader@1001 : Record 114;
+      DocumentNo@1002 : Code[20];
+      PreAssignedNo@1003 : Code[20];
+    BEGIN
+      MiniLinesInstructionMgt.SalesCheckAllLinesHaveQuantityAssigned(Rec);
+
+      IF NOT CONFIRM(PostAndPrintQst,FALSE) THEN
+        EXIT;
+
+      PreAssignedNo := "No.";
+      SendToPosting(PostingCodeunitID);
+
+      IF "Last Posting No." = '' THEN
+        DocumentNo := "No."
+      ELSE
+        DocumentNo := "Last Posting No.";
+
+      IF SalesCrMemoHeader.GET(DocumentNo) THEN BEGIN
+        SalesCrMemoHeader.SETRECFILTER;
+        COMMIT;
+        SalesCrMemoHeader.PrintRecords(NOT AllowDotNetAddIn);
+        ShowPostedConfirmationMessage(PreAssignedNo);
+      END;
+    END;
+
+    LOCAL PROCEDURE ShowPostedConfirmationMessage@7(PreAssignedNo@1001 : Code[20]);
+    VAR
+      SalesCrMemoHeader@1000 : Record 114;
+    BEGIN
+      SalesCrMemoHeader.SETRANGE("Pre-Assigned No.",PreAssignedNo);
+      IF SalesCrMemoHeader.FINDFIRST THEN
+        IF DIALOG.CONFIRM(OpenPostedSalesCrMemoQst,FALSE) THEN
+          PAGE.RUN(PAGE::"Mini Posted Sales Credit Memo",SalesCrMemoHeader);
+    END;
+
+    PROCEDURE ShowPreview@2();
+    VAR
+      SalesPostYesNo@1001 : Codeunit 81;
+    BEGIN
+      SalesPostYesNo.Preview(Rec);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

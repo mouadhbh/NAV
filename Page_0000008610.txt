@@ -1,0 +1,164 @@
+OBJECT Page 8610 Config. Questionnaire
+{
+  OBJECT-PROPERTIES
+  {
+    Date=23/09/13;
+    Time=12:00:00;
+    Version List=NAVW17.10;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Config. Questionnaire;
+               FRA=Questionnaire config.];
+    SourceTable=Table8610;
+    PageType=List;
+    PromotedActionCategoriesML=[ENU=New,Process,Report,Excel;
+                                FRA=Nouveau,Traitement,êtat,Excel];
+    ActionList=ACTIONS
+    {
+      { 1900000003;  ;ActionContainer;
+                      ActionContainerType=ActionItems }
+      { 14      ;1   ;ActionGroup;
+                      CaptionML=[ENU=&Questionnaire;
+                                 FRA=&Questionnaire];
+                      Image=Questionaire }
+      { 11      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=E&xport to Excel;
+                                 FRA=E&xporter vers Excel];
+                      Promoted=Yes;
+                      Image=ExportToExcel;
+                      PromotedCategory=Category4;
+                      OnAction=BEGIN
+                                 TESTFIELD(Code);
+
+                                 FileName := FileMgt.SaveFileDialog(Text002,FileName,'');
+                                 IF FileName = '' THEN
+                                   EXIT;
+
+                                 IF QuestionnaireMgt.ExportQuestionnaireToExcel(FileName,Rec) THEN
+                                   MESSAGE(Text000);
+                               END;
+                                }
+      { 10      ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Import from Excel;
+                                 FRA=&Importer d'Excel];
+                      Promoted=Yes;
+                      Image=ImportExcel;
+                      PromotedCategory=Category4;
+                      OnAction=BEGIN
+                                 FileName := FileMgt.OpenFileDialog(Text002,FileName,'');
+                                 IF FileName = '' THEN
+                                   EXIT;
+
+                                 IF QuestionnaireMgt.ImportQuestionnaireFromExcel(FileName) THEN
+                                   MESSAGE(Text001);
+                               END;
+                                }
+      { 9       ;2   ;Separator  }
+      { 8       ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Export to XML;
+                                 FRA=&Exporter vers un fichier XML];
+                      Image=Export;
+                      OnAction=BEGIN
+                                 IF QuestionnaireMgt.ExportQuestionnaireAsXML(FileName,Rec) THEN
+                                   MESSAGE(Text000)
+                                 ELSE
+                                   MESSAGE(Text003);
+                               END;
+                                }
+      { 7       ;2   ;Action    ;
+                      Ellipsis=Yes;
+                      CaptionML=[ENU=&Import from XML;
+                                 FRA=&Importer d'un fichier XML];
+                      Image=Import;
+                      OnAction=BEGIN
+                                 IF QuestionnaireMgt.ImportQuestionnaireAsXMLFromClient THEN
+                                   MESSAGE(Text001);
+                               END;
+                                }
+      { 6       ;2   ;Separator  }
+      { 5       ;2   ;Action    ;
+                      CaptionML=[ENU=&Update Questionnaire;
+                                 FRA=Mettre Ö jo&ur questionnaire];
+                      Image=Refresh;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 IF QuestionnaireMgt.UpdateQuestionnaire(Rec) THEN
+                                   MESSAGE(Text004);
+                               END;
+                                }
+      { 3       ;2   ;Action    ;
+                      CaptionML=[ENU=&Apply Answers;
+                                 FRA=&Appliquer rÇponses];
+                      Promoted=Yes;
+                      Image=Apply;
+                      PromotedCategory=Process;
+                      OnAction=BEGIN
+                                 IF QuestionnaireMgt.ApplyAnswers(Rec) THEN
+                                   MESSAGE(Text005);
+                               END;
+                                }
+      { 15      ;    ;ActionContainer;
+                      ActionContainerType=RelatedInformation }
+      { 16      ;1   ;ActionGroup;
+                      CaptionML=[ENU=Areas;
+                                 FRA=DÇpts destination/provenance] }
+      { 13      ;2   ;Action    ;
+                      CaptionML=[ENU=&Question Areas;
+                                 FRA=Zones &question];
+                      RunObject=Page 8613;
+                      RunPageLink=Questionnaire Code=FIELD(Code);
+                      Promoted=Yes;
+                      Image=View;
+                      PromotedCategory=Process }
+    }
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Group     ;
+                GroupType=Repeater }
+
+    { 2   ;2   ;Field     ;
+                SourceExpr=Code }
+
+    { 4   ;2   ;Field     ;
+                SourceExpr=Description }
+
+    { 1900000007;0;Container;
+                ContainerType=FactBoxArea }
+
+    { 1900383207;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=RecordLinks }
+
+    { 1905767507;1;Part   ;
+                Visible=FALSE;
+                PartType=System;
+                SystemPartID=Notes }
+
+  }
+  CODE
+  {
+    VAR
+      Text000@1001 : TextConst 'ENU=The questionnaire has been successfully exported.;FRA=Le questionnaire a bien ÇtÇ exportÇ.';
+      Text001@1000 : TextConst 'ENU=The questionnaire has been successfully imported.;FRA=Le questionnaire a bien ÇtÇ importÇ.';
+      Text002@1002 : TextConst 'ENU=Save as Excel workbook;FRA=Enregistrer en tant que classeur Excel';
+      Text003@1003 : TextConst 'ENU=The export of the questionnaire has been canceled.;FRA=L''exportation du questionnaire a ÇtÇ annulÇe.';
+      QuestionnaireMgt@1004 : Codeunit 8610;
+      FileMgt@1009 : Codeunit 419;
+      FileName@1005 : Text;
+      Text004@1006 : TextConst 'ENU=The questionnaire has been updated.;FRA=Le questionnaire a ÇtÇ mis Ö jour.';
+      Text005@1010 : TextConst 'ENU=Answers have been applied.;FRA=Les rÇponses ont ÇtÇ appliquÇes.';
+
+    BEGIN
+    END.
+  }
+}
+

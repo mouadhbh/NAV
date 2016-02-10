@@ -1,0 +1,94 @@
+OBJECT Table 10861 Payment Status
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVFR8.00;
+  }
+  PROPERTIES
+  {
+    OnInsert=VAR
+               PaymentStatus@1120000 : Record 10861;
+             BEGIN
+               IF NOT PaymentStatus.GET("Payment Class",0) THEN
+                 Line := 0;
+             END;
+
+    OnDelete=VAR
+               PaymentStep@1120000 : Record 10862;
+               PaymentHeader@1120001 : Record 10865;
+               PaymentLine@1120002 : Record 10866;
+             BEGIN
+               IF Line = 0 THEN
+                 ERROR(Text000);
+               PaymentStep.SETRANGE("Payment Class","Payment Class");
+               PaymentStep.SETRANGE("Previous Status",Line);
+               IF PaymentStep.FINDFIRST THEN
+                 ERROR(Text001);
+               PaymentStep.SETRANGE("Previous Status");
+               PaymentStep.SETRANGE("Next Status",Line);
+               IF PaymentStep.FINDFIRST THEN
+                 ERROR(Text001);
+               PaymentHeader.SETRANGE("Payment Class","Payment Class");
+               PaymentHeader.SETRANGE("Status No.",Line);
+               IF PaymentHeader.FINDFIRST THEN
+                 ERROR(Text001);
+               PaymentLine.SETRANGE("Payment Class","Payment Class");
+               PaymentLine.SETRANGE("Status No.",Line);
+               IF PaymentLine.FINDFIRST THEN
+                 ERROR(Text001);
+             END;
+
+    CaptionML=[ENU=Payment Status;
+               FRA=Statut rŠglement];
+    LookupPageID=Page10861;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Payment Class       ;Text30        ;TableRelation="Payment Class";
+                                                   CaptionML=[ENU=Payment Class;
+                                                              FRA=Type de rŠglement] }
+    { 2   ;   ;Line                ;Integer       ;CaptionML=[ENU=Line;
+                                                              FRA=Ligne] }
+    { 3   ;   ;Name                ;Text50        ;CaptionML=[ENU=Name;
+                                                              FRA=Nom] }
+    { 4   ;   ;RIB                 ;Boolean       ;CaptionML=[ENU=RIB;
+                                                              FRA=RIB] }
+    { 5   ;   ;Look                ;Boolean       ;CaptionML=[ENU=Look;
+                                                              FRA=Consultation] }
+    { 6   ;   ;ReportMenu          ;Boolean       ;CaptionML=[ENU=ReportMenu;
+                                                              FRA=ReportMenu] }
+    { 7   ;   ;Acceptation Code    ;Boolean       ;CaptionML=[ENU=Acceptation Code;
+                                                              FRA=Code acceptation] }
+    { 8   ;   ;Amount              ;Boolean       ;CaptionML=[ENU=Amount;
+                                                              FRA=Montant] }
+    { 9   ;   ;Debit               ;Boolean       ;CaptionML=[ENU=Debit;
+                                                              FRA=D‚bit] }
+    { 10  ;   ;Credit              ;Boolean       ;CaptionML=[ENU=Credit;
+                                                              FRA=Cr‚dit] }
+    { 11  ;   ;Bank Account        ;Boolean       ;CaptionML=[ENU=Bank Account;
+                                                              FRA=Compte bancaire] }
+    { 20  ;   ;Payment in Progress ;Boolean       ;CaptionML=[ENU=Payment in Progress;
+                                                              FRA=Paiement en cours] }
+    { 21  ;   ;Archiving Authorized;Boolean       ;CaptionML=[ENU=Archiving Authorized;
+                                                              FRA=Archivage autoris‚] }
+  }
+  KEYS
+  {
+    {    ;Payment Class,Line                      ;Clustered=Yes }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      Text000@1120000 : TextConst 'ENU=Deleting the first report is not allowed.;FRA=Vous n''avez pas le droit de supprimer le premier ‚tat.';
+      Text001@1120001 : TextConst 'ENU=Deleting is not allowed because this Payment Status is already used.;FRA=La suppression est impossible car ce statut rŠglement est d‚j… utilis‚.';
+
+    BEGIN
+    END.
+  }
+}
+

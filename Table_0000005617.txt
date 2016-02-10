@@ -1,0 +1,75 @@
+OBJECT Table 5617 FA Register
+{
+  OBJECT-PROPERTIES
+  {
+    Date=07/09/12;
+    Time=12:00:00;
+    Version List=NAVW17.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=FA Register;
+               FRA=Hist. trans. immobilisation];
+    LookupPageID=Page5627;
+  }
+  FIELDS
+  {
+    { 1   ;   ;No.                 ;Integer       ;CaptionML=[ENU=No.;
+                                                              FRA=Nø] }
+    { 2   ;   ;From Entry No.      ;Integer       ;TableRelation="FA Ledger Entry";
+                                                   CaptionML=[ENU=From Entry No.;
+                                                              FRA=Nø s‚quence d‚but] }
+    { 3   ;   ;To Entry No.        ;Integer       ;TableRelation="FA Ledger Entry";
+                                                   CaptionML=[ENU=To Entry No.;
+                                                              FRA=Nø s‚quence fin] }
+    { 4   ;   ;Creation Date       ;Date          ;CaptionML=[ENU=Creation Date;
+                                                              FRA=Date cr‚ation] }
+    { 5   ;   ;Source Code         ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Source Code;
+                                                              FRA=Code journal] }
+    { 6   ;   ;User ID             ;Code50        ;TableRelation=User."User Name";
+                                                   OnLookup=VAR
+                                                              UserMgt@1000 : Codeunit 418;
+                                                            BEGIN
+                                                              UserMgt.LookupUserID("User ID");
+                                                            END;
+
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=User ID;
+                                                              FRA=Code utilisateur] }
+    { 7   ;   ;Journal Batch Name  ;Code10        ;CaptionML=[ENU=Journal Batch Name;
+                                                              FRA=Nom feuille] }
+    { 8   ;   ;Journal Type        ;Option        ;CaptionML=[ENU=Journal Type;
+                                                              FRA=Type feuille];
+                                                   OptionCaptionML=[ENU=G/L,Fixed Asset;
+                                                                    FRA=Comptabilit‚,Immobilisation];
+                                                   OptionString=G/L,Fixed Asset }
+    { 9   ;   ;G/L Register No.    ;Integer       ;TableRelation="G/L Register";
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=G/L Register No.;
+                                                              FRA=Nø hist. transaction compta.];
+                                                   BlankZero=Yes }
+    { 10  ;   ;From Maintenance Entry No.;Integer ;TableRelation="Maintenance Ledger Entry";
+                                                   CaptionML=[ENU=From Maintenance Entry No.;
+                                                              FRA=De l'‚criture maintenance nø] }
+    { 11  ;   ;To Maintenance Entry No.;Integer   ;TableRelation="Maintenance Ledger Entry";
+                                                   CaptionML=[ENU=To Maintenance Entry No.;
+                                                              FRA=A l'‚criture maintenance nø] }
+  }
+  KEYS
+  {
+    {    ;No.                                     ;Clustered=Yes }
+    {    ;Creation Date                            }
+    {    ;Source Code,Journal Batch Name,Creation Date }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+
+    BEGIN
+    END.
+  }
+}
+

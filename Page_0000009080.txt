@@ -1,0 +1,103 @@
+OBJECT Page 9080 Sales Hist. Sell-to FactBox
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Sell-to Customer Sales History;
+               FRA=Historique des ventes - donneur d'ordre];
+    SourceTable=Table18;
+    PageType=CardPart;
+  }
+  CONTROLS
+  {
+    { 1900000001;0;Container;
+                ContainerType=ContentArea }
+
+    { 1   ;1   ;Field     ;
+                CaptionML=[ENU=Customer No.;
+                           FRA=Nø client];
+                SourceExpr="No.";
+                OnDrillDown=BEGIN
+                              ShowDetails;
+                            END;
+                             }
+
+    { 3   ;1   ;Field     ;
+                CaptionML=[ENU=Quotes;
+                           FRA=Devis];
+                SourceExpr="No. of Quotes";
+                DrillDownPageID=Sales Quotes }
+
+    { 5   ;1   ;Field     ;
+                CaptionML=[ENU=Blanket Orders;
+                           FRA=Commandes ouvertes];
+                SourceExpr="No. of Blanket Orders";
+                DrillDownPageID=Blanket Sales Orders }
+
+    { 7   ;1   ;Field     ;
+                CaptionML=[ENU=Orders;
+                           FRA=Commandes];
+                SourceExpr="No. of Orders";
+                DrillDownPageID=Sales Order List }
+
+    { 9   ;1   ;Field     ;
+                CaptionML=[ENU=Invoices;
+                           FRA=Factures];
+                SourceExpr="No. of Invoices";
+                DrillDownPageID=Sales Invoice List }
+
+    { 11  ;1   ;Field     ;
+                CaptionML=[ENU=Return Orders;
+                           FRA=Retours];
+                SourceExpr="No. of Return Orders";
+                DrillDownPageID=Sales Return Order List }
+
+    { 13  ;1   ;Field     ;
+                CaptionML=[ENU=Credit Memos;
+                           FRA=Avoirs];
+                SourceExpr="No. of Credit Memos";
+                DrillDownPageID=Sales Credit Memos }
+
+    { 15  ;1   ;Field     ;
+                CaptionML=[ENU=Pstd. Shipments;
+                           FRA=Exp‚ditions enreg.];
+                SourceExpr="No. of Pstd. Shipments";
+                DrillDownPageID=Posted Sales Shipments }
+
+    { 17  ;1   ;Field     ;
+                CaptionML=[ENU=Pstd. Invoices;
+                           FRA=Factures enreg.];
+                SourceExpr="No. of Pstd. Invoices";
+                DrillDownPageID=Posted Sales Invoices }
+
+    { 19  ;1   ;Field     ;
+                CaptionML=[ENU=Pstd. Return Receipts;
+                           FRA=R‚ceptions retour enreg.];
+                SourceExpr="No. of Pstd. Return Receipts";
+                DrillDownPageID=Posted Return Receipts }
+
+    { 21  ;1   ;Field     ;
+                CaptionML=[ENU=Pstd. Credit Memos;
+                           FRA=Avoirs enreg.];
+                SourceExpr="No. of Pstd. Credit Memos";
+                DrillDownPageID=Posted Sales Credit Memos }
+
+  }
+  CODE
+  {
+
+    LOCAL PROCEDURE ShowDetails@1102601000();
+    BEGIN
+      PAGE.RUN(PAGE::"Customer Card",Rec);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

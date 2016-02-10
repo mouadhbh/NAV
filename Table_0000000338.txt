@@ -1,0 +1,128 @@
+OBJECT Table 338 Entry Summary
+{
+  OBJECT-PROPERTIES
+  {
+    Date=09/09/14;
+    Time=12:00:00;
+    Version List=NAVW18.00;
+  }
+  PROPERTIES
+  {
+    CaptionML=[ENU=Entry Summary;
+               FRA=Ecriture document r‚servation];
+  }
+  FIELDS
+  {
+    { 1   ;   ;Entry No.           ;Integer       ;CaptionML=[ENU=Entry No.;
+                                                              FRA=Nø s‚quence] }
+    { 2   ;   ;Table ID            ;Integer       ;CaptionML=[ENU=Table ID;
+                                                              FRA=ID table] }
+    { 3   ;   ;Summary Type        ;Text80        ;CaptionML=[ENU=Summary Type;
+                                                              FRA=Nom de la table] }
+    { 4   ;   ;Total Quantity      ;Decimal       ;CaptionML=[ENU=Total Quantity;
+                                                              FRA=Quantit‚ totale];
+                                                   DecimalPlaces=0:5 }
+    { 5   ;   ;Total Reserved Quantity;Decimal    ;CaptionML=[ENU=Total Reserved Quantity;
+                                                              FRA=Quantit‚ totale r‚serv‚e];
+                                                   DecimalPlaces=0:5 }
+    { 6   ;   ;Total Available Quantity;Decimal   ;CaptionML=[ENU=Total Available Quantity;
+                                                              FRA=Quantit‚ totale disponible];
+                                                   DecimalPlaces=0:5 }
+    { 7   ;   ;Current Reserved Quantity;Decimal  ;CaptionML=[ENU=Current Reserved Quantity;
+                                                              FRA=R‚servation en cours];
+                                                   DecimalPlaces=0:5 }
+    { 8   ;   ;Source Subtype      ;Integer       ;CaptionML=[ENU=Source Subtype;
+                                                              FRA=Sous-type origine] }
+    { 15  ;   ;Qty. Alloc. in Warehouse;Decimal   ;CaptionML=[ENU=Qty. Alloc. in Warehouse;
+                                                              FRA=Qt‚. allou‚e en entrep“t];
+                                                   DecimalPlaces=0:5 }
+    { 16  ;   ;Res. Qty. on Picks & Shipmts.;Decimal;
+                                                   CaptionML=[ENU=Res. Qty. on Picks & Shipmts.;
+                                                              FRA=Qt‚ r‚s. sur pr‚lŠvements et livraisons];
+                                                   DecimalPlaces=0:5 }
+    { 6500;   ;Serial No.          ;Code20        ;CaptionML=[ENU=Serial No.;
+                                                              FRA=Nø de s‚rie];
+                                                   Editable=No }
+    { 6501;   ;Lot No.             ;Code20        ;CaptionML=[ENU=Lot No.;
+                                                              FRA=Nø lot];
+                                                   Editable=No }
+    { 6502;   ;Warranty Date       ;Date          ;CaptionML=[ENU=Warranty Date;
+                                                              FRA=Date garantie];
+                                                   Editable=No }
+    { 6503;   ;Expiration Date     ;Date          ;CaptionML=[ENU=Expiration Date;
+                                                              FRA=Date d'expiration];
+                                                   Editable=No }
+    { 6504;   ;Total Requested Quantity;Decimal   ;CaptionML=[ENU=Total Requested Quantity;
+                                                              FRA=Quantit‚ totale demand‚e];
+                                                   DecimalPlaces=0:5 }
+    { 6505;   ;Selected Quantity   ;Decimal       ;OnValidate=BEGIN
+                                                                IF "Bin Active" AND ("Total Available Quantity" > "Bin Content") THEN BEGIN
+                                                                  IF "Selected Quantity" > "Bin Content" THEN
+                                                                    ERROR(Text001,"Bin Content");
+                                                                END ELSE
+                                                                  IF "Selected Quantity" > "Total Available Quantity" THEN
+                                                                    ERROR(Text001,"Total Available Quantity");
+                                                              END;
+
+                                                   CaptionML=[ENU=Selected Quantity;
+                                                              FRA=Quantit‚ s‚lectionn‚e];
+                                                   DecimalPlaces=0:5;
+                                                   MinValue=0;
+                                                   BlankZero=Yes }
+    { 6506;   ;Current Pending Quantity;Decimal   ;CaptionML=[ENU=Current Pending Quantity;
+                                                              FRA=Quantit‚ suspendue actuelle];
+                                                   DecimalPlaces=0:5 }
+    { 6507;   ;Current Requested Quantity;Decimal ;CaptionML=[ENU=Current Requested Quantity;
+                                                              FRA=Quantit‚ demand‚e actuelle] }
+    { 6508;   ;Bin Content         ;Decimal       ;AccessByPermission=TableData 5771=R;
+                                                   CaptionML=[ENU=Bin Content;
+                                                              FRA=Contenu emplacement];
+                                                   DecimalPlaces=0:5;
+                                                   Editable=No }
+    { 6509;   ;Bin Active          ;Boolean       ;CaptionML=[ENU=Bin Active;
+                                                              FRA=Empl. actif];
+                                                   Editable=No }
+    { 6510;   ;Non-specific Reserved Qty.;Decimal ;CaptionML=[ENU=Non-specific Reserved Qty.;
+                                                              FRA=Qt‚ r‚serv‚e non sp‚cifique];
+                                                   Editable=No }
+    { 6511;   ;Double-entry Adjustment;Decimal    ;CaptionML=[ENU=Double-entry Adjustment;
+                                                              FRA=Ajustement doublon];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Entry No.                               ;Clustered=Yes }
+    {    ;Lot No.,Serial No.                       }
+    {    ;Expiration Date                          }
+  }
+  FIELDGROUPS
+  {
+  }
+  CODE
+  {
+    VAR
+      Text001@1000 : TextConst 'ENU=You cannot select more than %1 units.;FRA=Vous ne pouvez pas s‚lectionner plus de %1 unit‚(s).';
+
+    PROCEDURE UpdateAvailable@1();
+    BEGIN
+      "Total Available Quantity" :=
+        "Total Quantity" -
+        "Total Requested Quantity" -
+        "Current Pending Quantity" +
+        "Double-entry Adjustment";
+    END;
+
+    PROCEDURE HasQuantity@2() : Boolean;
+    BEGIN
+      EXIT(("Total Quantity" <> 0) OR
+        ("Qty. Alloc. in Warehouse" <> 0) OR
+        ("Total Requested Quantity" <> 0) OR
+        ("Current Pending Quantity" <> 0) OR
+        ("Double-entry Adjustment" <> 0));
+    END;
+
+    BEGIN
+    END.
+  }
+}
+

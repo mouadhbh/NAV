@@ -1,0 +1,424 @@
+OBJECT Table 17 G/L Entry
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15/09/15;
+    Time=12:00:00;
+    Version List=NAVW19.00,NAVFR9.00;
+  }
+  PROPERTIES
+  {
+    OnInsert=VAR
+               GenJnlPostPreview@1000 : Codeunit 19;
+             BEGIN
+               GenJnlPostPreview.SaveGLEntry(Rec);
+             END;
+
+    CaptionML=[ENU=G/L Entry;
+               FRA=Ecriture comptable];
+    LookupPageID=Page20;
+    DrillDownPageID=Page20;
+  }
+  FIELDS
+  {
+    { 1   ;   ;Entry No.           ;Integer       ;CaptionML=[ENU=Entry No.;
+                                                              FRA=Nø s‚quence] }
+    { 3   ;   ;G/L Account No.     ;Code20        ;TableRelation="G/L Account";
+                                                   CaptionML=[ENU=G/L Account No.;
+                                                              FRA=Nø compte g‚n‚ral] }
+    { 4   ;   ;Posting Date        ;Date          ;CaptionML=[ENU=Posting Date;
+                                                              FRA=Date comptabilisation];
+                                                   ClosingDates=Yes }
+    { 5   ;   ;Document Type       ;Option        ;CaptionML=[ENU=Document Type;
+                                                              FRA=Type document];
+                                                   OptionCaptionML=[ENU=" ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund";
+                                                                    FRA=" ,Paiement,Facture,Avoir,Int‚rˆts,Relance,Remboursement"];
+                                                   OptionString=[ ,Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund] }
+    { 6   ;   ;Document No.        ;Code20        ;OnLookup=VAR
+                                                              IncomingDocument@1000 : Record 130;
+                                                            BEGIN
+                                                              IncomingDocument.HyperlinkToDocument("Document No.","Posting Date");
+                                                            END;
+
+                                                   CaptionML=[ENU=Document No.;
+                                                              FRA=Nø document] }
+    { 7   ;   ;Description         ;Text50        ;CaptionML=[ENU=Description;
+                                                              FRA=D‚signation] }
+    { 10  ;   ;Bal. Account No.    ;Code20        ;TableRelation=IF (Bal. Account Type=CONST(G/L Account)) "G/L Account"
+                                                                 ELSE IF (Bal. Account Type=CONST(Customer)) Customer
+                                                                 ELSE IF (Bal. Account Type=CONST(Vendor)) Vendor
+                                                                 ELSE IF (Bal. Account Type=CONST(Bank Account)) "Bank Account"
+                                                                 ELSE IF (Bal. Account Type=CONST(Fixed Asset)) "Fixed Asset"
+                                                                 ELSE IF (Bal. Account Type=CONST(IC Partner)) "IC Partner";
+                                                   CaptionML=[ENU=Bal. Account No.;
+                                                              FRA=Nø compte contrepartie] }
+    { 17  ;   ;Amount              ;Decimal       ;CaptionML=[ENU=Amount;
+                                                              FRA=Montant];
+                                                   AutoFormatType=1 }
+    { 23  ;   ;Global Dimension 1 Code;Code20     ;TableRelation="Dimension Value".Code WHERE (Global Dimension No.=CONST(1));
+                                                   CaptionML=[ENU=Global Dimension 1 Code;
+                                                              FRA=Code axe principal 1];
+                                                   CaptionClass='1,1,1' }
+    { 24  ;   ;Global Dimension 2 Code;Code20     ;TableRelation="Dimension Value".Code WHERE (Global Dimension No.=CONST(2));
+                                                   CaptionML=[ENU=Global Dimension 2 Code;
+                                                              FRA=Code axe principal 2];
+                                                   CaptionClass='1,1,2' }
+    { 27  ;   ;User ID             ;Code50        ;TableRelation=User."User Name";
+                                                   OnLookup=VAR
+                                                              UserMgt@1000 : Codeunit 418;
+                                                            BEGIN
+                                                              UserMgt.LookupUserID("User ID");
+                                                            END;
+
+                                                   ValidateTableRelation=No;
+                                                   TestTableRelation=No;
+                                                   CaptionML=[ENU=User ID;
+                                                              FRA=Code utilisateur] }
+    { 28  ;   ;Source Code         ;Code10        ;TableRelation="Source Code";
+                                                   CaptionML=[ENU=Source Code;
+                                                              FRA=Code journal] }
+    { 29  ;   ;System-Created Entry;Boolean       ;CaptionML=[ENU=System-Created Entry;
+                                                              FRA=criture systŠme] }
+    { 30  ;   ;Prior-Year Entry    ;Boolean       ;CaptionML=[ENU=Prior-Year Entry;
+                                                              FRA=Ecr. exercice pr‚c‚dent] }
+    { 41  ;   ;Job No.             ;Code20        ;TableRelation=Job;
+                                                   CaptionML=[ENU=Job No.;
+                                                              FRA=Nø projet] }
+    { 42  ;   ;Quantity            ;Decimal       ;CaptionML=[ENU=Quantity;
+                                                              FRA=Quantit‚];
+                                                   DecimalPlaces=0:5 }
+    { 43  ;   ;VAT Amount          ;Decimal       ;CaptionML=[ENU=VAT Amount;
+                                                              FRA=Montant TVA];
+                                                   AutoFormatType=1 }
+    { 45  ;   ;Business Unit Code  ;Code10        ;TableRelation="Business Unit";
+                                                   CaptionML=[ENU=Business Unit Code;
+                                                              FRA=Code centre de profit] }
+    { 46  ;   ;Journal Batch Name  ;Code10        ;CaptionML=[ENU=Journal Batch Name;
+                                                              FRA=Nom feuille] }
+    { 47  ;   ;Reason Code         ;Code10        ;TableRelation="Reason Code";
+                                                   CaptionML=[ENU=Reason Code;
+                                                              FRA=Code motif] }
+    { 48  ;   ;Gen. Posting Type   ;Option        ;CaptionML=[ENU=Gen. Posting Type;
+                                                              FRA=Type compta. TVA];
+                                                   OptionCaptionML=[ENU=" ,Purchase,Sale,Settlement";
+                                                                    FRA=" ,Achat,Vente,RŠglement"];
+                                                   OptionString=[ ,Purchase,Sale,Settlement] }
+    { 49  ;   ;Gen. Bus. Posting Group;Code10     ;TableRelation="Gen. Business Posting Group";
+                                                   CaptionML=[ENU=Gen. Bus. Posting Group;
+                                                              FRA=Groupe compta. march‚] }
+    { 50  ;   ;Gen. Prod. Posting Group;Code10    ;TableRelation="Gen. Product Posting Group";
+                                                   CaptionML=[ENU=Gen. Prod. Posting Group;
+                                                              FRA=Groupe compta. produit] }
+    { 51  ;   ;Bal. Account Type   ;Option        ;CaptionML=[ENU=Bal. Account Type;
+                                                              FRA=Type compte contrepartie];
+                                                   OptionCaptionML=[ENU=G/L Account,Customer,Vendor,Bank Account,Fixed Asset,IC Partner;
+                                                                    FRA=G‚n‚ral,Client,Fournisseur,Banque,Immobilisation,Partenaire IC];
+                                                   OptionString=G/L Account,Customer,Vendor,Bank Account,Fixed Asset,IC Partner }
+    { 52  ;   ;Transaction No.     ;Integer       ;CaptionML=[ENU=Transaction No.;
+                                                              FRA=Nø transaction] }
+    { 53  ;   ;Debit Amount        ;Decimal       ;CaptionML=[ENU=Debit Amount;
+                                                              FRA=Montant d‚bit];
+                                                   BlankZero=Yes;
+                                                   AutoFormatType=1 }
+    { 54  ;   ;Credit Amount       ;Decimal       ;CaptionML=[ENU=Credit Amount;
+                                                              FRA=Montant cr‚dit];
+                                                   BlankZero=Yes;
+                                                   AutoFormatType=1 }
+    { 55  ;   ;Document Date       ;Date          ;CaptionML=[ENU=Document Date;
+                                                              FRA=Date document];
+                                                   ClosingDates=Yes }
+    { 56  ;   ;External Document No.;Code35       ;CaptionML=[ENU=External Document No.;
+                                                              FRA=Nø doc. externe] }
+    { 57  ;   ;Source Type         ;Option        ;CaptionML=[ENU=Source Type;
+                                                              FRA=Type origine];
+                                                   OptionCaptionML=[ENU=" ,Customer,Vendor,Bank Account,Fixed Asset";
+                                                                    FRA=" ,Client,Fournisseur,Banque,Immobilisation"];
+                                                   OptionString=[ ,Customer,Vendor,Bank Account,Fixed Asset] }
+    { 58  ;   ;Source No.          ;Code20        ;TableRelation=IF (Source Type=CONST(Customer)) Customer
+                                                                 ELSE IF (Source Type=CONST(Vendor)) Vendor
+                                                                 ELSE IF (Source Type=CONST(Bank Account)) "Bank Account"
+                                                                 ELSE IF (Source Type=CONST(Fixed Asset)) "Fixed Asset";
+                                                   CaptionML=[ENU=Source No.;
+                                                              FRA=Nø origine] }
+    { 59  ;   ;No. Series          ;Code10        ;TableRelation="No. Series";
+                                                   CaptionML=[ENU=No. Series;
+                                                              FRA=Souches de nø] }
+    { 60  ;   ;Tax Area Code       ;Code20        ;TableRelation="Tax Area";
+                                                   CaptionML=[ENU=Tax Area Code;
+                                                              FRA=Code zone recouvrement] }
+    { 61  ;   ;Tax Liable          ;Boolean       ;CaptionML=[ENU=Tax Liable;
+                                                              FRA=Soumis … recouvrement] }
+    { 62  ;   ;Tax Group Code      ;Code10        ;TableRelation="Tax Group";
+                                                   CaptionML=[ENU=Tax Group Code;
+                                                              FRA=Code groupe taxes] }
+    { 63  ;   ;Use Tax             ;Boolean       ;CaptionML=[ENU=Use Tax;
+                                                              FRA=Use Tax] }
+    { 64  ;   ;VAT Bus. Posting Group;Code10      ;TableRelation="VAT Business Posting Group";
+                                                   CaptionML=[ENU=VAT Bus. Posting Group;
+                                                              FRA=Groupe compta. march‚ TVA] }
+    { 65  ;   ;VAT Prod. Posting Group;Code10     ;TableRelation="VAT Product Posting Group";
+                                                   CaptionML=[ENU=VAT Prod. Posting Group;
+                                                              FRA=Groupe compta. produit TVA] }
+    { 68  ;   ;Additional-Currency Amount;Decimal ;AccessByPermission=TableData 4=R;
+                                                   CaptionML=[ENU=Additional-Currency Amount;
+                                                              FRA=Montant DR];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 69  ;   ;Add.-Currency Debit Amount;Decimal ;CaptionML=[ENU=Add.-Currency Debit Amount;
+                                                              FRA=Montant d‚bit DR];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 70  ;   ;Add.-Currency Credit Amount;Decimal;CaptionML=[ENU=Add.-Currency Credit Amount;
+                                                              FRA=Montant cr‚dit DR];
+                                                   AutoFormatType=1;
+                                                   AutoFormatExpr=GetCurrencyCode }
+    { 71  ;   ;Close Income Statement Dim. ID;Integer;
+                                                   CaptionML=[ENU=Close Income Statement Dim. ID;
+                                                              FRA=ID axe cl“ture exercice comptable] }
+    { 72  ;   ;IC Partner Code     ;Code20        ;TableRelation="IC Partner";
+                                                   CaptionML=[ENU=IC Partner Code;
+                                                              FRA=Code du partenaire IC] }
+    { 73  ;   ;Reversed            ;Boolean       ;CaptionML=[ENU=Reversed;
+                                                              FRA=Contre-pass‚] }
+    { 74  ;   ;Reversed by Entry No.;Integer      ;TableRelation="G/L Entry";
+                                                   CaptionML=[ENU=Reversed by Entry No.;
+                                                              FRA=Contre-pass‚ par nø ‚criture];
+                                                   BlankZero=Yes }
+    { 75  ;   ;Reversed Entry No.  ;Integer       ;TableRelation="G/L Entry";
+                                                   CaptionML=[ENU=Reversed Entry No.;
+                                                              FRA=Nø ‚criture contre-pass‚e];
+                                                   BlankZero=Yes }
+    { 76  ;   ;G/L Account Name    ;Text50        ;FieldClass=FlowField;
+                                                   CalcFormula=Lookup("G/L Account".Name WHERE (No.=FIELD(G/L Account No.)));
+                                                   CaptionML=[ENU=G/L Account Name;
+                                                              FRA=Nom compte g‚n‚ral];
+                                                   Editable=No }
+    { 480 ;   ;Dimension Set ID    ;Integer       ;TableRelation="Dimension Set Entry";
+                                                   OnLookup=BEGIN
+                                                              ShowDimensions;
+                                                            END;
+
+                                                   CaptionML=[ENU=Dimension Set ID;
+                                                              FRA=ID ensemble de dimensions];
+                                                   Editable=No }
+    { 5400;   ;Prod. Order No.     ;Code20        ;CaptionML=[ENU=Prod. Order No.;
+                                                              FRA=Nø ordre de fabrication] }
+    { 5600;   ;FA Entry Type       ;Option        ;AccessByPermission=TableData 5600=R;
+                                                   CaptionML=[ENU=FA Entry Type;
+                                                              FRA=Type ‚criture immo.];
+                                                   OptionCaptionML=[ENU=" ,Fixed Asset,Maintenance";
+                                                                    FRA=" ,Immobilisation,Maintenance"];
+                                                   OptionString=[ ,Fixed Asset,Maintenance] }
+    { 5601;   ;FA Entry No.        ;Integer       ;TableRelation=IF (FA Entry Type=CONST(Fixed Asset)) "FA Ledger Entry"
+                                                                 ELSE IF (FA Entry Type=CONST(Maintenance)) "Maintenance Ledger Entry";
+                                                   CaptionML=[ENU=FA Entry No.;
+                                                              FRA=Nø s‚quence immo.];
+                                                   BlankZero=Yes }
+    { 10810;  ;Entry Type          ;Option        ;CaptionML=[ENU=Entry Type;
+                                                              FRA=Type ‚criture];
+                                                   OptionCaptionML=[ENU=Definitive,Simulation;
+                                                                    FRA=D‚finitive,Simulation];
+                                                   OptionString=Definitive,Simulation }
+    { 10811;  ;Applies-to ID       ;Code50        ;CaptionML=[ENU=Applies-to ID;
+                                                              FRA=ID lettrage];
+                                                   Editable=No }
+    { 10812;  ;Letter              ;Text3         ;CaptionML=[ENU=Letter;
+                                                              FRA=Lettre];
+                                                   Editable=No }
+    { 10813;  ;Letter Date         ;Date          ;CaptionML=[ENU=Letter Date;
+                                                              FRA=Date de la lettre];
+                                                   Editable=No }
+  }
+  KEYS
+  {
+    {    ;Entry No.                               ;Clustered=Yes }
+    {    ;G/L Account No.,Posting Date,Entry Type ;SumIndexFields=Amount,Debit Amount,Credit Amount,Additional-Currency Amount,Add.-Currency Debit Amount,Add.-Currency Credit Amount }
+    {    ;G/L Account No.,Global Dimension 1 Code,Global Dimension 2 Code,Posting Date,Entry Type;
+                                                   SumIndexFields=Amount,Debit Amount,Credit Amount,Additional-Currency Amount,Add.-Currency Debit Amount,Add.-Currency Credit Amount }
+    {    ;G/L Account No.,Business Unit Code,Posting Date;
+                                                   SumIndexFields=Amount,Debit Amount,Credit Amount,Additional-Currency Amount,Add.-Currency Debit Amount,Add.-Currency Credit Amount }
+    {    ;G/L Account No.,Business Unit Code,Global Dimension 1 Code,Global Dimension 2 Code,Posting Date,Entry Type;
+                                                   SumIndexFields=Amount,Debit Amount,Credit Amount,Additional-Currency Amount,Add.-Currency Debit Amount,Add.-Currency Credit Amount }
+    {    ;Document No.,Posting Date                }
+    {    ;Transaction No.                          }
+    {    ;IC Partner Code                          }
+    {    ;G/L Account No.,Job No.,Posting Date    ;SumIndexFields=Amount }
+    {    ;Posting Date,G/L Account No.,Dimension Set ID;
+                                                   SumIndexFields=Amount }
+    {    ;Source Code,Posting Date,Document No.    }
+    {    ;Source Code,Document No.,Posting Date    }
+    {    ;G/L Account No.,Posting Date,Source Code }
+    {    ;G/L Account No.,Document No.,Posting Date }
+    {    ;G/L Account No.,Source Type,Source No.   }
+    {    ;G/L Account No.,Letter                   }
+    {    ;Entry Type,Global Dimension 2 Code,G/L Account No.,Posting Date;
+                                                   SumIndexFields=Debit Amount }
+    {    ;Entry Type,Business Unit Code,G/L Account No.,Posting Date;
+                                                   SumIndexFields=Amount }
+    {    ;Posting Date                             }
+    {    ;Document Type,Document No.               }
+  }
+  FIELDGROUPS
+  {
+    { 1   ;DropDown            ;Entry No.,Description,G/L Account No.,Posting Date,Document Type,Document No. }
+  }
+  CODE
+  {
+    VAR
+      GLSetup@1000 : Record 98;
+      GLSetupRead@1002 : Boolean;
+
+    PROCEDURE GetCurrencyCode@1() : Code[10];
+    BEGIN
+      IF NOT GLSetupRead THEN BEGIN
+        GLSetup.GET;
+        GLSetupRead := TRUE;
+      END;
+      EXIT(GLSetup."Additional Reporting Currency");
+    END;
+
+    PROCEDURE ShowValueEntries@8();
+    VAR
+      GLItemLedgRelation@1000 : Record 5823;
+      ValueEntry@1002 : Record 5802;
+      TempValueEntry@1001 : TEMPORARY Record 5802;
+    BEGIN
+      GLItemLedgRelation.SETRANGE("G/L Entry No.","Entry No.");
+      IF GLItemLedgRelation.FINDSET THEN
+        REPEAT
+          ValueEntry.GET(GLItemLedgRelation."Value Entry No.");
+          TempValueEntry.INIT;
+          TempValueEntry := ValueEntry;
+          TempValueEntry.INSERT;
+        UNTIL GLItemLedgRelation.NEXT = 0;
+
+      PAGE.RUNMODAL(0,TempValueEntry);
+    END;
+
+    PROCEDURE ShowDimensions@2();
+    VAR
+      DimMgt@1000 : Codeunit 408;
+    BEGIN
+      DimMgt.ShowDimensionSet("Dimension Set ID",STRSUBSTNO('%1 %2',TABLECAPTION,"Entry No."));
+    END;
+
+    PROCEDURE UpdateDebitCredit@3(Correction@1000 : Boolean);
+    BEGIN
+      IF ((Amount > 0) AND (NOT Correction)) OR
+         ((Amount < 0) AND Correction)
+      THEN BEGIN
+        "Debit Amount" := Amount;
+        "Credit Amount" := 0
+      END ELSE BEGIN
+        "Debit Amount" := 0;
+        "Credit Amount" := -Amount;
+      END;
+
+      IF (("Additional-Currency Amount" > 0) AND (NOT Correction)) OR
+         (("Additional-Currency Amount" < 0) AND Correction)
+      THEN BEGIN
+        "Add.-Currency Debit Amount" := "Additional-Currency Amount";
+        "Add.-Currency Credit Amount" := 0
+      END ELSE BEGIN
+        "Add.-Currency Debit Amount" := 0;
+        "Add.-Currency Credit Amount" := -"Additional-Currency Amount";
+      END;
+    END;
+
+    PROCEDURE CopyFromGenJnlLine@4(GenJnlLine@1000 : Record 81);
+    BEGIN
+      "Posting Date" := GenJnlLine."Posting Date";
+      "Document Date" := GenJnlLine."Document Date";
+      "Document Type" := GenJnlLine."Document Type";
+      "Document No." := GenJnlLine."Document No.";
+      "External Document No." := GenJnlLine."External Document No.";
+      Description := GenJnlLine.Description;
+      "Business Unit Code" := GenJnlLine."Business Unit Code";
+      "Global Dimension 1 Code" := GenJnlLine."Shortcut Dimension 1 Code";
+      "Global Dimension 2 Code" := GenJnlLine."Shortcut Dimension 2 Code";
+      "Dimension Set ID" := GenJnlLine."Dimension Set ID";
+      "Source Code" := GenJnlLine."Source Code";
+      IF GenJnlLine."Account Type" = GenJnlLine."Account Type"::"G/L Account" THEN BEGIN
+        "Source Type" := GenJnlLine."Source Type";
+        "Source No." := GenJnlLine."Source No.";
+      END ELSE BEGIN
+        "Source Type" := GenJnlLine."Account Type";
+        "Source No." := GenJnlLine."Account No.";
+      END;
+      IF (GenJnlLine."Account Type" = GenJnlLine."Account Type"::"IC Partner") OR
+         (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::"IC Partner")
+      THEN
+        "Source Type" := "Source Type"::" ";
+      "Job No." := GenJnlLine."Job No.";
+      Quantity := GenJnlLine.Quantity;
+      "Journal Batch Name" := GenJnlLine."Journal Batch Name";
+      "Reason Code" := GenJnlLine."Reason Code";
+      "User ID" := USERID;
+      "No. Series" := GenJnlLine."Posting No. Series";
+      "IC Partner Code" := GenJnlLine."IC Partner Code";
+
+      OnAfterCopyGLEntryFromGenJnlLine(Rec,GenJnlLine);
+    END;
+
+    PROCEDURE CopyPostingGroupsFromGLEntry@5(GLEntry@1000 : Record 17);
+    BEGIN
+      "Gen. Posting Type" := GLEntry."Gen. Posting Type";
+      "Gen. Bus. Posting Group" := GLEntry."Gen. Bus. Posting Group";
+      "Gen. Prod. Posting Group" := GLEntry."Gen. Prod. Posting Group";
+      "VAT Bus. Posting Group" := GLEntry."VAT Bus. Posting Group";
+      "VAT Prod. Posting Group" := GLEntry."VAT Prod. Posting Group";
+      "Tax Area Code" := GLEntry."Tax Area Code";
+      "Tax Liable" := GLEntry."Tax Liable";
+      "Tax Group Code" := GLEntry."Tax Group Code";
+      "Use Tax" := GLEntry."Use Tax";
+    END;
+
+    PROCEDURE CopyPostingGroupsFromVATEntry@96(VATEntry@1001 : Record 254);
+    BEGIN
+      "Gen. Posting Type" := VATEntry.Type;
+      "Gen. Bus. Posting Group" := VATEntry."Gen. Bus. Posting Group";
+      "Gen. Prod. Posting Group" := VATEntry."Gen. Prod. Posting Group";
+      "VAT Bus. Posting Group" := VATEntry."VAT Bus. Posting Group";
+      "VAT Prod. Posting Group" := VATEntry."VAT Prod. Posting Group";
+      "Tax Area Code" := VATEntry."Tax Area Code";
+      "Tax Liable" := VATEntry."Tax Liable";
+      "Tax Group Code" := VATEntry."Tax Group Code";
+      "Use Tax" := VATEntry."Use Tax";
+    END;
+
+    PROCEDURE CopyPostingGroupsFromGenJnlLine@19(GenJnlLine@1000 : Record 81);
+    BEGIN
+      "Gen. Posting Type" := GenJnlLine."Gen. Posting Type";
+      "Gen. Bus. Posting Group" := GenJnlLine."Gen. Bus. Posting Group";
+      "Gen. Prod. Posting Group" := GenJnlLine."Gen. Prod. Posting Group";
+      "VAT Bus. Posting Group" := GenJnlLine."VAT Bus. Posting Group";
+      "VAT Prod. Posting Group" := GenJnlLine."VAT Prod. Posting Group";
+      "Tax Area Code" := GenJnlLine."Tax Area Code";
+      "Tax Liable" := GenJnlLine."Tax Liable";
+      "Tax Group Code" := GenJnlLine."Tax Group Code";
+      "Use Tax" := GenJnlLine."Use Tax";
+    END;
+
+    PROCEDURE CopyPostingGroupsFromDtldCVBuf@94(DtldCVLedgEntryBuf@1001 : Record 383;GenPostingType@1002 : ' ,Purchase,Sale,Settlement');
+    BEGIN
+      "Gen. Posting Type" := GenPostingType;
+      "Gen. Bus. Posting Group" := DtldCVLedgEntryBuf."Gen. Bus. Posting Group";
+      "Gen. Prod. Posting Group" := DtldCVLedgEntryBuf."Gen. Prod. Posting Group";
+      "VAT Bus. Posting Group" := DtldCVLedgEntryBuf."VAT Bus. Posting Group";
+      "VAT Prod. Posting Group" := DtldCVLedgEntryBuf."VAT Prod. Posting Group";
+      "Tax Area Code" := DtldCVLedgEntryBuf."Tax Area Code";
+      "Tax Liable" := DtldCVLedgEntryBuf."Tax Liable";
+      "Tax Group Code" := DtldCVLedgEntryBuf."Tax Group Code";
+      "Use Tax" := DtldCVLedgEntryBuf."Use Tax";
+    END;
+
+    [Integration]
+    LOCAL PROCEDURE OnAfterCopyGLEntryFromGenJnlLine@6(VAR GLEntry@1000 : Record 17;VAR GenJournalLine@1001 : Record 81);
+    BEGIN
+    END;
+
+    BEGIN
+    END.
+  }
+}
+
